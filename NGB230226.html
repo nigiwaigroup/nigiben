@@ -65,10 +65,18 @@
         .acc-info span { font-weight: bold; }
         .acc-body { padding: 0; border-top: 1px solid #ddd; }
         
+        /* Header แบบคลิกเพื่อ Sort ได้ */
+        .item-header { display: flex; justify-content: space-between; padding: 10px 20px; background-color: #eaf3fb; font-size: 0.95rem; font-weight: bold; color: var(--primary-color); border-bottom: 2px solid #ddd; }
+        .item-header div { cursor: pointer; user-select: none; transition: color 0.2s; }
+        .item-header div:hover { color: var(--accent-color); text-decoration: underline; }
+        
         .item-list { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f5f5f5; font-size: 0.95rem; }
         .item-list:nth-child(even) { background: #fafafa; }
         .item-list:last-child { border-bottom: none; }
-        .item-n { flex: 2; font-weight: 500;}
+        
+        /* กำหนดความกว้างคอลัมน์ให้ตรงกันทั้ง Header และ Data */
+        .item-n { flex: 2; font-weight: 500; }
+        .item-c { flex: 0.8; text-align: center; color: var(--primary-color); }
         .item-q { flex: 1; text-align: center; color: var(--text-muted); }
         .item-d { flex: 1; text-align: center; color: var(--accent-color); }
         .item-r { flex: 1; text-align: right; color: var(--success-color); }
@@ -91,8 +99,13 @@
             .grid-2 { grid-template-columns: 1fr; }
             .grid-insight { grid-template-columns: 1fr; }
             summary.acc-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .item-header { display: none; /* ซ่อน Header บนมือถือเพื่อความสะอาดตา */ }
             .item-list { flex-direction: column; gap: 5px; text-align: left; }
-            .item-q, .item-d, .item-r { text-align: left; }
+            .item-c, .item-q, .item-d, .item-r { text-align: left; }
+            .item-c::before { content: "จำนวน: "; font-weight: normal; color: #7f8c8d;}
+            .item-q::before { content: "ยอดรวม: "; font-weight: normal; color: #7f8c8d;}
+            .item-d::before { content: "ส่วนลด: "; font-weight: normal; color: #7f8c8d;}
+            .item-r::before { content: "ยอดสุทธิ: "; font-weight: normal; color: #7f8c8d;}
             .badge { width: auto; display: inline-block; }
         }
     </style>
@@ -215,36 +228,159 @@
 
         <div class="title-sec">📦 4. เจาะลึกยอดขายและส่วนลดรายหมวดหมู่ (คลิกแถบด้านล่างเพื่อเปิดดู)</div>
         
-        <details class="acc-box">
+        <details class="acc-box" open>
             <summary class="acc-head">
                 <div>🍣 หมวดหมู่: Sushi Bento</div>
                 <div class="acc-info">
+                    <div style="color:var(--text-muted);">ขาย <span>206</span> ชิ้น</div>
                     <div style="color:var(--text-main);">ยอดรวม <span>฿51,485</span></div>
-                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿20,815</span></div>
+                    <div style="color:var(--accent-color);">ลด <span>-฿20,815</span></div>
                     <div style="color:var(--success-color);">สุทธิ <span>฿30,670</span></div>
-                    <div style="color:var(--primary-color);">▼คลิก</div>
+                    <div style="color:var(--primary-color);">▼คลิกเพื่อขยาย</div>
                 </div>
             </summary>
             <div class="acc-body">
-                <div class="item-list"><div class="item-n">Salmon Sushi 7 pcs.</div><div class="item-q">ยอด <b>฿5,250</b></div><div class="item-d">ลด <b>-฿882</b></div><div class="item-r">สุทธิ <b>฿4,368</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Moriawase Set</div><div class="item-q">ยอด <b>฿7,040</b></div><div class="item-d">ลด <b>-฿2,890</b></div><div class="item-r">สุทธิ <b>฿4,150</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento 2 Friends</div><div class="item-q">ยอด <b>฿6,370</b></div><div class="item-d">ลด <b>-฿3,390</b></div><div class="item-r">สุทธิ <b>฿2,980</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Salmon 2 Tone</div><div class="item-q">ยอด <b>฿6,820</b></div><div class="item-d">ลด <b>-฿4,210</b></div><div class="item-r">สุทธิ <b>฿2,610</b></div></div>
-                <div class="item-list"><div class="item-n">Salmon Tuna Ebiko Sandwich</div><div class="item-q">ยอด <b>฿1,920</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,920</b></div></div>
-                <div class="item-list"><div class="item-n">Salmon Varity Set S</div><div class="item-q">ยอด <b>฿4,200</b></div><div class="item-d">ลด <b>-฿2,520</b></div><div class="item-r">สุทธิ <b>฿1,680</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Super Maki S</div><div class="item-q">ยอด <b>฿1,800</b></div><div class="item-d">ลด <b>-฿140</b></div><div class="item-r">สุทธิ <b>฿1,660</b></div></div>
-                <div class="item-list"><div class="item-n">Salmon Aburi Sushi 7 pcs.</div><div class="item-q">ยอด <b>฿2,760</b></div><div class="item-d">ลด <b>-฿1,288</b></div><div class="item-r">สุทธิ <b>฿1,472</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Sashimi Varity</div><div class="item-q">ยอด <b>฿2,940</b></div><div class="item-d">ลด <b>-฿1,470</b></div><div class="item-r">สุทธิ <b>฿1,470</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Medium Set 2</div><div class="item-q">ยอด <b>฿1,680</b></div><div class="item-d">ลด <b>-฿294</b></div><div class="item-r">สุทธิ <b>฿1,386</b></div></div>
-                <div class="item-list"><div class="item-n">Salmon Varity Set  M</div><div class="item-q">ยอด <b>฿1,540</b></div><div class="item-d">ลด <b>-฿270</b></div><div class="item-r">สุทธิ <b>฿1,270</b></div></div>
-                <div class="item-list"><div class="item-n">Tuna Varity Set M</div><div class="item-q">ยอด <b>฿1,260</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,260</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Aburi Set</div><div class="item-q">ยอด <b>฿3,300</b></div><div class="item-d">ลด <b>-฿2,118</b></div><div class="item-r">สุทธิ <b>฿1,182</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Mori Set</div><div class="item-q">ยอด <b>฿1,240</b></div><div class="item-d">ลด <b>-฿217</b></div><div class="item-r">สุทธิ <b>฿1,023</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Veggie 1</div><div class="item-q">ยอด <b>฿1,050</b></div><div class="item-d">ลด <b>-฿122</b></div><div class="item-r">สุทธิ <b>฿928</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento  Veggie 2</div><div class="item-q">ยอด <b>฿495</b></div><div class="item-d">ลด <b>-฿116</b></div><div class="item-r">สุทธิ <b>฿380</b></div></div>
-                <div class="item-list"><div class="item-n">Tuna Sushi 7 pcs.</div><div class="item-q">ยอด <b>฿550</b></div><div class="item-d">ลด <b>-฿192</b></div><div class="item-r">สุทธิ <b>฿358</b></div></div>
-                <div class="item-list"><div class="item-n">Tuna Varity Set S</div><div class="item-q">ยอด <b>฿550</b></div><div class="item-d">ลด <b>-฿192</b></div><div class="item-r">สุทธิ <b>฿358</b></div></div>
-                <div class="item-list"><div class="item-n">Sushi Bento Super Maki Set M</div><div class="item-q">ยอด <b>฿720</b></div><div class="item-d">ลด <b>-฿504</b></div><div class="item-r">สุทธิ <b>฿216</b></div></div>
+                <div class="item-header">
+                    <div class="item-n" onclick="sortList(this, 'name')">ชื่อสินค้า ↕</div>
+                    <div class="item-c" onclick="sortList(this, 'qty')">จำนวน(ชิ้น) ↕</div>
+                    <div class="item-q" onclick="sortList(this, 'gross')">ยอดรวม ↕</div>
+                    <div class="item-d" onclick="sortList(this, 'disc')">ส่วนลด ↕</div>
+                    <div class="item-r" onclick="sortList(this, 'net')">ยอดสุทธิ ↕</div>
+                </div>
+                
+                <div class="item-list">
+                    <div class="item-n">Salmon Sushi 7 pcs.</div>
+                    <div class="item-c"><b>25</b></div>
+                    <div class="item-q"><b>฿5,250</b></div>
+                    <div class="item-d"><b>-฿882</b></div>
+                    <div class="item-r"><b>฿4,368</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Moriawase Set</div>
+                    <div class="item-c"><b>32</b></div>
+                    <div class="item-q"><b>฿7,040</b></div>
+                    <div class="item-d"><b>-฿2,890</b></div>
+                    <div class="item-r"><b>฿4,150</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento 2 Friends</div>
+                    <div class="item-c"><b>26</b></div>
+                    <div class="item-q"><b>฿6,370</b></div>
+                    <div class="item-d"><b>-฿3,390</b></div>
+                    <div class="item-r"><b>฿2,980</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Salmon 2 Tone</div>
+                    <div class="item-c"><b>31</b></div>
+                    <div class="item-q"><b>฿6,820</b></div>
+                    <div class="item-d"><b>-฿4,210</b></div>
+                    <div class="item-r"><b>฿2,610</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Salmon Tuna Ebiko Sandwich</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿1,920</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿1,920</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Salmon Varity Set S</div>
+                    <div class="item-c"><b>21</b></div>
+                    <div class="item-q"><b>฿4,200</b></div>
+                    <div class="item-d"><b>-฿2,520</b></div>
+                    <div class="item-r"><b>฿1,680</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Super Maki S</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿1,800</b></div>
+                    <div class="item-d"><b>-฿140</b></div>
+                    <div class="item-r"><b>฿1,660</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Salmon Aburi Sushi 7 pcs.</div>
+                    <div class="item-c"><b>12</b></div>
+                    <div class="item-q"><b>฿2,760</b></div>
+                    <div class="item-d"><b>-฿1,288</b></div>
+                    <div class="item-r"><b>฿1,472</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Sashimi Varity</div>
+                    <div class="item-c"><b>7</b></div>
+                    <div class="item-q"><b>฿2,940</b></div>
+                    <div class="item-d"><b>-฿1,470</b></div>
+                    <div class="item-r"><b>฿1,470</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Medium Set 2</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿1,680</b></div>
+                    <div class="item-d"><b>-฿294</b></div>
+                    <div class="item-r"><b>฿1,386</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Salmon Varity Set  M</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿1,540</b></div>
+                    <div class="item-d"><b>-฿270</b></div>
+                    <div class="item-r"><b>฿1,270</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Tuna Varity Set M</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿1,260</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿1,260</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Aburi Set</div>
+                    <div class="item-c"><b>12</b></div>
+                    <div class="item-q"><b>฿3,300</b></div>
+                    <div class="item-d"><b>-฿2,118</b></div>
+                    <div class="item-r"><b>฿1,182</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Mori Set</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿1,240</b></div>
+                    <div class="item-d"><b>-฿217</b></div>
+                    <div class="item-r"><b>฿1,023</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Veggie 1</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿1,050</b></div>
+                    <div class="item-d"><b>-฿122</b></div>
+                    <div class="item-r"><b>฿928</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento  Veggie 2</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿495</b></div>
+                    <div class="item-d"><b>-฿116</b></div>
+                    <div class="item-r"><b>฿380</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Tuna Sushi 7 pcs.</div>
+                    <div class="item-c"><b>2</b></div>
+                    <div class="item-q"><b>฿550</b></div>
+                    <div class="item-d"><b>-฿192</b></div>
+                    <div class="item-r"><b>฿358</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Tuna Varity Set S</div>
+                    <div class="item-c"><b>2</b></div>
+                    <div class="item-q"><b>฿550</b></div>
+                    <div class="item-d"><b>-฿192</b></div>
+                    <div class="item-r"><b>฿358</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sushi Bento Super Maki Set M</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿720</b></div>
+                    <div class="item-d"><b>-฿504</b></div>
+                    <div class="item-r"><b>฿216</b></div>
+                </div>
             </div>
         </details>
 
@@ -252,51 +388,211 @@
             <summary class="acc-head">
                 <div>🍱 หมวดหมู่: Donburi</div>
                 <div class="acc-info">
+                    <div style="color:var(--text-muted);">ขาย <span>57</span> ชิ้น</div>
                     <div style="color:var(--text-main);">ยอดรวม <span>฿11,745</span></div>
-                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿948</span></div>
+                    <div style="color:var(--accent-color);">ลด <span>-฿948</span></div>
                     <div style="color:var(--success-color);">สุทธิ <span>฿10,796</span></div>
-                    <div style="color:var(--primary-color);">▼คลิก</div>
+                    <div style="color:var(--primary-color);">▼คลิกเพื่อขยาย</div>
                 </div>
             </summary>
             <div class="acc-body">
-                <div class="item-list"><div class="item-n">Salmon Teriyaki Don</div><div class="item-q">ยอด <b>฿1,500</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,500</b></div></div>
-                <div class="item-list"><div class="item-n">Salmon Don</div><div class="item-q">ยอด <b>฿1,470</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,470</b></div></div>
-                <div class="item-list"><div class="item-n">Negi Salmon Don</div><div class="item-q">ยอด <b>฿1,260</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,260</b></div></div>
-                <div class="item-list"><div class="item-n">Torikatsu Curry Don</div><div class="item-q">ยอด <b>฿960</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿960</b></div></div>
-                <div class="item-list"><div class="item-n">Chirashi Don</div><div class="item-q">ยอด <b>฿930</b></div><div class="item-d">ลด <b>-฿217</b></div><div class="item-r">สุทธิ <b>฿713</b></div></div>
-                <div class="item-list"><div class="item-n">Aburi Salmon Don</div><div class="item-q">ยอด <b>฿880</b></div><div class="item-d">ลด <b>-฿154</b></div><div class="item-r">สุทธิ <b>฿726</b></div></div>
-                <div class="item-list"><div class="item-n">Buta Kimchi Don</div><div class="item-q">ยอด <b>฿870</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿870</b></div></div>
-                <div class="item-list"><div class="item-n">Poke Bowl</div><div class="item-q">ยอด <b>฿825</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿825</b></div></div>
-                <div class="item-list"><div class="item-n">Unagi Don</div><div class="item-q">ยอด <b>฿770</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿770</b></div></div>
-                <div class="item-list"><div class="item-n">Gyu Don</div><div class="item-q">ยอด <b>฿630</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿630</b></div></div>
-                <div class="item-list"><div class="item-n">Oyakodon</div><div class="item-q">ยอด <b>฿420</b></div><div class="item-d">ลด <b>-฿196</b></div><div class="item-r">สุทธิ <b>฿224</b></div></div>
-                <div class="item-list"><div class="item-n">Tori Teriyaki Don</div><div class="item-q">ยอด <b>฿390</b></div><div class="item-d">ลด <b>-฿273</b></div><div class="item-r">สุทธิ <b>฿117</b></div></div>
-                <div class="item-list"><div class="item-n">Saba Teriyaki Don</div><div class="item-q">ยอด <b>฿310</b></div><div class="item-d">ลด <b>-฿108</b></div><div class="item-r">สุทธิ <b>฿202</b></div></div>
-                <div class="item-list"><div class="item-n">Tonkatsu Curry Don</div><div class="item-q">ยอด <b>฿265</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿265</b></div></div>
-                <div class="item-list"><div class="item-n">Buta Teriyaki Don</div><div class="item-q">ยอด <b>฿145</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿145</b></div></div>
-                <div class="item-list"><div class="item-n">Kimchi</div><div class="item-q">ยอด <b>฿120</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿120</b></div></div>
+                <div class="item-header">
+                    <div class="item-n" onclick="sortList(this, 'name')">ชื่อสินค้า ↕</div>
+                    <div class="item-c" onclick="sortList(this, 'qty')">จำนวน(ชิ้น) ↕</div>
+                    <div class="item-q" onclick="sortList(this, 'gross')">ยอดรวม ↕</div>
+                    <div class="item-d" onclick="sortList(this, 'disc')">ส่วนลด ↕</div>
+                    <div class="item-r" onclick="sortList(this, 'net')">ยอดสุทธิ ↕</div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Salmon Teriyaki Don</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿1,500</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿1,500</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Salmon Don</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿1,470</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿1,470</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Negi Salmon Don</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿1,260</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿1,260</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Torikatsu Curry Don</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿960</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿960</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Buta Kimchi Don</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿870</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿870</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Poke Bowl</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿825</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿825</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Unagi Don</div>
+                    <div class="item-c"><b>2</b></div>
+                    <div class="item-q"><b>฿770</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿770</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Aburi Salmon Don</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿880</b></div>
+                    <div class="item-d"><b>-฿154</b></div>
+                    <div class="item-r"><b>฿726</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Chirashi Don</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿930</b></div>
+                    <div class="item-d"><b>-฿217</b></div>
+                    <div class="item-r"><b>฿713</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Gyu Don</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿630</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿630</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Tonkatsu Curry Don</div>
+                    <div class="item-c"><b>1</b></div>
+                    <div class="item-q"><b>฿265</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿265</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Oyakodon</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿420</b></div>
+                    <div class="item-d"><b>-฿196</b></div>
+                    <div class="item-r"><b>฿224</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Saba Teriyaki Don</div>
+                    <div class="item-c"><b>2</b></div>
+                    <div class="item-q"><b>฿310</b></div>
+                    <div class="item-d"><b>-฿108</b></div>
+                    <div class="item-r"><b>฿202</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Buta Teriyaki Don</div>
+                    <div class="item-c"><b>1</b></div>
+                    <div class="item-q"><b>฿145</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿145</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Kimchi</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿120</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿120</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Tori Teriyaki Don</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿390</b></div>
+                    <div class="item-d"><b>-฿273</b></div>
+                    <div class="item-r"><b>฿117</b></div>
+                </div>
             </div>
         </details>
 
         <details class="acc-box">
             <summary class="acc-head">
-                <div>🥤 หมวดหมู่: Beverage (เครื่องดื่ม)</div>
+                <div>🥤 หมวดหมู่: Beverage</div>
                 <div class="acc-info">
+                    <div style="color:var(--text-muted);">ขาย <span>190</span> ชิ้น</div>
                     <div style="color:var(--text-main);">ยอดรวม <span>฿3,960</span></div>
-                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿0</span></div>
+                    <div style="color:var(--accent-color);">ลด <span>-฿0</span></div>
                     <div style="color:var(--success-color);">สุทธิ <span>฿3,960</span></div>
-                    <div style="color:var(--primary-color);">▼คลิก</div>
+                    <div style="color:var(--primary-color);">▼คลิกเพื่อขยาย</div>
                 </div>
             </summary>
             <div class="acc-body">
-                <div class="item-list"><div class="item-n">Namthip Drinking Water 550 ml.</div><div class="item-q">ยอด <b>฿1,500</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,500</b></div></div>
-                <div class="item-list"><div class="item-n">Singha Beer (Can) 320 ml.</div><div class="item-q">ยอด <b>฿1,080</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,080</b></div></div>
-                <div class="item-list"><div class="item-n">ITOEN Jasmine Green Tea 500 ml.</div><div class="item-q">ยอด <b>฿400</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿400</b></div></div>
-                <div class="item-list"><div class="item-n">Asahi Beer (Can) 330 ml.</div><div class="item-q">ยอด <b>฿360</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿360</b></div></div>
-                <div class="item-list"><div class="item-n">ITOEN Unsweetened Green Tea</div><div class="item-q">ยอด <b>฿350</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿350</b></div></div>
-                <div class="item-list"><div class="item-n">Pepsi Max (Can) 325ml.</div><div class="item-q">ยอด <b>฿120</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿120</b></div></div>
-                <div class="item-list"><div class="item-n">Pepsi (Can) 325ml.</div><div class="item-q">ยอด <b>฿90</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿90</b></div></div>
-                <div class="item-list"><div class="item-n">Sprite (Can) 325ml.</div><div class="item-q">ยอด <b>฿60</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿60</b></div></div>
+                <div class="item-header">
+                    <div class="item-n" onclick="sortList(this, 'name')">ชื่อสินค้า ↕</div>
+                    <div class="item-c" onclick="sortList(this, 'qty')">จำนวน(ชิ้น) ↕</div>
+                    <div class="item-q" onclick="sortList(this, 'gross')">ยอดรวม ↕</div>
+                    <div class="item-d" onclick="sortList(this, 'disc')">ส่วนลด ↕</div>
+                    <div class="item-r" onclick="sortList(this, 'net')">ยอดสุทธิ ↕</div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Namthip Drinking Water 550 ml.</div>
+                    <div class="item-c"><b>150</b></div>
+                    <div class="item-q"><b>฿1,500</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿1,500</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Singha Beer 320 ml.</div>
+                    <div class="item-c"><b>12</b></div>
+                    <div class="item-q"><b>฿1,080</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿1,080</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">ITOEN Elegant Jasmine Green Tea</div>
+                    <div class="item-c"><b>8</b></div>
+                    <div class="item-q"><b>฿400</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿400</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Asahi Beer 330 ml.</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿360</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿360</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">ITOEN Unsweetened Green Tea</div>
+                    <div class="item-c"><b>7</b></div>
+                    <div class="item-q"><b>฿350</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿350</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Pepsi Max 325ml.</div>
+                    <div class="item-c"><b>4</b></div>
+                    <div class="item-q"><b>฿120</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿120</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Pepsi 325ml.</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿90</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿90</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Sprite 325ml.</div>
+                    <div class="item-c"><b>2</b></div>
+                    <div class="item-q"><b>฿60</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿60</b></div>
+                </div>
             </div>
         </details>
 
@@ -304,21 +600,77 @@
             <summary class="acc-head">
                 <div>🍡 หมวดหมู่: Dessert & Appetizer</div>
                 <div class="acc-info">
+                    <div style="color:var(--text-muted);">ขาย <span>45</span> ชิ้น</div>
                     <div style="color:var(--text-main);">ยอดรวม <span>฿2,414</span></div>
-                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿89</span></div>
+                    <div style="color:var(--accent-color);">ลด <span>-฿89</span></div>
                     <div style="color:var(--success-color);">สุทธิ <span>฿2,325</span></div>
-                    <div style="color:var(--primary-color);">▼คลิก</div>
+                    <div style="color:var(--primary-color);">▼คลิกเพื่อขยาย</div>
                 </div>
             </summary>
             <div class="acc-body">
-                <div class="item-list"><div class="item-n">Matcha Red Bean Daifuku</div><div class="item-q">ยอด <b>฿429</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿429</b></div></div>
-                <div class="item-list"><div class="item-n">Yuzu Daifuku</div><div class="item-q">ยอด <b>฿390</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿390</b></div></div>
-                <div class="item-list"><div class="item-n">Salmon Tataki</div><div class="item-q">ยอด <b>฿420</b></div><div class="item-d">ลด <b>-฿89</b></div><div class="item-r">สุทธิ <b>฿331</b></div></div>
-                <div class="item-list"><div class="item-n">Tako Wasabi</div><div class="item-q">ยอด <b>฿330</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿330</b></div></div>
-                <div class="item-list"><div class="item-n">Dorayaki</div><div class="item-q">ยอด <b>฿300</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿300</b></div></div>
-                <div class="item-list"><div class="item-n">Chuka Wakame</div><div class="item-q">ยอด <b>฿240</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿240</b></div></div>
-                <div class="item-list"><div class="item-n">Rare Cheese Daifuku</div><div class="item-q">ยอด <b>฿195</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿195</b></div></div>
-                <div class="item-list"><div class="item-n">Kani Tataki</div><div class="item-q">ยอด <b>฿110</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿110</b></div></div>
+                <div class="item-header">
+                    <div class="item-n" onclick="sortList(this, 'name')">ชื่อสินค้า ↕</div>
+                    <div class="item-c" onclick="sortList(this, 'qty')">จำนวน(ชิ้น) ↕</div>
+                    <div class="item-q" onclick="sortList(this, 'gross')">ยอดรวม ↕</div>
+                    <div class="item-d" onclick="sortList(this, 'disc')">ส่วนลด ↕</div>
+                    <div class="item-r" onclick="sortList(this, 'net')">ยอดสุทธิ ↕</div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Matcha Red Bean Daifuku</div>
+                    <div class="item-c"><b>11</b></div>
+                    <div class="item-q"><b>฿429</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿429</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Yuzu Daifuku</div>
+                    <div class="item-c"><b>10</b></div>
+                    <div class="item-q"><b>฿390</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿390</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Salmon Tataki</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿420</b></div>
+                    <div class="item-d"><b>-฿89</b></div>
+                    <div class="item-r"><b>฿331</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Tako Wasabi</div>
+                    <div class="item-c"><b>3</b></div>
+                    <div class="item-q"><b>฿330</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿330</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Dorayaki</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿300</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿300</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Chuka Wakame</div>
+                    <div class="item-c"><b>6</b></div>
+                    <div class="item-q"><b>฿240</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿240</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Rare Cheese Daifuku</div>
+                    <div class="item-c"><b>5</b></div>
+                    <div class="item-q"><b>฿195</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿195</b></div>
+                </div>
+                <div class="item-list">
+                    <div class="item-n">Kani Tataki</div>
+                    <div class="item-c"><b>1</b></div>
+                    <div class="item-q"><b>฿110</b></div>
+                    <div class="item-d"><b>-฿0</b></div>
+                    <div class="item-r"><b>฿110</b></div>
+                </div>
             </div>
         </details>
 
@@ -352,11 +704,44 @@
     </div>
 
     <script>
+        // ระบบเรียงลำดับข้อมูล (Sorting) เมื่อคลิกที่หัวตาราง
+        function sortList(headerEl, type) {
+            const accBody = headerEl.parentElement.parentElement;
+            const rows = Array.from(accBody.querySelectorAll('.item-list'));
+            
+            // เช็คว่าปัจจุบันเรียงแบบไหนอยู่ สลับเป็นอีกแบบ
+            let order = headerEl.dataset.order || 'desc';
+            order = order === 'desc' ? 'asc' : 'desc';
+            headerEl.dataset.order = order;
+            
+            rows.sort((a, b) => {
+                let valA, valB;
+                if (type === 'name') {
+                    valA = a.querySelector('.item-n').innerText;
+                    valB = b.querySelector('.item-n').innerText;
+                    return order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    let selector = type === 'qty' ? '.item-c b' :
+                                   type === 'gross' ? '.item-q b' :
+                                   type === 'disc' ? '.item-d b' : '.item-r b';
+                    
+                    // แปลงข้อความตัวเลขที่มีลูกน้ำ/สกุลเงิน ให้เป็น float 
+                    valA = parseFloat(a.querySelector(selector).innerText.replace(/[^0-9.-]+/g,""));
+                    valB = parseFloat(b.querySelector(selector).innerText.replace(/[^0-9.-]+/g,""));
+                    return order === 'asc' ? valA - valB : valB - valA;
+                }
+            });
+            
+            // ลบแถวเก่าออก แล้วเอาแถวที่เรียงใหม่ใส่กลับเข้าไป
+            rows.forEach(row => row.remove());
+            rows.forEach(row => accBody.appendChild(row));
+        }
+
+        // ระบบวาดกราฟ Chart.js
         document.addEventListener('DOMContentLoaded', function() {
             if(typeof Chart === 'undefined') return;
             Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
             
-            // 1 & 2 Doughnut Charts
             const bData = [195, 88, 12], bRev = [11568, 24479, 11714];
             const bLabels = ["Grab & Go (<200฿)", "Solo Meal (200-500฿)", "Group (>500฿)"];
             const bColors = ["#bdc3c7", "#3498db", "#2ecc71"];
@@ -365,7 +750,6 @@
             new Chart(document.getElementById('c1').getContext('2d'), { type: 'doughnut', data: { labels: bLabels, datasets: [{ data: bData, backgroundColor: bColors }] }, options: optDoughnut });
             new Chart(document.getElementById('c2').getContext('2d'), { type: 'doughnut', data: { labels: bLabels, datasets: [{ data: bRev, backgroundColor: bColors }] }, options: optDoughnut });
 
-            // 3 Bar Chart
             const hr = ["11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"];
             const nData = [6799, 2587, 1858, 2874, 5989, 5648, 299, 985, 1800, 940, 9327, 338];
             const dData = [0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 20990, 787];
@@ -375,7 +759,6 @@
                 options: { maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } 
             });
 
-            // 4 Item Chart
             const itm = ["Namthip Water","Sushi Moriawase","Salmon 2 Tone","2 Friends","Salmon Sushi 7pcs","Salmon Varity S"];
             const qFull = [150, 13, 3, 6, 19, 3], qDisc = [0, 19, 28, 20, 6, 18];
 
