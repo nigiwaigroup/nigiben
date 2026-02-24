@@ -8,8 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
     <style>
         :root {
@@ -22,316 +21,282 @@
             --card-bg: #ffffff;
             --success-color: #27ae60;
         }
-
-        body { 
-            font-family: 'Noto Sans Thai', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main);
-            margin: 0; 
-            padding: 0; 
-        }
-
-        .dashboard-header { 
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); 
-            color: white; 
-            padding: 40px 20px; 
-            text-align: center; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
-        }
-        .dashboard-header h1 { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: 0.5px; }
-        .dashboard-header p { margin-top: 10px; font-size: 1.1rem; color: #d1d8e0; font-weight: 300; }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            padding-bottom: 50px;
-        }
-
-        .section-title { 
-            font-size: 1.6rem; 
-            font-weight: 700; 
-            color: var(--text-main); 
-            margin-bottom: 25px; 
-            padding-left: 15px;
-            border-left: 6px solid var(--accent-color);
-            display: flex;
-            align-items: center;
-        }
-
-        /* KPI Section */
-        .kpi-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-            gap: 20px; 
-            margin-bottom: 50px; 
-        }
-        .kpi-card { 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-            text-align: center;
-            border: 1px solid #e1e8ed;
-            transition: all 0.3s ease;
-        }
-        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--secondary-color); }
-        .kpi-title { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
-        .kpi-value { font-size: 2.3rem; font-weight: 700; color: var(--text-main); margin: 10px 0; }
-        .kpi-sub { font-size: 0.9rem; color: var(--success-color); font-weight: 500; }
-        .kpi-sub.negative { color: var(--accent-color); background: #fdeaea; padding: 4px 10px; border-radius: 20px; display: inline-block;}
-        .kpi-sub.warning { color: #d35400; background: #fae5d3; padding: 4px 10px; border-radius: 20px; display: inline-block;}
-
-        /* Charts Section (Full Width Layout) */
-        .charts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 40px; 
-            margin-bottom: 50px;
-        }
-        .chart-section {
-            background: var(--card-bg); 
-            padding: 35px; 
-            border-radius: 12px; 
-            box-shadow: 0 6px 12px rgba(0,0,0,0.05); 
-            border: 1px solid #e1e8ed;
-        }
-        .chart-header { 
-            font-size: 1.3rem; 
-            font-weight: 700; 
-            color: var(--primary-color); 
-            margin-bottom: 25px; 
-            padding-bottom: 15px;
-            border-bottom: 2px solid #ecf0f1; 
-        }
-        .chart-wrapper {
-            position: relative;
-            height: 450px; 
-            width: 100%;
-        }
-
-        /* Two Column Layout inside Section */
-        .two-cols {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        .donut-wrapper { height: 350px; position: relative; width: 100%; }
-
-        /* Insights Section */
-        .insights-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-        }
-        .insight-card { 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-            border-top: 5px solid #3498db; 
-            transition: all 0.3s ease;
-        }
-        .insight-card.urgent { border-top: 5px solid var(--accent-color); }
-        .insight-card:hover { background-color: #f8fbfe; transform: translateY(-5px); }
-        .insight-number { font-size: 1.2rem; font-weight: 700; color: #3498db; margin-bottom: 10px; }
-        .insight-card.urgent .insight-number { color: var(--accent-color); }
-        .insight-text { font-size: 1rem; line-height: 1.6; color: var(--text-main); }
-        .insight-text strong { color: var(--primary-color); }
+        * { box-sizing: border-box; }
+        body { font-family: 'Noto Sans Thai', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
         
-        @media (max-width: 992px) {
-            .two-cols { grid-template-columns: 1fr; }
-            .chart-wrapper { height: 350px; }
+        .header-bg { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 30px 20px; text-align: center; margin-bottom: 30px; }
+        .header-bg h1 { margin: 0; font-size: 2rem; }
+        .header-bg p { margin: 10px 0 0 0; opacity: 0.9; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 50px 15px; }
+        .title-sec { font-size: 1.4rem; font-weight: bold; border-left: 5px solid var(--accent-color); padding-left: 10px; margin: 30px 0 20px 0; }
+        
+        /* KPIs */
+        .grid-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .card-kpi { background: var(--card-bg); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .card-kpi h3 { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+        .card-kpi .val { font-size: 2rem; font-weight: bold; margin: 10px 0; color: var(--text-main); }
+        .card-kpi .sub { font-size: 0.85rem; color: var(--success-color); }
+        .card-kpi .sub.red { color: var(--accent-color); background: #fdeaea; padding: 3px 8px; border-radius: 12px; }
+        
+        /* Charts */
+        .grid-charts { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .card-chart { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .chart-box { position: relative; height: 350px; width: 100%; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        /* Accordion (Native HTML5) */
+        details.acc-box { background: var(--card-bg); border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; overflow: hidden; }
+        summary.acc-head { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #f8fbfe; font-weight: bold; font-size: 1.1rem; list-style: none; }
+        summary.acc-head::-webkit-details-marker { display: none; }
+        summary.acc-head:hover { background: #eff6fb; }
+        .acc-info { display: flex; gap: 20px; font-size: 0.95rem; color: var(--text-muted); font-weight: normal; }
+        .acc-info span { font-weight: bold; }
+        .acc-body { padding: 0; border-top: 1px solid #ddd; }
+        
+        .item-list { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f5f5f5; font-size: 0.95rem; }
+        .item-list:nth-child(even) { background: #fafafa; }
+        .item-list:last-child { border-bottom: none; }
+        .item-n { flex: 2; font-weight: 500;}
+        .item-q { flex: 1; text-align: center; color: var(--text-muted); }
+        .item-d { flex: 1; text-align: center; color: var(--accent-color); }
+        .item-r { flex: 1; text-align: right; color: var(--success-color); }
+        .item-list b { font-weight: 700; }
+        
+        /* Insights */
+        .grid-insight { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .card-insight { background: var(--card-bg); padding: 25px; border-radius: 10px; border-top: 5px solid #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card-insight.red { border-top-color: var(--accent-color); }
+        .card-insight h4 { margin: 0 0 10px 0; color: #3498db; font-size: 1.1rem; }
+        .card-insight.red h4 { color: var(--accent-color); }
+        .card-insight p { margin: 0; font-size: 0.95rem; line-height: 1.6; }
+        
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            summary.acc-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .item-list { flex-direction: column; gap: 5px; text-align: left; }
+            .item-q, .item-d, .item-r { text-align: left; }
         }
     </style>
 </head>
 <body>
 
-    <div class="dashboard-header">
+    <div class="header-bg">
         <h1>Nigiben Executive Dashboard</h1>
-        <p>รายงานเชิงกลยุทธ์ สาขาสนามบินดอนเมือง | เจาะลึกยอดขาย & พฤติกรรมตะกร้าสินค้า</p>
+        <p>รายงานเชิงกลยุทธ์ สาขาสนามบินดอนเมือง | เจาะลึกยอดขาย ส่วนลด และพฤติกรรมลูกค้า</p>
     </div>
 
     <div class="container">
         
-        <h2 class="section-title">📊 1. Executive Summary</h2>
-        <div class="kpi-container">
-            <div class="kpi-card">
-                <div class="kpi-title">Gross Sales (ยอดขายรวม)</div>
-                <div class="kpi-value">฿69,604</div>
-                <div class="kpi-sub">Total Revenue Generated</div>
+        <div class="title-sec">📊 1. ภาพรวมยอดขาย (Executive Summary)</div>
+        <div class="grid-kpi">
+            <div class="card-kpi">
+                <h3>Gross Sales (ยอดขายรวม)</h3>
+                <div class="val">฿69,604</div>
+                <div class="sub">Total Revenue Generated</div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-title" style="color: #27ae60;">Net Sales (ยอดขายจริง)</div>
-                <div class="kpi-value" style="color: #27ae60;">฿47,761</div>
-                <div class="kpi-sub">Real Cash Collected</div>
+            <div class="card-kpi">
+                <h3 style="color:#27ae60;">Net Sales (ยอดขายสุทธิ)</h3>
+                <div class="val" style="color:#27ae60;">฿47,761</div>
+                <div class="sub">Real Cash Collected</div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-title">Total Discount (ส่วนลดทั้งหมด)</div>
-                <div class="kpi-value" style="color: #e74c3c;">-฿21,853</div>
-                <div class="kpi-sub negative">สูญเสียถึง 31.4% ของรายได้</div>
+            <div class="card-kpi">
+                <h3>Total Discount (ส่วนลด)</h3>
+                <div class="val" style="color:#e74c3c;">-฿21,853</div>
+                <div class="sub red">รั่วไหล 31.4% ของรายได้</div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-title">Water Sales (คนซื้อน้ำขวดเดียว)</div>
-                <div class="kpi-value" style="color: #d35400;">103 บิล</div>
-                <div class="kpi-sub warning">สูญเสียโอกาส Cross-sell อาหาร</div>
+            <div class="card-kpi">
+                <h3>Water Only (ซื้อน้ำอย่างเดียว)</h3>
+                <div class="val" style="color:#d35400;">103 บิล</div>
+                <div class="sub red">เสียโอกาส Cross-sell อาหาร</div>
             </div>
         </div>
 
-        <h2 class="section-title">🎯 2. Basket Segmentation (ประยุกต์ใช้แทน RFM สำหรับกลุ่มลูกค้าสัญจร)</h2>
-        <div class="chart-section">
-            <div class="chart-header">การแบ่งกลุ่มลูกค้าตามอำนาจการซื้อ (Monetary Value) และสัดส่วนรายได้ที่ได้รับ</div>
-            <div class="two-cols">
+        <div class="title-sec">🎯 2. สัดส่วนกลุ่มลูกค้า (Basket Segmentation)</div>
+        <div class="card-chart">
+            <div class="grid-2">
                 <div>
-                    <h3 style="text-align: center; color: var(--text-muted); font-size: 1.1rem;">ปริมาณคน (จำนวนบิล)</h3>
-                    <div class="donut-wrapper">
-                        <canvas id="basketCountChart"></canvas>
-                    </div>
+                    <h3 style="text-align:center;font-size:1rem;color:#7f8c8d;">จำนวนบิล (Transactions)</h3>
+                    <div class="chart-box"><canvas id="c1"></canvas></div>
                 </div>
                 <div>
-                    <h3 style="text-align: center; color: var(--text-muted); font-size: 1.1rem;">รายได้ที่สร้าง (Net Revenue - THB)</h3>
-                    <div class="donut-wrapper">
-                        <canvas id="basketRevChart"></canvas>
-                    </div>
+                    <h3 style="text-align:center;font-size:1rem;color:#7f8c8d;">รายได้สุทธิ (Net Revenue - THB)</h3>
+                    <div class="chart-box"><canvas id="c2"></canvas></div>
                 </div>
             </div>
-            <p style="text-align: center; margin-top: 20px; color: #7f8c8d; font-size: 0.95rem;">
-                * <strong>Grab & Go:</strong> ซื้อน้ำหรือขนม (<200฿) | <strong>Solo Meal:</strong> ซื้อซูชิ 1 กล่อง (200-500฿) | <strong>Couple/Group:</strong> ซื้อชุดใหญ่ (>500฿)
-            </p>
         </div>
 
-        <h2 class="section-title">📈 3. Sales & Profitability Analysis</h2>
-        <div class="charts-container">
-            
-            <div class="chart-section">
-                <div class="chart-header">ยอดขายสุทธิเทียบกับส่วนลดที่เสียไป (รายชั่วโมง)</div>
-                <div class="chart-wrapper">
-                    <canvas id="hourlyChart"></canvas>
-                </div>
+        <div class="title-sec">📈 3. วิเคราะห์ยอดขายเชิงลึก</div>
+        <div class="grid-charts">
+            <div class="card-chart">
+                <h3 style="margin-top:0;">ยอดขายสุทธิ เทียบกับ ส่วนลด (รายชั่วโมง)</h3>
+                <div class="chart-box"><canvas id="c3"></canvas></div>
             </div>
-            
-            <div class="chart-section">
-                <div class="chart-header">พฤติกรรมการซื้อรายสินค้า: ราคาเต็ม VS ลดราคา (The Illusion of Best Sellers)</div>
-                <div class="chart-wrapper">
-                    <canvas id="itemChart"></canvas>
-                </div>
+            <div class="card-chart">
+                <h3 style="margin-top:0;">พฤติกรรมการซื้อ: ราคาเต็ม VS ลดราคา</h3>
+                <div class="chart-box" style="height:450px;"><canvas id="c4"></canvas></div>
             </div>
-
         </div>
 
-        <h2 class="section-title">💡 4. Strategic Action Plans (ข้อเสนอแนะระดับผู้บริหาร)</h2>
-        <div class="insights-container">
-            
-            <div class="insight-card urgent">
-                <div class="insight-number">🔥 01. แก้ปัญหารอยรั่ว "น้ำดื่ม" ทันที</div>
-                <div class="insight-text">
-                    จากบิลทั้งหมด ลูกค้าเดินเข้ามา <strong>ซื้อน้ำขวดเดียวแล้วออกไปถึง 103 คน (35% ของร้าน)</strong> ในขณะที่คนซื้อเบนโตะกลับไม่ยอมซื้อน้ำดื่มพ่วงเลย! <br><br>
-                    <strong>Action:</strong> สั่งทำโปรโมชั่น <strong>"สิทธิ์แลกซื้อน้ำดื่ม 10 บาท / หรือแถมซุป"</strong> เมื่อซื้อซูชิเซ็ตทันที เพื่อเพิ่ม Ticket Size ในกลุ่ม Solo Meal และดึงดูดกลุ่ม Grab&Go ให้สนใจของทานเล่น
+        <div class="title-sec">📦 4. เจาะลึกยอดขายและส่วนลดรายหมวดหมู่ (คลิกแถบด้านล่างเพื่อเปิดดู)</div>
+        
+        <details class="acc-box" open>
+            <summary class="acc-head">
+                <div>🍣 หมวดหมู่: Sushi Bento</div>
+                <div class="acc-info">
+                    <div style="color:var(--text-main);">ยอดรวม <span>฿51,485</span></div>
+                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿20,815</span></div>
+                    <div style="color:var(--success-color);">สุทธิ <span>฿30,670</span></div>
+                    <div style="color:var(--primary-color);">▼คลิก</div>
                 </div>
+            </summary>
+            <div class="acc-body">
+                <div class="item-list"><div class="item-n">Salmon Sushi 7 pcs.</div><div class="item-q">ยอด <b>฿5,250</b></div><div class="item-d">ลด <b>-฿882</b></div><div class="item-r">สุทธิ <b>฿4,368</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Moriawase Set</div><div class="item-q">ยอด <b>฿7,040</b></div><div class="item-d">ลด <b>-฿2,890</b></div><div class="item-r">สุทธิ <b>฿4,150</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento 2 Friends</div><div class="item-q">ยอด <b>฿6,370</b></div><div class="item-d">ลด <b>-฿3,390</b></div><div class="item-r">สุทธิ <b>฿2,980</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Salmon 2 Tone</div><div class="item-q">ยอด <b>฿6,820</b></div><div class="item-d">ลด <b>-฿4,210</b></div><div class="item-r">สุทธิ <b>฿2,610</b></div></div>
+                <div class="item-list"><div class="item-n">Salmon Tuna Ebiko Sandwich</div><div class="item-q">ยอด <b>฿1,920</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,920</b></div></div>
+                <div class="item-list"><div class="item-n">Salmon Varity Set S</div><div class="item-q">ยอด <b>฿4,200</b></div><div class="item-d">ลด <b>-฿2,520</b></div><div class="item-r">สุทธิ <b>฿1,680</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Super Maki S</div><div class="item-q">ยอด <b>฿1,800</b></div><div class="item-d">ลด <b>-฿140</b></div><div class="item-r">สุทธิ <b>฿1,660</b></div></div>
+                <div class="item-list"><div class="item-n">Salmon Aburi Sushi 7 pcs.</div><div class="item-q">ยอด <b>฿2,760</b></div><div class="item-d">ลด <b>-฿1,288</b></div><div class="item-r">สุทธิ <b>฿1,472</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Sashimi Varity</div><div class="item-q">ยอด <b>฿2,940</b></div><div class="item-d">ลด <b>-฿1,470</b></div><div class="item-r">สุทธิ <b>฿1,470</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Medium Set 2</div><div class="item-q">ยอด <b>฿1,680</b></div><div class="item-d">ลด <b>-฿294</b></div><div class="item-r">สุทธิ <b>฿1,386</b></div></div>
+                <div class="item-list"><div class="item-n">Salmon Varity Set  M</div><div class="item-q">ยอด <b>฿1,540</b></div><div class="item-d">ลด <b>-฿270</b></div><div class="item-r">สุทธิ <b>฿1,270</b></div></div>
+                <div class="item-list"><div class="item-n">Tuna Varity Set M</div><div class="item-q">ยอด <b>฿1,260</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,260</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Aburi Set</div><div class="item-q">ยอด <b>฿3,300</b></div><div class="item-d">ลด <b>-฿2,118</b></div><div class="item-r">สุทธิ <b>฿1,182</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Mori Set</div><div class="item-q">ยอด <b>฿1,240</b></div><div class="item-d">ลด <b>-฿217</b></div><div class="item-r">สุทธิ <b>฿1,023</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Veggie 1</div><div class="item-q">ยอด <b>฿1,050</b></div><div class="item-d">ลด <b>-฿122</b></div><div class="item-r">สุทธิ <b>฿928</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento  Veggie 2</div><div class="item-q">ยอด <b>฿495</b></div><div class="item-d">ลด <b>-฿116</b></div><div class="item-r">สุทธิ <b>฿380</b></div></div>
+                <div class="item-list"><div class="item-n">Tuna Sushi 7 pcs.</div><div class="item-q">ยอด <b>฿550</b></div><div class="item-d">ลด <b>-฿192</b></div><div class="item-r">สุทธิ <b>฿358</b></div></div>
+                <div class="item-list"><div class="item-n">Tuna Varity Set S</div><div class="item-q">ยอด <b>฿550</b></div><div class="item-d">ลด <b>-฿192</b></div><div class="item-r">สุทธิ <b>฿358</b></div></div>
+                <div class="item-list"><div class="item-n">Sushi Bento Super Maki Set M</div><div class="item-q">ยอด <b>฿720</b></div><div class="item-d">ลด <b>-฿504</b></div><div class="item-r">สุทธิ <b>฿216</b></div></div>
             </div>
-            
-            <div class="insight-card">
-                <div class="insight-number">✈️ 02. จัด "Couple Set" สำหรับนักเดินทาง</div>
-                <div class="insight-text">
-                    จากการทำ Market Basket Analysis พบว่าสินค้าที่ถูกหยิบซื้อคู่กันบ่อยที่สุดคือ <strong>2 Friends + Moriawase Set</strong> และ <strong>กลุ่มไดฟุกุแพ็กคู่ (ชาเขียว+ยูซุ)</strong><br><br>
-                    <strong>Action:</strong> จัดวางสินค้ากลุ่มนี้ติดกันตรงจุดที่สายตามองเห็นชัดสุด (Eye-level) หรือรัดแพ็กเกจคู่ทำเป็น "Travel Duo Set" เพื่อดันกลุ่มลูกค้า Medium ให้ขยับไปสู่ High Value Basket (>500 บาท)
+        </details>
+
+        <details class="acc-box">
+            <summary class="acc-head">
+                <div>🍱 หมวดหมู่: Donburi</div>
+                <div class="acc-info">
+                    <div style="color:var(--text-main);">ยอดรวม <span>฿11,745</span></div>
+                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿948</span></div>
+                    <div style="color:var(--success-color);">สุทธิ <span>฿10,796</span></div>
+                    <div style="color:var(--primary-color);">▼คลิก</div>
                 </div>
+            </summary>
+            <div class="acc-body">
+                <div class="item-list"><div class="item-n">Salmon Teriyaki Don</div><div class="item-q">ยอด <b>฿1,500</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,500</b></div></div>
+                <div class="item-list"><div class="item-n">Salmon Don</div><div class="item-q">ยอด <b>฿1,470</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,470</b></div></div>
+                <div class="item-list"><div class="item-n">Negi Salmon Don</div><div class="item-q">ยอด <b>฿1,260</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,260</b></div></div>
+                <div class="item-list"><div class="item-n">Torikatsu Curry Don</div><div class="item-q">ยอด <b>฿960</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿960</b></div></div>
+                <div class="item-list"><div class="item-n">Chirashi Don</div><div class="item-q">ยอด <b>฿930</b></div><div class="item-d">ลด <b>-฿217</b></div><div class="item-r">สุทธิ <b>฿713</b></div></div>
+                <div class="item-list"><div class="item-n">Aburi Salmon Don</div><div class="item-q">ยอด <b>฿880</b></div><div class="item-d">ลด <b>-฿154</b></div><div class="item-r">สุทธิ <b>฿726</b></div></div>
+                <div class="item-list"><div class="item-n">Buta Kimchi Don</div><div class="item-q">ยอด <b>฿870</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿870</b></div></div>
+                <div class="item-list"><div class="item-n">Poke Bowl</div><div class="item-q">ยอด <b>฿825</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿825</b></div></div>
+                <div class="item-list"><div class="item-n">Unagi Don</div><div class="item-q">ยอด <b>฿770</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿770</b></div></div>
+                <div class="item-list"><div class="item-n">Gyu Don</div><div class="item-q">ยอด <b>฿630</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿630</b></div></div>
+                <div class="item-list"><div class="item-n">Oyakodon</div><div class="item-q">ยอด <b>฿420</b></div><div class="item-d">ลด <b>-฿196</b></div><div class="item-r">สุทธิ <b>฿224</b></div></div>
+                <div class="item-list"><div class="item-n">Tori Teriyaki Don</div><div class="item-q">ยอด <b>฿390</b></div><div class="item-d">ลด <b>-฿273</b></div><div class="item-r">สุทธิ <b>฿117</b></div></div>
+                <div class="item-list"><div class="item-n">Saba Teriyaki Don</div><div class="item-q">ยอด <b>฿310</b></div><div class="item-d">ลด <b>-฿108</b></div><div class="item-r">สุทธิ <b>฿202</b></div></div>
+                <div class="item-list"><div class="item-n">Tonkatsu Curry Don</div><div class="item-q">ยอด <b>฿265</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿265</b></div></div>
+                <div class="item-list"><div class="item-n">Buta Teriyaki Don</div><div class="item-q">ยอด <b>฿145</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿145</b></div></div>
+                <div class="item-list"><div class="item-n">Kimchi</div><div class="item-q">ยอด <b>฿120</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿120</b></div></div>
             </div>
-            
-            <div class="insight-card">
-                <div class="insight-number">✂️ 03. หั่นงบการผลิต "Salmon 2 Tone" ช่วงดึก</div>
-                <div class="insight-text">
-                    ช่วง 21:00 น. สร้างรายได้รวมดูเหมือนสูง แต่มาจากการกระหน่ำลดราคา 70% เกือบทั้งร้าน โดยเฉพาะเมนูยอดฮิตอย่าง "Salmon 2 Tone" ที่ยอดขาย 90% เกิดขึ้นตอนป้ายเหลือง<br><br>
-                    <strong>Action:</strong> ลด Forecast การผลิตซูชิเซ็ตช่วงเย็นลง 30-40% เพื่อลดอัตรา Food Waste ต้นทุนที่เสียไปจะได้กลับมาเป็นกำไรเนื้อๆ (Net Margin) ที่เพิ่มขึ้น
+        </details>
+
+        <details class="acc-box">
+            <summary class="acc-head">
+                <div>🥤 หมวดหมู่: Beverage (เครื่องดื่ม)</div>
+                <div class="acc-info">
+                    <div style="color:var(--text-main);">ยอดรวม <span>฿3,960</span></div>
+                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿0</span></div>
+                    <div style="color:var(--success-color);">สุทธิ <span>฿3,960</span></div>
+                    <div style="color:var(--primary-color);">▼คลิก</div>
                 </div>
+            </summary>
+            <div class="acc-body">
+                <div class="item-list"><div class="item-n">Namthip Drinking Water 550 ml.</div><div class="item-q">ยอด <b>฿1,500</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,500</b></div></div>
+                <div class="item-list"><div class="item-n">Singha Beer (Can) 320 ml.</div><div class="item-q">ยอด <b>฿1,080</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿1,080</b></div></div>
+                <div class="item-list"><div class="item-n">ITOEN Jasmine Green Tea 500 ml.</div><div class="item-q">ยอด <b>฿400</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿400</b></div></div>
+                <div class="item-list"><div class="item-n">Asahi Beer (Can) 330 ml.</div><div class="item-q">ยอด <b>฿360</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿360</b></div></div>
+                <div class="item-list"><div class="item-n">ITOEN Unsweetened Green Tea</div><div class="item-q">ยอด <b>฿350</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿350</b></div></div>
+                <div class="item-list"><div class="item-n">Pepsi Max (Can) 325ml.</div><div class="item-q">ยอด <b>฿120</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿120</b></div></div>
+                <div class="item-list"><div class="item-n">Pepsi (Can) 325ml.</div><div class="item-q">ยอด <b>฿90</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿90</b></div></div>
+                <div class="item-list"><div class="item-n">Sprite (Can) 325ml.</div><div class="item-q">ยอด <b>฿60</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿60</b></div></div>
             </div>
-            
+        </details>
+
+        <details class="acc-box">
+            <summary class="acc-head">
+                <div>🍡 หมวดหมู่: Dessert & Appetizer</div>
+                <div class="acc-info">
+                    <div style="color:var(--text-main);">ยอดรวม <span>฿2,414</span></div>
+                    <div style="color:var(--accent-color);">ส่วนลด <span>-฿89</span></div>
+                    <div style="color:var(--success-color);">สุทธิ <span>฿2,325</span></div>
+                    <div style="color:var(--primary-color);">▼คลิก</div>
+                </div>
+            </summary>
+            <div class="acc-body">
+                <div class="item-list"><div class="item-n">Matcha Red Bean Daifuku</div><div class="item-q">ยอด <b>฿429</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿429</b></div></div>
+                <div class="item-list"><div class="item-n">Yuzu Daifuku</div><div class="item-q">ยอด <b>฿390</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿390</b></div></div>
+                <div class="item-list"><div class="item-n">Salmon Tataki</div><div class="item-q">ยอด <b>฿420</b></div><div class="item-d">ลด <b>-฿89</b></div><div class="item-r">สุทธิ <b>฿331</b></div></div>
+                <div class="item-list"><div class="item-n">Tako Wasabi</div><div class="item-q">ยอด <b>฿330</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿330</b></div></div>
+                <div class="item-list"><div class="item-n">Dorayaki</div><div class="item-q">ยอด <b>฿300</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿300</b></div></div>
+                <div class="item-list"><div class="item-n">Chuka Wakame</div><div class="item-q">ยอด <b>฿240</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿240</b></div></div>
+                <div class="item-list"><div class="item-n">Rare Cheese Daifuku</div><div class="item-q">ยอด <b>฿195</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿195</b></div></div>
+                <div class="item-list"><div class="item-n">Kani Tataki</div><div class="item-q">ยอด <b>฿110</b></div><div class="item-d">ลด <b>-฿0</b></div><div class="item-r">สุทธิ <b>฿110</b></div></div>
+            </div>
+        </details>
+
+        <div class="title-sec">💡 5. แผนปฏิบัติการ (Strategic Actions)</div>
+        <div class="grid-insight">
+            <div class="card-insight red">
+                <h4>🔥 01. อุดรอยรั่ว "น้ำดื่ม"</h4>
+                <p>มีลูกค้าถึง 103 คนที่เข้ามาซื้อแต่น้ำดื่มขวดเดียว (35% ของร้าน) แสดงถึงโอกาส Cross-sell ที่หายไป <b>แนะนำให้ทำโปรโมชัน "แลกซื้อน้ำดื่ม 10 บาท"</b> เมื่อซื้อซูชิเพื่อจูงใจให้คนซื้ออาหารเพิ่ม</p>
+            </div>
+            <div class="card-insight">
+                <h4>✈️ 02. จัดแพ็กเกจ "Travel Duo"</h4>
+                <p>ข้อมูลชี้ว่าลูกค้ามักซื้อ <b>2 Friends + Moriawase Set</b> คู่กันเสมอ แนะนำให้จัดแพ็กเกจคู่ หรือวางโชว์ติดกันในระดับสายตา เพื่อผลักดันยอดบิลให้ทะลุ 500 บาท/บิล</p>
+            </div>
+            <div class="card-insight">
+                <h4>✂️ 03. หั่นงบผลิต "ป้ายเหลือง"</h4>
+                <p>หมวด Sushi Bento ลดราคาไปถึง 20,815 บาท (แทบไม่มีกำไร) โดยเฉพาะ <b>Salmon 2 Tone</b> แนะนำให้ลดการผลิตลง 30-40% ในรอบเย็น เพื่อประหยัดต้นทุนและลด Food Waste</p>
+            </div>
         </div>
 
     </div>
 
     <script>
-        Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
-        Chart.defaults.font.size = 14;
-        Chart.defaults.color = '#7f8c8d';
+        document.addEventListener('DOMContentLoaded', function() {
+            if(typeof Chart === 'undefined') return;
+            Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
+            
+            // 1 & 2 Doughnut Charts
+            const bData = [195, 88, 12], bRev = [11568, 24479, 11714];
+            const bLabels = ["Grab & Go (<200฿)", "Solo Meal (200-500฿)", "Group (>500฿)"];
+            const bColors = ["#bdc3c7", "#3498db", "#2ecc71"];
+            const optDoughnut = { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '65%' };
 
-        // ---------------- Data ----------------
-        const basketData = [
-            {"Segment": "Tier 3: Grab & Go (<200฿)", "Count": 195, "Revenue": 11568, "color": "#bdc3c7"},
-            {"Segment": "Tier 2: Solo Meal (200-500฿)", "Count": 88, "Revenue": 24479, "color": "#3498db"},
-            {"Segment": "Tier 1: Couple/Group (>500฿)", "Count": 12, "Revenue": 11714, "color": "#2ecc71"}
-        ];
+            new Chart(document.getElementById('c1').getContext('2d'), { type: 'doughnut', data: { labels: bLabels, datasets: [{ data: bData, backgroundColor: bColors }] }, options: optDoughnut });
+            new Chart(document.getElementById('c2').getContext('2d'), { type: 'doughnut', data: { labels: bLabels, datasets: [{ data: bRev, backgroundColor: bColors }] }, options: optDoughnut });
 
-        const hourlyData = [{"Hour": 5, "Gross": 795, "Net": 795, "Discount": 0}, {"Hour": 6, "Gross": 2830, "Net": 2816, "Discount": 14}, {"Hour": 7, "Gross": 480, "Net": 480, "Discount": 0}, {"Hour": 8, "Gross": 525, "Net": 525, "Discount": 0}, {"Hour": 9, "Gross": 2818, "Net": 2818, "Discount": 0}, {"Hour": 10, "Gross": 883, "Net": 883, "Discount": 0}, {"Hour": 11, "Gross": 6799, "Net": 6799, "Discount": 0}, {"Hour": 12, "Gross": 2587, "Net": 2587, "Discount": 0}, {"Hour": 13, "Gross": 1858, "Net": 1858, "Discount": 0}, {"Hour": 14, "Gross": 2874, "Net": 2874, "Discount": 0}, {"Hour": 15, "Gross": 6041, "Net": 5989, "Discount": 52}, {"Hour": 16, "Gross": 5648, "Net": 5648, "Discount": 0}, {"Hour": 17, "Gross": 299, "Net": 299, "Discount": 0}, {"Hour": 18, "Gross": 985, "Net": 985, "Discount": 0}, {"Hour": 19, "Gross": 1800, "Net": 1800, "Discount": 0}, {"Hour": 20, "Gross": 940, "Net": 940, "Discount": 0}, {"Hour": 21, "Gross": 30317, "Net": 9327, "Discount": 20990}, {"Hour": 22, "Gross": 1125, "Net": 338, "Discount": 787}];
-        
-        const itemData = [{"Item": "BEV005/Namthip Drinking Water", "Qty_Full": 150, "Qty_Disc": 0}, {"Item": "MINI014/Sushi Moriawase Set", "Qty_Full": 13, "Qty_Disc": 19}, {"Item": "MINI010/Sushi Bento Salmon 2 Tone", "Qty_Full": 3, "Qty_Disc": 28}, {"Item": "MINI011/Sushi Bento 2 Friends", "Qty_Full": 6, "Qty_Disc": 20}, {"Item": "MINI001/Salmon Sushi 7 pcs.", "Qty_Full": 19, "Qty_Disc": 6}, {"Item": "MINI004/Salmon Varity Set S", "Qty_Full": 3, "Qty_Disc": 18}, {"Item": "MINI012/Sushi Bento Aburi Set", "Qty_Full": 1, "Qty_Disc": 11}, {"Item": "BEV001/Singha Beer (Can) 320 ml.", "Qty_Full": 12, "Qty_Disc": 0}, {"Item": "MINI002/Salmon Aburi Sushi 7 pcs.", "Qty_Full": 4, "Qty_Disc": 8}, {"Item": "DES003/Matcha Red Bean Daifuku", "Qty_Full": 11, "Qty_Disc": 0}];
+            // 3 Bar Chart
+            const hr = ["11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"];
+            const nData = [6799, 2587, 1858, 2874, 5989, 5648, 299, 985, 1800, 940, 9327, 338];
+            const dData = [0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 20990, 787];
+            
+            new Chart(document.getElementById('c3').getContext('2d'), { 
+                type: 'bar', data: { labels: hr, datasets: [{ label: 'ยอดขายสุทธิ (Net)', data: nData, backgroundColor: '#2ecc71' }, { label: 'ส่วนลดป้ายเหลือง', data: dData, backgroundColor: '#e74c3c' }] }, 
+                options: { maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } 
+            });
 
-        const commonOptions = { maintainAspectRatio: false, responsive: true };
+            // 4 Item Chart
+            const itm = ["Namthip Water","Sushi Moriawase","Salmon 2 Tone","2 Friends","Salmon Sushi 7pcs","Salmon Varity S"];
+            const qFull = [150, 13, 3, 6, 19, 3], qDisc = [0, 19, 28, 20, 6, 18];
 
-        // ---------------- Render Charts ----------------
-        
-        // 1. Basket Count (Doughnut)
-        new Chart(document.getElementById('basketCountChart').getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: basketData.map(d => d.Segment),
-                datasets: [{
-                    data: basketData.map(d => d.Count),
-                    backgroundColor: basketData.map(d => d.color),
-                    borderWidth: 2, hoverOffset: 5
-                }]
-            },
-            options: { ...commonOptions, plugins: { legend: { position: 'bottom', labels: { padding: 15 } }, tooltip: { callbacks: { label: function(c) { return ' ' + c.raw + ' บิล'; } } } }, cutout: '65%' }
-        });
-
-        // 2. Basket Revenue (Doughnut)
-        new Chart(document.getElementById('basketRevChart').getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: basketData.map(d => d.Segment),
-                datasets: [{
-                    data: basketData.map(d => d.Revenue),
-                    backgroundColor: basketData.map(d => d.color),
-                    borderWidth: 2, hoverOffset: 5
-                }]
-            },
-            options: { ...commonOptions, plugins: { legend: { position: 'bottom', labels: { padding: 15 } }, tooltip: { callbacks: { label: function(c) { return ' ฿' + c.raw.toLocaleString(); } } } }, cutout: '65%' }
-        });
-
-        // 3. Hourly Chart (Bar)
-        new Chart(document.getElementById('hourlyChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: hourlyData.map(d => d.Hour + ':00 น.'),
-                datasets: [
-                    { label: 'ยอดขายจริงสุทธิ (Net Revenue)', data: hourlyData.map(d => d.Net), backgroundColor: '#2ecc71', borderRadius: 4, order: 1 },
-                    { label: 'ส่วนลดที่เสียไป (Discount Loss)', data: hourlyData.map(d => d.Discount), backgroundColor: '#e74c3c', borderRadius: 4, order: 2 }
-                ]
-            },
-            options: {
-                ...commonOptions,
-                plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: {size: 14} } } },
-                scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, border: { dash: [4, 4] } } }
-            }
-        });
-
-        // 4. Item Performance Chart (Horizontal Bar)
-        new Chart(document.getElementById('itemChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: itemData.map(d => d.Item),
-                datasets: [
-                    { label: 'ยอดขายราคาเต็ม (Full Price)', data: itemData.map(d => d.Qty_Full), backgroundColor: '#3498db', borderRadius: 4 },
-                    { label: 'ยอดขายช่วงป้ายเหลืองลดราคา', data: itemData.map(d => d.Qty_Disc), backgroundColor: '#b2bec3', borderRadius: 4 }
-                ]
-            },
-            options: {
-                ...commonOptions,
-                indexAxis: 'y',
-                plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: {size: 14} } } },
-                scales: { x: { stacked: true, border: { dash: [4, 4] } }, y: { stacked: true, grid: { display: false }, ticks: { font: { size: 13 } } } }
-            }
+            new Chart(document.getElementById('c4').getContext('2d'), { 
+                type: 'bar', data: { labels: itm, datasets: [{ label: 'ขายราคาเต็ม', data: qFull, backgroundColor: '#3498db' }, { label: 'ขายลดราคา', data: qDisc, backgroundColor: '#b2bec3' }] }, 
+                options: { indexAxis: 'y', maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } 
+            });
         });
     </script>
 </body>
