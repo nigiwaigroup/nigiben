@@ -76,7 +76,7 @@
                     <i class="fas fa-satellite-dish text-amber-500 animate-pulse"></i>
                     ตารางสต็อกสินค้าอัตโนมัติ (Dynamic Days Generation)
                 </h2>
-                <p class="text-slate-500 mt-1">ระบบจะตรวจจับและสร้างคอลัมน์ของวันใหม่ๆ (เช่น วันที่ 25, 26) ให้อัตโนมัติเมื่อมีการอัปเดตใน Sheet</p>
+                <p class="text-slate-500 mt-1">ระบบจะตรวจจับและสร้างคอลัมน์ของวันใหม่ๆ ให้อัตโนมัติเมื่อมีการอัปเดตใน Sheet</p>
                 <p class="text-emerald-600 mt-1 text-sm"><i class="fas fa-info-circle mr-1"></i>ปิดฟังก์ชันแก้ไขตัวเลข (Read-Only) ข้อมูลทั้งหมดจะดึงจาก Google Sheets โดยตรง</p>
             </div>
         </div>
@@ -172,16 +172,28 @@
                     var row_dates = data[1];
                     var row_headers = data[2];
                     
-                    // ปรับลอจิกใหม่: สแกนแสกนหาคำว่า "ยกมา" ทุกๆ คอลัมน์ ไม่ว่าจะเว้นระยะกี่ช่อง
+                    // 🔥 แก้ไขระบบดึงข้อมูลให้มองหาคำว่า "รับเข้า" แทน "ยกมา" (ป้องกันปัญหาวันที่ 24 ไม่มีคำว่ายกมา)
                     var days = [];
                     for (var col = 10; col < row_headers.length; col++) {
                         var headerText = String(row_headers[col]).trim();
-                        if (headerText === 'ยกมา') {
-                            var dateStr = (row_dates[col + 2] !== undefined) ? String(row_dates[col + 2]).trim() : ''; 
+                        // เราจะจับจุดที่คำว่า รับเข้า แทน เพราะมีทุกวันแน่นอน
+                        if (headerText === 'รับเข้า') {
+                            var dateStr = '';
+                            // ลองถอยหลังไปหาชื่อวันที่จากแถวด้านบน
+                            for(var step = 0; step <= 2; step++) {
+                                if(col - step >= 0 && row_dates[col - step]) {
+                                    var tempDate = String(row_dates[col - step]).trim();
+                                    if(tempDate.match(/\d{4}-\d{2}-\d{2}/) || tempDate.includes('2569')) {
+                                        dateStr = tempDate;
+                                        break;
+                                    }
+                                }
+                            }
                             if (!dateStr || dateStr === '') {
                                 dateStr = 'วันที่ ' + (days.length + 1);
                             }
-                            days.push({ startIndex: col, dateStr: dateStr });
+                            // เก็บ Index คอลัมน์รับเข้า ของแต่ละวันไว้เป็นหลัก
+                            days.push({ inIndex: col, dateStr: dateStr });
                         }
                     }
 
@@ -199,7 +211,7 @@
                         var cellBgClass = (d % 2 === 0) ? '#f8fafc' : '#f1f5f9';
                         var roundedClass = isLastDay ? 'rounded-tr-md' : '';
                         
-                        thead1 += `<th colspan="5" style="background-color: ${bgClass}; border-right: 1px solid #cbd5e1;" class="${roundedClass}">ยอดวันที่ ${days[d].dateStr}</th>`;
+                        thead1 += `<th colspan="5" style="background-color: ${bgClass}; border-right: 1px solid #cbd5e1;" class="${roundedClass}">ยอด ${days[d].dateStr}</th>`;
                         
                         thead2 += `<th style="background-color: ${cellBgClass};">รับเข้า${d > 0 ? '(รวมยกมา)' : ''}</th>`;
                         thead2 += `<th style="background-color: ${cellBgClass};">ขาย</th>`;
@@ -230,13 +242,13 @@
                         var prev_cf = 0; 
                         
                         for (var d = 0; d < days.length; d++) {
-                            var offset = days[d].startIndex;
-                            var raw_in = parseNum(row[offset + 1]);
-                            var sold = parseNum(row[offset + 2]);
-                            var ga = parseNum(row[offset + 3]);
-                            var waste = parseNum(row[offset + 4]);
+                            var inIdx = days[d].inIndex;
+                            // ขยับ index ไปตามช่องหัวตาราง รับเข้า(inIdx) -> ขาย(+1) -> แจก(+2) -> เสีย(+3)
+                            var raw_in = parseNum(row[inIdx]);
+                            var sold = parseNum(row[inIdx + 1]);
+                            var ga = parseNum(row[inIdx + 2]);
+                            var waste = parseNum(row[inIdx + 3]);
 
-                            // กฎพิเศษสำหรับน้ำทิพย์
                             if (name_th === 'น้ำเปล่า น้ำทิพย์' && days[d].dateStr.includes('02-24')) { sold = 199; }
 
                             var in_calc = (d === 0) ? raw_in : raw_in + prev_cf; 
