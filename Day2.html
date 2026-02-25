@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigiben Executive Dashboard - Crisis Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #e74c3c;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --day1-color: #bdc3c7;
+            --day2-color: #3498db;
+        }
+        body { font-family: 'Noto Sans Thai', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .dashboard-header { background: linear-gradient(135deg, #1e3c72 0%, #000000 100%); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 40px; }
+        .dashboard-header h1 { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: 0.5px; }
+        .dashboard-header p { margin-top: 10px; font-size: 1.1rem; color: #e74c3c; font-weight: 600; background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 15px; border-radius: 20px;}
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; padding-bottom: 50px; }
+        
+        .section-title { font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-bottom: 15px; padding-left: 15px; border-left: 6px solid var(--accent-color); display: flex; align-items: center; }
+        .section-desc { font-size: 1rem; color: var(--text-muted); margin-bottom: 25px; padding-left: 21px; line-height: 1.6; }
+
+        /* KPI Comparison Cards */
+        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; transition: transform 0.3s ease; display: flex; flex-direction: column; align-items: center;}
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--accent-color); }
+        .kpi-title { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 15px; text-align: center;}
+        
+        .kpi-compare-row { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;}
+        .kpi-col { display: flex; flex-direction: column; align-items: center; width: 45%;}
+        .kpi-date-label { font-size: 0.85rem; color: #95a5a6; margin-bottom: 5px; font-weight: 600;}
+        .kpi-val { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .kpi-val.highlight { color: var(--day2-color); }
+        .kpi-vs { font-size: 1.2rem; color: #bdc3c7; font-weight: 300; }
+        
+        .kpi-diff { font-size: 0.9rem; font-weight: 600; padding: 6px 12px; border-radius: 20px; margin-top: 10px;}
+        .diff-up-good { color: #27ae60; background: #e8f8f5; }
+        .diff-down-bad { color: #c0392b; background: #fdedec; }
+        .diff-up-bad { color: #c0392b; background: #fdedec; }
+        .diff-down-good { color: #27ae60; background: #e8f8f5; }
+
+        /* Charts & Analysis Boxes */
+        .chart-section { background: var(--card-bg); padding: 35px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; margin-bottom: 40px;}
+        .chart-header { font-size: 1.3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; padding-bottom: 15px; border-bottom: 2px solid #ecf0f1; }
+        .chart-wrapper { position: relative; height: 400px; width: 100%; margin-top: 20px; }
+        
+        .analysis-box { background-color: #fdfefe; border-left: 5px solid var(--accent-color); padding: 20px 25px; border-radius: 0 8px 8px 0; margin-top: 25px; font-size: 0.95rem; line-height: 1.6; color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        .analysis-box h4 { margin-top: 0; color: var(--accent-color); margin-bottom: 15px; font-size: 1.1rem;}
+        .analysis-box ul { margin-bottom: 0; padding-left: 20px; }
+        .analysis-box li { margin-bottom: 10px; }
+
+        /* Lists for Section 5 */
+        .list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;}
+        .list-card { background: white; padding: 25px; border-radius: 12px; border: 1px solid #e1e8ed; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .list-card.best h3 { color: #27ae60; margin-top: 0; border-bottom: 2px solid #27ae60; padding-bottom: 10px; }
+        .list-card.worst h3 { color: #c0392b; margin-top: 0; border-bottom: 2px solid #c0392b; padding-bottom: 10px; }
+        .rank-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f4f7f6; font-size: 0.95rem;}
+        .rank-item:last-child { border-bottom: none; }
+        .rank-item span.val { font-weight: 600; color: var(--text-muted); }
+        .rank-item span.price-tag { font-size: 0.85rem; color: #95a5a6; margin-left: 5px; font-weight: normal; }
+
+        .shelf-strategy { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px;}
+        .shelf-card { padding: 25px; border-radius: 12px; color: white; }
+        .shelf-card.add { background: linear-gradient(135deg, #2ecc71, #27ae60); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
+        .shelf-card.remove { background: linear-gradient(135deg, #e74c3c, #c0392b); box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); }
+        .shelf-card h3 { margin-top: 0; font-size: 1.3rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px;}
+        .shelf-card ul { padding-left: 20px; font-size: 1.05rem; line-height: 1.6;}
+        
+        /* Action Plan Cards - Detailed */
+        .action-plan-section { display: flex; flex-direction: column; gap: 25px; margin-bottom: 50px;}
+        .action-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #e1e8ed;}
+        .action-header { padding: 20px 25px; color: white; display: flex; align-items: center; gap: 15px; font-size: 1.3rem; font-weight: 700;}
+        .action-header.prod { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .action-header.sales { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .action-header.inv { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .action-body { padding: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .action-block h4 { margin-top: 0; font-size: 1.1rem; color: var(--text-main); border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; margin-bottom: 15px;}
+        .action-block p { font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 10px;}
+        .issue-text { border-left: 4px solid #e74c3c; padding-left: 15px; background: #fdfefe; padding-top: 5px; padding-bottom: 5px;}
+        .solution-text { border-left: 4px solid #2ecc71; padding-left: 15px; margin-bottom: 15px;}
+        .solution-text strong { color: #27ae60; font-size: 1rem;}
+
+        /* Accordion */
+        .category-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .day-column h3 { text-align: center; color: var(--primary-color); padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-top: 0; border: 1px solid #e1e8ed;}
+        .accordion-container { display: flex; flex-direction: column; gap: 15px; }
+        .acc-item { background: var(--card-bg); border: 1px solid #e1e8ed; border-radius: 8px; overflow: hidden; }
+        .acc-header { padding: 15px 20px; cursor: pointer; background-color: #f8fbfe; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
+        .acc-header:hover { background-color: #eaf3fb; }
+        .acc-title { font-size: 1.1rem; font-weight: 600; color: var(--primary-color); }
+        .acc-stats { display: flex; gap: 15px; font-weight: 500; color: var(--text-muted); font-size: 0.9rem; align-items: center;}
+        .acc-stats span { color: var(--text-main); font-weight: 700; margin-left: 5px; }
+        .acc-content { display: none; border-top: 1px solid #e1e8ed; max-height: 400px; overflow-y: auto; }
+        .acc-content.active { display: block; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f4f7f6; font-size: 0.9rem; }
+        .item-row:nth-child(even) { background-color: #fafbfc; }
+        .item-row:last-child { border-bottom: none; }
+        .item-name { flex: 2; color: var(--text-main); font-weight: 500;}
+        .item-qty { flex: 1; text-align: right; color: var(--text-muted); }
+
+        .fallback-error { padding: 20px; background: #fee; border: 1px solid #fcc; color: #c00; border-radius: 8px; text-align: center; margin-bottom: 20px; display: none;}
+        
+        @media (max-width: 992px) {
+            .list-grid, .shelf-strategy, .action-body, .category-compare-grid { grid-template-columns: 1fr; gap: 20px;}
+            .chart-wrapper { height: 350px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1>Nigiben Executive Dashboard</h1>
+        <p>🚨 Crisis Report: วิเคราะห์รอยรั่วไหลของกำไร (Day 1 vs Day 2) | สาขาสนามบินดอนเมือง</p>
+    </div>
+
+    <div class="container">
+        <div id="jsError" class="fallback-error">⚠️ ไม่สามารถโหลดกราฟได้ กรุณาเชื่อมต่ออินเทอร์เน็ต แต่ยังสามารถดูข้อมูลในตารางและข้อเสนอแนะได้ตามปกติ</div>
+
+        <h2 class="section-title">📊 1. Performance Overview (วิกฤตการณ์กำไรหดตัว)</h2>
+        <p class="section-desc">แม้ Gross Sales จะดูเหมือนเติบโต แต่คุณภาพของตะกร้าสินค้ากลับดิ่งลงอย่างหนัก (Basket Quality Crisis)</p>
+        <div class="kpi-container">
+            <div class="kpi-card">
+                <div class="kpi-title">ยอดขายก่อนหักส่วนลด (Gross)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">Day 1</div><div class="kpi-val">69.6k</div></div>
+                    <div class="kpi-vs">VS</div>
+                    <div class="kpi-col"><div class="kpi-date-label">Day 2</div><div class="kpi-val highlight">77.1k</div></div>
+                </div>
+                <div class="kpi-diff diff-up-good">▲ เติบโต +10.7% (ภาพลวงตา)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">เงินสดรับจริงสุทธิ (Net Sales)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">Day 1</div><div class="kpi-val">47.7k</div></div>
+                    <div class="kpi-vs">VS</div>
+                    <div class="kpi-col"><div class="kpi-date-label">Day 2</div><div class="kpi-val" style="color:#c0392b;">43.9k</div></div>
+                </div>
+                <div class="kpi-diff diff-down-bad">▼ หดตัว -7.9% (เงินเข้าลดลง)</div>
+            </div>
+            <div class="kpi-card" style="border-color: #e74c3c;">
+                <div class="kpi-title" style="color: #e74c3c;">ส่วนลดที่เสียไป (Discount Leak)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">Day 1 (31%)</div><div class="kpi-val">21.8k</div></div>
+                    <div class="kpi-vs">VS</div>
+                    <div class="kpi-col"><div class="kpi-date-label">Day 2 (43%)</div><div class="kpi-val" style="color:#e74c3c;">33.1k</div></div>
+                </div>
+                <div class="kpi-diff diff-up-bad">▲ รั่วไหลหนักขึ้น +51.5%</div>
+            </div>
+            <div class="kpi-card" style="border-color: #e74c3c;">
+                <div class="kpi-title" style="color: #e74c3c;">คุณภาพบิล (ลูกค้ายอมจ่ายราคาเต็ม)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">Day 1</div><div class="kpi-val">80%</div></div>
+                    <div class="kpi-vs">VS</div>
+                    <div class="kpi-col"><div class="kpi-date-label">Day 2</div><div class="kpi-val" style="color:#c0392b;">63%</div></div>
+                </div>
+                <div class="kpi-diff diff-down-bad">▼ ลูกค้ารอของลดราคาเพิ่มขึ้น</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">📈 2. Visual Analytics (เจาะลึกพฤติกรรมยอดขาย)</h2>
+        <div class="chart-section">
+            <div class="chart-header">แนวโน้ม "ปากฉลาม (The Jaws Effect)" (Day 1 vs Day 2)</div>
+            <div class="chart-wrapper" style="height: 350px;"><canvas id="dailyTrendChart"></canvas></div>
+            <div class="analysis-box" style="border-left-color: #3498db;">
+                <h4>🔍 สัญญาณอันตรายจากกราฟ</h4>
+                <p>ยอดขายดูเหมือนโตขึ้น (เส้นสีน้ำเงิน) แต่ถูกถ่วงน้ำหนักด้วยส่วนลดที่สูงชัน (เส้นสีแดง) ดึงให้กระแสเงินสดรับจริง (เส้นสีเขียว) ปักหัวลง นี่คือสัญญาณว่า "เรากำลังแคนนิบาลตัวเอง (Cannibalization)" ลูกค้าเปลี่ยนพฤติกรรมมารอโปรโมชั่นป้ายเหลือง</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">⏰ 3. Hourly Analytics (เจาะลึกพฤติกรรมรายชั่วโมง)</h2>
+        <div class="chart-section">
+            <div class="chart-header">กระแสเงินสดรับจริง & ส่วนลดรายชั่วโมง (Day 1 vs Day 2)</div>
+            <div class="chart-wrapper"><canvas id="hourlyNetChart"></canvas></div>
+            <div class="chart-wrapper" style="margin-top: 40px;"><canvas id="hourlyDiscChart"></canvas></div>
+            <div class="analysis-box">
+                <h4>🔍 ผลการวิเคราะห์ช่วงเวลา (Time-series Insights)</h4>
+                <ul>
+                    <li><strong>ช่วงบ่าย 14:00 น. เป็นช่วงเวลาทองคำแห่งใหม่:</strong> ใน Day 2 ยอดขายสุทธิช่วงบ่ายสองพุ่งขึ้นแตะเกือบ 5,000 บาท ซึ่งเป็นการขายราคาเต็ม 100% ควรจัดพนักงานให้พร้อมบริการในเวลานี้</li>
+                    <li><strong>วิกฤตการณ์ 21:00 น.:</strong> กราฟเส้นสีแดงกระโดดพุ่งทะลุเพดานในเวลา 2 ทุ่ม-3 ทุ่ม ของ Day 2 มีการให้ส่วนลดรวมกว่า <strong>24,967 บาท ภายในชั่วโมงเดียว!</strong> สะท้อนปริมาณซูชิที่ทำเผื่อไว้มากเกินไป จนต้องหั่นราคา 70% หนี Food Waste</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="section-title">🏷️ 4. เปรียบเทียบยอดขายระดับสินค้า (Item Performance Comparison)</h2>
+        <p class="section-desc">เปรียบเทียบปริมาณที่ขายได้ <strong>(Day 1 เทียบกับ Day 2)</strong> พร้อมแสดงราคาขายต่อชิ้น เพื่อหาสินค้าที่มีปัญหา</p>
+        
+        <div class="accordion-container" id="categoryAccordion">
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">📦 Sushi Bento (เบนโตะเซ็ต)</div>
+                    <div class="acc-stats">
+                        <div style="font-size: 0.95rem;">Day 1: <span style="font-weight:normal;">212</span> | Day 2: <span>240</span> <span style="color:#27ae60; font-weight:700;">(+28)</span></div>
+                        <div style="color:var(--primary-color);">▼คลิกเพื่อดูเมนู</div>
+                    </div>
+                </div>
+                <div class="acc-content active">
+                    <div class="item-row">
+                        <div class="item-name">Salmon Varity Set S <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿200/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">21</span> | D2: <span style="color:var(--primary-color);">21</span> </div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Salmon Aburi Sushi 7 pcs. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿230/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">12</span> | D2: <span style="color:var(--primary-color);">20</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+8</span></div>
+                    </div>
+                    <div class="item-row" style="background-color: #fdfefe; border-left: 3px solid #e74c3c;">
+                        <div class="item-name">Sushi Bento Small Set 1 <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿200/ชิ้น)</span> <span style="color:#e74c3c; font-size:0.8rem; font-weight:600;">⚠️ ผลิตเกิน (ขายราคาเต็ม 0 ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">0</span> | D2: <span style="color:var(--primary-color);">20</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+20</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento 2 Friends <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿245/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">26</span> | D2: <span style="color:var(--primary-color);">20</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-6</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Moriawase Set <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿220/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">32</span> | D2: <span style="color:var(--primary-color);">20</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-12</span></div>
+                    </div>
+                    <div class="item-row" style="background-color: #fdfefe; border-left: 3px solid #27ae60;">
+                        <div class="item-name">Salmon Sushi 7 pcs. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿210/ชิ้น)</span> <span style="color:#27ae60; font-size:0.8rem; font-weight:600;">⭐ Hero Product</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">25</span> | D2: <span style="color:var(--primary-color);">20</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-5</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Salmon 2 Tone <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿220/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">31</span> | D2: <span style="color:var(--primary-color);">19</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-12</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Aburi Set <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿275/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">12</span> | D2: <span style="color:var(--primary-color);">18</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+6</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Sashimi Varity <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿420/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">7</span> | D2: <span style="color:var(--primary-color);">10</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Super Maki Set M <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿240/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">9</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+6</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Tuna Sushi 7 pcs. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿275/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">2</span> | D2: <span style="color:var(--primary-color);">9</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+7</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Medium Set 2 <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿420/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">4</span> | D2: <span style="color:var(--primary-color);">9</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+5</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Spicy Sushi Bento Set <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿265/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">0</span> | D2: <span style="color:var(--primary-color);">8</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+8</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Super Maki S <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿200/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">9</span> | D2: <span style="color:var(--primary-color);">7</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-2</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Medium Set 1 <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿385/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">0</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+5</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Mori Set <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿310/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">4</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Veggie 1 <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿175/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">6</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Varity Aburi Rolls Set <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿385/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">0</span> | D2: <span style="color:var(--primary-color);">4</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+4</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento Super Rolls Set <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿310/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">0</span> | D2: <span style="color:var(--primary-color);">4</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+4</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sushi Bento  Veggie 2 <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿165/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">3</span> </div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Salmon Tuna Ebiko Sandwich Sushi Bento <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿320/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">6</span> | D2: <span style="color:var(--primary-color);">3</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Tuna Varity Set S <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿275/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">2</span> | D2: <span style="color:var(--primary-color);">1</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Tuna Varity Set M <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿420/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">0</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Salmon Varity Set  M <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿385/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">4</span> | D2: <span style="color:var(--primary-color);">0</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-4</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">📦 Donburi (ข้าวหน้าต่างๆ)</div>
+                    <div class="acc-stats">
+                        <div style="font-size: 0.95rem;">Day 1: <span style="font-weight:normal;">54</span> | Day 2: <span>43</span> <span style="color:#c0392b; font-weight:700;">(-11)</span></div>
+                        <div style="color:var(--primary-color);">▼คลิกเพื่อดูเมนู</div>
+                    </div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row">
+                        <div class="item-name">Salmon Teriyaki Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿250/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">6</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Gyu Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿210/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+2</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Unagi Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿385/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">2</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Buta Kimchi Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿145/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">6</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Negi Salmon Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿210/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">6</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Salmon Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿210/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">7</span> | D2: <span style="color:var(--primary-color);">4</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Aburi Salmon Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿220/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">4</span> | D2: <span style="color:var(--primary-color);">4</span> </div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Saba Teriyaki Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿155/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">2</span> | D2: <span style="color:var(--primary-color);">3</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Chirashi Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿310/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">3</span> </div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Oyakodon <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿140/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">2</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Torikatsu Curry Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿240/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">4</span> | D2: <span style="color:var(--primary-color);">0</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-4</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Poke Bowl <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿275/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">0</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Tori Teriyaki Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿130/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">0</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Buta Teriyaki Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿145/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">1</span> | D2: <span style="color:var(--primary-color);">0</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Tonkatsu Curry Don <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿265/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">1</span> | D2: <span style="color:var(--primary-color);">0</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">📦 Beverage (เครื่องดื่ม)</div>
+                    <div class="acc-stats">
+                        <div style="font-size: 0.95rem;">Day 1: <span style="font-weight:normal;">190</span> | Day 2: <span>236</span> <span style="color:#27ae60; font-weight:700;">(+46)</span></div>
+                        <div style="color:var(--primary-color);">▼คลิกเพื่อดูเมนู</div>
+                    </div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row">
+                        <div class="item-name">Namthip Drinking Water 550 ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿10/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">150</span> | D2: <span style="color:var(--primary-color);">199</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+49</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Singha Beer (Can) 320 ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿90/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">12</span> | D2: <span style="color:var(--primary-color);">13</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Asahi Beer (Can) 330 ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿90/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">4</span> | D2: <span style="color:var(--primary-color);">9</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+5</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">ITOEN Elegant Jasmine Green Tea 500 ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿50/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">8</span> | D2: <span style="color:var(--primary-color);">5</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">ITOEN Unsweetened Green Tea 500 ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿50/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">7</span> | D2: <span style="color:var(--primary-color);">4</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Pepsi Max (Can) 325ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿30/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">4</span> | D2: <span style="color:var(--primary-color);">2</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-2</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Pepsi (Can) 325ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿30/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">2</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Sprite (Can) 325ml. <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿30/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">2</span> | D2: <span style="color:var(--primary-color);">2</span> </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">📦 Dessert (ของหวาน)</div>
+                    <div class="acc-stats">
+                        <div style="font-size: 0.95rem;">Day 1: <span style="font-weight:normal;">32</span> | Day 2: <span>34</span> <span style="color:#27ae60; font-weight:700;">(+2)</span></div>
+                        <div style="color:var(--primary-color);">▼คลิกเพื่อดูเมนู</div>
+                    </div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row">
+                        <div class="item-name">Matcha Red Bean Daifuku <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿39/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">11</span> | D2: <span style="color:var(--primary-color);">12</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Yuzu Daifuku <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿39/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">10</span> | D2: <span style="color:var(--primary-color);">10</span> </div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Rare Cheese Daifuku <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿39/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">5</span> | D2: <span style="color:var(--primary-color);">8</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+3</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Dorayaki <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿50/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">6</span> | D2: <span style="color:var(--primary-color);">4</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-2</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">📦 Appetizer (ของทานเล่น)</div>
+                    <div class="acc-stats">
+                        <div style="font-size: 0.95rem;">Day 1: <span style="font-weight:normal;">15</span> | Day 2: <span>13</span> <span style="color:#c0392b; font-weight:700;">(-2)</span></div>
+                        <div style="color:var(--primary-color);">▼คลิกเพื่อดูเมนู</div>
+                    </div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row">
+                        <div class="item-name">Tako Wasabi <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿110/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">4</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Kimchi <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿60/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">2</span> | D2: <span style="color:var(--primary-color);">3</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+1</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Chuka Wakame <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿40/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">6</span> | D2: <span style="color:var(--primary-color);">2</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-4</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Edamame <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿40/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">0</span> | D2: <span style="color:var(--primary-color);">2</span> <span style="color:#27ae60; font-weight:700; margin-left: 10px;">+2</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Salmon Tataki <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿140/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">3</span> | D2: <span style="color:var(--primary-color);">1</span> <span style="color:#c0392b; font-weight:700; margin-left: 10px;">-2</span></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="item-name">Kani Tataki <span style="font-size:0.85rem; color:#95a5a6; margin-left:5px;">(฿110/ชิ้น)</span></div>
+                        <div class="item-qty">D1: <span style="color:#7f8c8d; font-weight:normal;">1</span> | D2: <span style="color:var(--primary-color);">1</span> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">🚨 5. เจาะลึกวิกฤตคุณภาพตะกร้าสินค้า & ตัวผลาญกำไร (Deep Dive Analytics)</h2>
+        <p class="section-desc">เปิดเผยข้อมูลเชิงลึกขั้นสูง (Advanced Analytics) ที่เป็นต้นตอของผลกำไรที่หายไปใน Day 2</p>
+
+        <div class="chart-section">
+            <div class="chart-header">1. วิกฤตคุณภาพตะกร้าสินค้า (Basket Quality Crisis)</div>
+            <div class="analysis-box urgent" style="margin-top:0; margin-bottom: 25px;">
+                <h4>ลูกค้าที่ยอมจ่ายราคาเต็มลดลงอย่างหนัก!</h4>
+                <p>ความจริงที่ซ่อนอยู่หลังยอดขายที่ดูเหมือนจะเพิ่มขึ้นใน Day 2 คือพฤติกรรมการจ่ายเงินของลูกค้าเปลี่ยนไป:</p>
+                <ul>
+                    <li><strong>Day 1:</strong> ยอดขาย 80% มาจากบิลที่ "ลูกค้าจ่ายราคาเต็ม" (บิลที่ไม่ถูกหักส่วนลดมีถึง 235 บิล)</li>
+                    <li><strong>Day 2:</strong> ยอดขายจากบิลราคาเต็ม ร่วงลงมาเหลือแค่ <strong>63%</strong> (เหลือ 198 บิล)</li>
+                    <li><strong>Insight:</strong> นี่คือสัญญาณอันตรายว่าร้านกำลังเปลี่ยนสภาพจาก "ร้านอาหารพรีเมียม" กลายเป็น "ร้านของลดราคา" พฤติกรรมลูกค้าเริ่มเปลี่ยนมารอซื้อของ Clearance มากขึ้น <strong>บิลที่ติดโปรโมชั่นกระโดดจาก 60 บิล กลายเป็น 112 บิล!</strong></li>
+                </ul>
+            </div>
+            <div class="chart-wrapper" style="height: 200px;"><canvas id="basketQualityChart"></canvas></div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">💸 2. เจาะลึก 4 เมนู "ตัวผลาญกำไร (The Money Drainers)"</div>
+            <div class="analysis-box urgent" style="margin-top:0; margin-bottom: 25px;">
+                <h4>ผลิตมาเยอะ แต่ต้องยอมหั่นราคาหนีตาย</h4>
+                <p>จากการคำนวณหาเมนูที่สร้างความสูญเสีย (Discount Loss) ให้บริษัทมากที่สุดใน Day 2 พบว่าเมนูเหล่านี้ถูกผลิตมาล้นตู้ จนต้องยอมเฉือนเนื้อลดราคากว่า 60-70% เพื่อระบายออก:</p>
+                <ul>
+                    <li><strong>Sushi Bento Small Set 1:</strong> สูญเสียกำไรไป <strong>2,800 บาท</strong> (ยอมหั่นราคาไปถึง 70% ของมูลค่าสินค้าที่ผลิตมา และขายราคาเต็มไม่ได้เลย)</li>
+                    <li><strong>Tuna Sushi 7 pcs:</strong> ยอมหั่นราคาไปถึง <strong>70%</strong> ของมูลค่าสินค้าที่ผลิตมา</li>
+                    <li><strong>Sushi Bento 2 Friends:</strong> สูญเสียกำไรหนักสุดถึง <strong>3,059 บาท</strong> (ยอมหั่นราคาไป 62%)</li>
+                    <li><strong>Salmon Aburi Sushi 7 pcs:</strong> สูญเสียกำไรไป <strong>2,804 บาท</strong> (ยอมหั่นราคาไป 61%)</li>
+                </ul>
+            </div>
+            <div class="chart-wrapper" style="height: 350px;"><canvas id="moneyDrainersChart"></canvas></div>
+        </div>
+
+        <h2 class="section-title">🍱 6. กลยุทธ์การจัดชั้นวางสินค้า (Shelving Strategy)</h2>
+        <p class="section-desc">การจัดอันดับสินค้า Top 10 ขายดี และ Top 10 ขายไม่ออก (คำนวณจากข้อมูลรวมกันทั้ง 2 วัน เพื่อความแม่นยำ)</p>
+        
+        <div class="list-grid">
+            <div class="list-card best">
+                <h3>🏆 Top 10 สินค้าขายดี (สร้างรายได้หลัก)</h3>
+                <div class="rank-item"><span>1. Sushi Moriawase Set <span class="price-tag">(฿220/ชิ้น)</span></span><span class="val">฿11,440 (52 ชิ้น)</span></div>
+                <div class="rank-item"><span>2. Sushi Bento 2 Friends <span class="price-tag">(฿245/ชิ้น)</span></span><span class="val">฿11,270 (46 ชิ้น)</span></div>
+                <div class="rank-item"><span>3. Sushi Bento Salmon 2 Tone <span class="price-tag">(฿220/ชิ้น)</span></span><span class="val">฿11,000 (50 ชิ้น)</span></div>
+                <div class="rank-item"><span>4. Salmon Sushi 7 pcs. (Hero) <span class="price-tag">(฿210/ชิ้น)</span></span><span class="val">฿9,450 (45 ชิ้น)</span></div>
+                <div class="rank-item"><span>5. Salmon Varity Set S <span class="price-tag">(฿200/ชิ้น)</span></span><span class="val">฿8,400 (42 ชิ้น)</span></div>
+                <div class="rank-item"><span>6. Sushi Bento Aburi Set <span class="price-tag">(฿275/ชิ้น)</span></span><span class="val">฿8,250 (30 ชิ้น)</span></div>
+                <div class="rank-item"><span>7. Salmon Aburi Sushi 7 pcs. <span class="price-tag">(฿230/ชิ้น)</span></span><span class="val">฿7,360 (32 ชิ้น)</span></div>
+                <div class="rank-item"><span>8. Sushi Bento Sashimi Varity <span class="price-tag">(฿420/ชิ้น)</span></span><span class="val">฿7,140 (17 ชิ้น)</span></div>
+                <div class="rank-item"><span>9. Sushi Bento Medium Set 2 <span class="price-tag">(฿420/ชิ้น)</span></span><span class="val">฿5,460 (13 ชิ้น)</span></div>
+                <div class="rank-item"><span>10. Sushi Bento Small Set 1 <span class="price-tag">(฿200/ชิ้น)</span></span><span class="val">฿4,000 (20 ชิ้น)</span></div>
+            </div>
+            <div class="list-card worst">
+                <h3>🗑️ Top 10 สินค้าขายไม่ดี (เสี่ยงเหลือทิ้ง)</h3>
+                <div class="rank-item"><span>1. Buta Teriyaki Don <span class="price-tag">(฿145/ชิ้น)</span></span><span class="val">1 ชิ้น (฿145)</span></div>
+                <div class="rank-item"><span>2. Tonkatsu Curry Don <span class="price-tag">(฿265/ชิ้น)</span></span><span class="val">1 ชิ้น (฿265)</span></div>
+                <div class="rank-item"><span>3. Edamame <span class="price-tag">(฿40/ชิ้น)</span></span><span class="val">2 ชิ้น (฿80)</span></div>
+                <div class="rank-item"><span>4. Kani Tataki <span class="price-tag">(฿110/ชิ้น)</span></span><span class="val">2 ชิ้น (฿220)</span></div>
+                <div class="rank-item"><span>5. Poke Bowl <span class="price-tag">(฿275/ชิ้น)</span></span><span class="val">3 ชิ้น (฿825)</span></div>
+                <div class="rank-item"><span>6. Tuna Varity Set S <span class="price-tag">(฿275/ชิ้น)</span></span><span class="val">3 ชิ้น (฿825)</span></div>
+                <div class="rank-item"><span>7. Tuna Varity Set M <span class="price-tag">(฿420/ชิ้น)</span></span><span class="val">3 ชิ้น (฿1,260)</span></div>
+                <div class="rank-item"><span>8. Sprite (Can) 325ml. <span class="price-tag">(฿30/ชิ้น)</span></span><span class="val">4 ชิ้น (฿120)</span></div>
+                <div class="rank-item"><span>9. Salmon Tataki <span class="price-tag">(฿140/ชิ้น)</span></span><span class="val">4 ชิ้น (฿560)</span></div>
+                <div class="rank-item"><span>10. Torikatsu Curry Don <span class="price-tag">(฿240/ชิ้น)</span></span><span class="val">4 ชิ้น (฿960)</span></div>
+            </div>
+        </div>
+
+        <div class="shelf-strategy">
+            <div class="shelf-card add">
+                <h3>✅ สินค้าที่ต้อง "เพิ่ม/รักษา" ในตู้โชว์ (Hero Products)</h3>
+                <ul>
+                    <li><strong>Salmon Sushi 7 pcs:</strong> เป็นแม่เหล็กทำกำไร ลูกค้ายอมจ่ายราคาเต็มเกือบ 100% ทั้ง 2 วัน ต้องมีติดตู้เสมอห้ามขาด (จัดวางระดับสายตา)</li>
+                    <li><strong>Yuzu & Matcha Daifuku:</strong> ขายหมดแบบไม่มีส่วนลดเลย วางไว้ใกล้หน้าเครื่องแคชเชียร์เพื่อทำ Upsell</li>
+                    <li><strong>น้ำดื่มน้ำทิพย์:</strong> ขายได้วันละ 115-150 ขวด (แต่ต้องใช้พ่วงโปรซูชิ "แลกซื้อ 10 บาท" เพื่อไม่ให้ลูกค้าซื้อแต่น้ำแล้วเดินออก)</li>
+                </ul>
+            </div>
+            <div class="shelf-card remove">
+                <h3>❌ สินค้าที่ต้อง "ถอดออก/เปลี่ยนระบบ" (Drainers)</h3>
+                <ul>
+                    <li><strong>Sushi Bento Small Set 1:</strong> แม้จะติด Top 10 ขายดี แต่ยอดขายมาจากการลดราคาป้ายเหลือง 100% ให้ถอดออกจากตู้โชว์ (Grab & Go) ทันที</li>
+                    <li><strong>กลุ่มซูชิหน้า Tuna:</strong> ขายยาก เสื่อมสภาพเร็ว ควบคุมคุณภาพยาก แนะนำให้ลดยอดการผลิตลง</li>
+                    <li><strong>กลุ่ม Donburi หมูทอด/เทอริยากิ:</strong> (เช่น Buta Teriyaki, Tonkatsu Curry) 2 วันขายได้แค่ 1 ชิ้น เลิกทำตั้งโชว์ทิ้งไว้ ให้เปลี่ยนเป็นรับออเดอร์แล้วทำใหม่ (Make-to-order) เท่านั้น</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="section-title">💡 7. แผนปฏิบัติการแบบเจาะลึก 3 มิติ (Action Plans)</h2>
+        <p class="section-desc">ข้อเสนอแนะระดับผู้บริหาร เพื่อแก้ปัญหาวิกฤตกำไรและพฤติกรรมลูกค้าภายใน 24 ชั่วโมง</p>
+        
+        <div class="action-plan-section">
+            
+            <div class="action-card">
+                <div class="action-header prod">
+                    <span>🍳 มิติที่ 1: การจัดการฝ่ายผลิต (Production & Kitchen)</span>
+                </div>
+                <div class="action-body">
+                    <div class="action-block">
+                        <h4>วิเคราะห์ปัญหา (The Problem)</h4>
+                        <p class="issue-text">พนักงานครัวกะบ่าย/เย็น ผลิตสินค้าทิ้งไว้ตามเป้าเดิมโดยไม่สนยอดขายจริง (Over-forecast) โดยเฉพาะ <strong>Small Set 1</strong> และ <strong>2 Friends</strong> ทำให้ของค้างตู้ตอน 21:00 น. บานเบอะ บีบให้ร้านต้องนำไปลด 70% เพื่อหนี Food Waste ทันที ส่งผลให้เกิด "ตัวผลาญกำไร"</p>
+                    </div>
+                    <div class="action-block">
+                        <h4>แผนปฏิบัติการ (Action Plan)</h4>
+                        <p class="solution-text">1. <strong>ปรับ Par Level ทันที:</strong> หั่นยอดสั่งผลิตเบนโตะเซ็ตกลุ่ม Money Drainers ลง 30-40% ทันทีหลังเวลา 16:00 น.</p>
+                        <p class="solution-text">2. <strong>ลดจำนวนการผลิตสินค้าที่ขายไม่ดี:</strong> สินค้า Top 10 ที่ขายไม่ดี (เช่น ข้าวหน้าไก่, หมูทอด) ให้ลดจำนวนผลิตลง เพื่อลดการสูญเสีย </p>
+                        <p class="solution-text">3. <strong>Focus Hero Product:</strong> ให้ความสำคัญกับการจัดตู้โชว์ด้วย <strong>Salmon Sushi 7 pcs</strong> ซึ่งเป็นเมนูเดียวที่ขายราคาเต็มได้สม่ำเสมอที่สุด</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-card">
+                <div class="action-header sales">
+                    <span>🛒 มิติที่ 2: หน้าร้านและการขาย (Front-of-house)</span>
+                </div>
+                <div class="action-body">
+                    <div class="action-block">
+                        <h4>วิเคราะห์ปัญหา (The Problem)</h4>
+                        <p class="issue-text">เกิดช่องโหว่พฤติกรรมลูกค้า 2 รูปแบบ: <br>1. <strong>คนซื้อน้ำ 84% (97 บิล)</strong> เดินเข้ามาซื้อแค่น้ำเปล่า 10 บาทแล้วเดินออก ไม่แตะซูชิ<br>2. <strong>คนซื้อซูชิราคา 300+ บาท</strong> กลับไม่ยอมหยิบน้ำดื่มพ่วงไปด้วย ทำให้ร้านทิ้งโอกาส Cross-selling ไปอย่างน่าเสียดาย</p>
+                    </div>
+                    <div class="action-block">
+                        <h4>แผนปฏิบัติการ (Action Plan)</h4>
+                        <p class="solution-text">1. <strong>บังคับ Upsell Script 100%:</strong> อบรมแคชเชียร์ให้พูดคำว่า "รับซูชิ 1 กล่อง แลกซื้อชาเขียว/น้ำดื่มได้ในราคา 10 บาทนะคะ" ทุกบิลที่มีการสั่งซูชิ</p>
+                        <p class="solution-text">2. <strong>สร้าง Travel Duo Set:</strong> รัดแพ็กเกจสินค้าขายดีคู่กัน เช่น "ซูชิ 2 Friends + น้ำดื่ม" หรือ "ไดฟุกุชาเขียว+ยูซุ" จัดวางไว้บริเวณ Eye-level เพื่อให้ลูกค้าสายด่วนหยิบง่าย จ่ายจบ</p>
+                        <p class="solution-text">3. <strong>เสริมกำลังช่วง 14:00 น.:</strong> กราฟชี้ชัดว่าบ่าย 2 คือ Golden Hour ใหม่ที่คนยอมจ่ายราคาเต็ม ต้องมีพนักงานสแตนด์บายเต็มสูบเพื่อเร่งปิดการขาย</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-card">
+                <div class="action-header inv">
+                    <span>📑 มิติที่ 3: นโยบายการให้ส่วนลด (Policy & Promotion)</span>
+                </div>
+                <div class="action-body">
+                    <div class="action-block">
+                        <h4>วิเคราะห์ปัญหา (The Problem)</h4>
+                        <p class="issue-text">ร้านเสพติดการหั่นราคาหนักเกินไป (ลดทีเดียว 70%) ทำให้สัดส่วนบิลที่ลดราคากระโดดจาก 60 เป็น 112 บิล ลูกค้าสนามบินเริ่มเรียนรู้พฤติกรรม <strong>"รอซื้อตอน 2 ทุ่มเพื่อให้ได้ของถูก"</strong> ส่งผลให้ยอดขายราคาเต็ม (Full-price Sales) ถูกแคนนิบาล (Cannibalize) โดยโปรโมชั่นของตัวเอง</p>
+                    </div>
+                    <div class="action-block">
+                        <h4>แผนปฏิบัติการ (Action Plan)</h4>
+                        <p class="solution-text">1. <strong>ใช้ระบบลดราคาขั้นบันได (Tiered Discount):</strong> ยกเลิกการอัดโปร 70% รวดเดียว ให้เริ่มประกาศลดแค่ 20-30% ในตอน 20:30 น. และขยับเป็น 50% ตอน 21:30 น. เพื่อรักษากำไรสุทธิให้บริษัท</p>
+                        <p class="solution-text">2. <strong>ปรับ KPI แคชเชียร์:</strong> วัดผลโบนัสและคอมมิชชันของพนักงานหน้าร้านจาก <strong>"ยอดขายราคาเต็ม (Full-price Net Revenue)"</strong> แทนที่จะดูแค่ยอดรวมแบบกวาดๆ เพื่อดัดนิสัยการรอเชียร์ขายเฉพาะช่วงโปรโมชั่น</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function toggleAcc(element) {
+            let content = element.nextElementSibling;
+            if (content.style.display === "block" || content.classList.contains("active")) {
+                content.style.display = "none";
+                content.classList.remove("active");
+            } else {
+                content.style.display = "block";
+                content.classList.add("active");
+            }
+        }
+
+        window.onload = function() {
+            try {
+                if(typeof Chart === 'undefined') {
+                    document.getElementById('jsError').style.display = 'block';
+                    return;
+                }
+
+                Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
+                Chart.defaults.font.size = 13;
+                Chart.defaults.color = '#7f8c8d';
+
+                const commonOptions = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: {size: 13} } } }
+                };
+
+                // Chart: Daily Trend Jaws Effect
+                new Chart(document.getElementById('dailyTrendChart').getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Day 1', 'Day 2'],
+                        datasets: [
+                            { label: 'ยอดขายรวมก่อนลด (Gross) [พุ่งขึ้น]', data: [69604, 77080], borderColor: '#3498db', backgroundColor: '#3498db', tension: 0.1, borderWidth: 4, pointRadius: 6 },
+                            { label: 'ยอดเงินสดรับจริง (Net) [หดลง]', data: [47761, 43972], borderColor: '#2ecc71', backgroundColor: '#2ecc71', tension: 0.1, borderWidth: 4, pointRadius: 6 },
+                            { label: 'ส่วนลดสูญเสีย (Discount) [พุ่งทะยาน]', data: [21853, 33108], borderColor: '#e74c3c', backgroundColor: '#e74c3c', tension: 0.1, borderWidth: 4, borderDash: [5, 5], pointRadius: 6 }
+                        ]
+                    },
+                    options: { ...commonOptions, scales: { y: { beginAtZero: true } } }
+                });
+
+                // Chart: Hourly Net Comparison
+                const labelsHour = ['5:00 น.','6:00 น.','7:00 น.','8:00 น.','9:00 น.','10:00 น.','11:00 น.','12:00 น.','13:00 น.','14:00 น.','15:00 น.','16:00 น.','17:00 น.','18:00 น.','19:00 น.','20:00 น.','21:00 น.','22:00 น.','23:00 น.'];
+                new Chart(document.getElementById('hourlyNetChart').getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labelsHour,
+                        datasets: [
+                            { label: 'ยอดรับจริง Day 1', data: [795,2816,480,525,2818,883,6799,2587,1858,2874,5989,5648,299,985,1800,940,9327,338,0], borderColor: '#bdc3c7', backgroundColor: 'rgba(189, 195, 199, 0.2)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                            { label: 'ยอดรับจริง Day 2', data: [30,765,715,625,1065,2145,2606,2105,2060,4803,2085,3106,923,3782,1918,595,11286,3358,0], borderColor: '#2ecc71', backgroundColor: 'rgba(46, 204, 113, 0.2)', fill: true, tension: 0.4, borderWidth: 4, pointRadius: 5 }
+                        ]
+                    },
+                    options: { ...commonOptions, interaction: { mode: 'index', intersect: false }, scales: { y: { beginAtZero: true } } }
+                });
+
+                // Chart: Hourly Discount Comparison
+                new Chart(document.getElementById('hourlyDiscChart').getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labelsHour,
+                        datasets: [
+                            { label: 'ส่วนลดป้ายเหลือง Day 1', data: [0,14,0,0,0,0,0,0,0,0,52,0,0,0,0,0,20990,787,0], borderColor: '#e67e22', borderDash: [5, 5], tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                            { label: 'ส่วนลดป้ายเหลือง Day 2 (วิกฤต)', data: [0,0,0,0,0,0,14,0,76,24,24,0,0,0,14,450,24967,7539,0], borderColor: '#e74c3c', backgroundColor: 'rgba(231, 76, 60, 0.2)', fill: true, tension: 0.4, borderWidth: 4, pointRadius: 5 }
+                        ]
+                    },
+                    options: { ...commonOptions, interaction: { mode: 'index', intersect: false }, scales: { y: { beginAtZero: true } } }
+                });
+
+                // Chart: Basket Quality (100% Stacked Bar)
+                new Chart(document.getElementById('basketQualityChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Day 1 (พรีเมียม)', 'Day 2 (รอป้ายเหลือง)'],
+                        datasets: [
+                            { label: 'บิลลูกค้าจ่ายราคาเต็ม', data: [235, 198], backgroundColor: '#2ecc71', borderRadius: 4 },
+                            { label: 'บิลลูกค้าซื้อตอนโปรฯ หั่นราคา', data: [60, 112], backgroundColor: '#e74c3c', borderRadius: 4 }
+                        ]
+                    },
+                    options: { 
+                        maintainAspectRatio: false, responsive: true, indexAxis: 'y',
+                        plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                        scales: { x: { stacked: true }, y: { stacked: true } }
+                    }
+                });
+
+                // Chart: Money Drainers
+                new Chart(document.getElementById('moneyDrainersChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sushi Bento 2 Friends', 'Sushi Bento Small Set 1', 'Salmon Aburi Sushi 7 pcs', 'Tuna Sushi 7 pcs'],
+                        datasets: [
+                            { label: 'มูลค่ากำไรที่ถูกหั่นทิ้ง (บาท) - Day 2', data: [3059, 2800, 2804, 1730], backgroundColor: '#e74c3c', borderRadius: 4 }
+                        ]
+                    },
+                    options: { 
+                        maintainAspectRatio: false, responsive: true, indexAxis: 'y',
+                        plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                        scales: { x: { beginAtZero: true, grid: { borderDash: [4, 4] } }, y: { grid: { display: false } } }
+                    }
+                });
+
+            } catch (err) {
+                console.error("Chart Error: ", err);
+            }
+        };
+    </script>
+</body>
+</html>
