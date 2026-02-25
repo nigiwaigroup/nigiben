@@ -48,19 +48,36 @@
         .diff-up-good { color: #27ae60; background: #e8f8f5; }
         .diff-down-bad { color: #c0392b; background: #fdedec; }
         .diff-up-bad { color: #c0392b; background: #fdedec; }
-        .diff-down-good { color: #27ae60; background: #e8f8f5; }
 
         /* Charts & Analysis Boxes */
         .chart-section { background: var(--card-bg); padding: 35px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; margin-bottom: 40px;}
         .chart-header { font-size: 1.3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; padding-bottom: 15px; border-bottom: 2px solid #ecf0f1; }
         .chart-wrapper { position: relative; height: 400px; width: 100%; margin-top: 20px; }
+        .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;}
+        .donut-wrapper { height: 320px; position: relative; width: 100%; }
         
         .analysis-box { background-color: #fdfefe; border-left: 5px solid var(--accent-color); padding: 20px 25px; border-radius: 0 8px 8px 0; margin-top: 25px; font-size: 0.95rem; line-height: 1.6; color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
         .analysis-box h4 { margin-top: 0; color: var(--accent-color); margin-bottom: 15px; font-size: 1.1rem;}
         .analysis-box ul { margin-bottom: 0; padding-left: 20px; }
         .analysis-box li { margin-bottom: 10px; }
 
-        /* Lists for Section 5 */
+        /* NEW Accordion Item Compare */
+        .accordion-container { display: flex; flex-direction: column; gap: 15px; margin-bottom: 50px; }
+        .acc-item { background: var(--card-bg); border: 1px solid #e1e8ed; border-radius: 8px; overflow: hidden; }
+        .acc-header { padding: 15px 20px; cursor: pointer; background-color: #f8fbfe; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
+        .acc-header:hover { background-color: #eaf3fb; }
+        .acc-title { font-size: 1.1rem; font-weight: 600; color: var(--primary-color); }
+        .acc-stats { display: flex; gap: 15px; font-weight: 500; color: var(--text-muted); font-size: 0.9rem; align-items: center;}
+        .acc-stats span { color: var(--text-main); font-weight: 700; margin-left: 5px; }
+        .acc-content { display: none; border-top: 1px solid #e1e8ed; max-height: 500px; overflow-y: auto; }
+        .acc-content.active { display: block; }
+        .item-row { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid #f4f7f6; font-size: 0.95rem; align-items: center;}
+        .item-row:nth-child(even) { background-color: #fafbfc; }
+        .item-row:last-child { border-bottom: none; }
+        .item-name { flex: 2; color: var(--text-main); font-weight: 500;}
+        .item-qty { flex: 1; text-align: right; color: var(--text-muted); }
+        
+        /* Lists */
         .list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;}
         .list-card { background: white; padding: 25px; border-radius: 12px; border: 1px solid #e1e8ed; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .list-card.best h3 { color: #27ae60; margin-top: 0; border-bottom: 2px solid #27ae60; padding-bottom: 10px; }
@@ -77,7 +94,7 @@
         .shelf-card h3 { margin-top: 0; font-size: 1.3rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px;}
         .shelf-card ul { padding-left: 20px; font-size: 1.05rem; line-height: 1.6;}
         
-        /* Action Plan Cards - Detailed */
+        /* Action Plan */
         .action-plan-section { display: flex; flex-direction: column; gap: 25px; margin-bottom: 50px;}
         .action-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #e1e8ed;}
         .action-header { padding: 20px 25px; color: white; display: flex; align-items: center; gap: 15px; font-size: 1.3rem; font-weight: 700;}
@@ -91,29 +108,13 @@
         .solution-text { border-left: 4px solid #2ecc71; padding-left: 15px; margin-bottom: 15px;}
         .solution-text strong { color: #27ae60; font-size: 1rem;}
 
-        /* Accordion */
-        .category-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-        .day-column h3 { text-align: center; color: var(--primary-color); padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-top: 0; border: 1px solid #e1e8ed;}
-        .accordion-container { display: flex; flex-direction: column; gap: 15px; }
-        .acc-item { background: var(--card-bg); border: 1px solid #e1e8ed; border-radius: 8px; overflow: hidden; }
-        .acc-header { padding: 15px 20px; cursor: pointer; background-color: #f8fbfe; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
-        .acc-header:hover { background-color: #eaf3fb; }
-        .acc-title { font-size: 1.1rem; font-weight: 600; color: var(--primary-color); }
-        .acc-stats { display: flex; gap: 15px; font-weight: 500; color: var(--text-muted); font-size: 0.9rem; align-items: center;}
-        .acc-stats span { color: var(--text-main); font-weight: 700; margin-left: 5px; }
-        .acc-content { display: none; border-top: 1px solid #e1e8ed; max-height: 400px; overflow-y: auto; }
-        .acc-content.active { display: block; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f4f7f6; font-size: 0.9rem; }
-        .item-row:nth-child(even) { background-color: #fafbfc; }
-        .item-row:last-child { border-bottom: none; }
-        .item-name { flex: 2; color: var(--text-main); font-weight: 500;}
-        .item-qty { flex: 1; text-align: right; color: var(--text-muted); }
-
         .fallback-error { padding: 20px; background: #fee; border: 1px solid #fcc; color: #c00; border-radius: 8px; text-align: center; margin-bottom: 20px; display: none;}
         
         @media (max-width: 992px) {
-            .list-grid, .shelf-strategy, .action-body, .category-compare-grid { grid-template-columns: 1fr; gap: 20px;}
+            .list-grid, .shelf-strategy, .action-body, .two-cols { grid-template-columns: 1fr; gap: 20px;}
             .chart-wrapper { height: 350px; }
+            .item-row { flex-direction: column; align-items: flex-start; gap: 5px;}
+            .item-qty { text-align: left; }
         }
     </style>
 </head>
@@ -127,7 +128,7 @@
         <div id="jsError" class="fallback-error">⚠️ ไม่สามารถโหลดกราฟได้ กรุณาเชื่อมต่ออินเทอร์เน็ต แต่ยังสามารถดูข้อมูลในตารางและข้อเสนอแนะได้ตามปกติ</div>
 
         <h2 class="section-title">📊 1. Performance Overview (วิกฤตการณ์กำไรหดตัว)</h2>
-        <p class="section-desc">แม้ Gross Sales จะดูเหมือนเติบโต แต่คุณภาพของตะกร้าสินค้ากลับดิ่งลงอย่างหนัก (Basket Quality Crisis)</p>
+        <p class="section-desc">การเติบโตที่ซ่อนปัญหา "แม้ Gross Sales จะโต แต่คุณภาพตะกร้าสินค้ากลับดิ่งลงอย่างหนัก"</p>
         <div class="kpi-container">
             <div class="kpi-card">
                 <div class="kpi-title">ยอดขายก่อนหักส่วนลด (Gross)</div>
@@ -168,12 +169,35 @@
         </div>
 
         <h2 class="section-title">📈 2. Visual Analytics (เจาะลึกพฤติกรรมยอดขาย)</h2>
+        <p class="section-desc">เจาะลึกโครงสร้างรายได้และพฤติกรรมการจ่ายเงินของลูกค้า</p>
+        
         <div class="chart-section">
             <div class="chart-header">แนวโน้ม "ปากฉลาม (The Jaws Effect)" (Day 1 vs Day 2)</div>
             <div class="chart-wrapper" style="height: 350px;"><canvas id="dailyTrendChart"></canvas></div>
             <div class="analysis-box" style="border-left-color: #3498db;">
                 <h4>🔍 สัญญาณอันตรายจากกราฟ</h4>
-                <p>ยอดขายดูเหมือนโตขึ้น (เส้นสีน้ำเงิน) แต่ถูกถ่วงน้ำหนักด้วยส่วนลดที่สูงชัน (เส้นสีแดง) ดึงให้กระแสเงินสดรับจริง (เส้นสีเขียว) ปักหัวลง นี่คือสัญญาณว่า "เรากำลังแคนนิบาลตัวเอง (Cannibalization)" ลูกค้าเปลี่ยนพฤติกรรมมารอโปรโมชั่นป้ายเหลือง</p>
+                <p>ยอดขายดูเหมือนโตขึ้น (เส้นสีน้ำเงิน) แต่ถูกถ่วงน้ำหนักด้วยส่วนลดที่สูงชัน (เส้นสีแดง) ดึงให้กระแสเงินสดรับจริง (เส้นสีเขียว) ปักหัวลง นี่คือสัญญาณว่า "เรากำลังแคนนิบาลตัวเอง" ลูกค้าเปลี่ยนพฤติกรรมมารอโปรโมชั่น</p>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">สัดส่วนกลุ่มลูกค้า (Basket Segmentation - ข้อมูลอัปเดต 24/02/2026)</div>
+            <div class="two-cols">
+                <div>
+                    <h3 style="text-align: center; color: var(--text-muted); font-size: 1.1rem;">ปริมาณลูกค้า (จำนวนบิล)</h3>
+                    <div class="donut-wrapper"><canvas id="basketCountChart"></canvas></div>
+                </div>
+                <div>
+                    <h3 style="text-align: center; color: var(--text-muted); font-size: 1.1rem;">รายได้ที่สร้าง (Net Revenue - THB)</h3>
+                    <div class="donut-wrapper"><canvas id="basketRevChart"></canvas></div>
+                </div>
+            </div>
+            <div class="analysis-box urgent" style="margin-top: 30px;">
+                <h4>🔍 ความย้อนแย้งของตะกร้าสินค้า (The Basket Paradox)</h4>
+                <ul>
+                    <li><strong>คนเต็มร้าน แต่ได้เงินน้อย:</strong> กลุ่ม Grab & Go (สีเทา) เดินเข้าร้านมากถึง <strong>69% (214 บิล)</strong> แต่นี่คือกลุ่มที่เดินมาซื้อน้ำเปล่าขวดเดียว สร้างรายได้ให้ร้านเพียง 28% ของทั้งหมด</li>
+                    <li><strong>เดอะแบกตัวจริง:</strong> กลุ่ม Solo Meal (สีฟ้า) ที่ซื้อบิลละ 200-500 บาท มีจำนวนเพียง 27% แต่กวาดรายได้ให้สาขาถึง <strong>54%</strong> นี่คือกลุ่มลูกค้าพรีเมียมที่ร้านต้องโฟกัสและทำการ Upsell น้ำดื่มให้สำเร็จ</li>
+                </ul>
             </div>
         </div>
 
@@ -186,7 +210,7 @@
                 <h4>🔍 ผลการวิเคราะห์ช่วงเวลา (Time-series Insights)</h4>
                 <ul>
                     <li><strong>ช่วงบ่าย 14:00 น. เป็นช่วงเวลาทองคำแห่งใหม่:</strong> ใน Day 2 ยอดขายสุทธิช่วงบ่ายสองพุ่งขึ้นแตะเกือบ 5,000 บาท ซึ่งเป็นการขายราคาเต็ม 100% ควรจัดพนักงานให้พร้อมบริการในเวลานี้</li>
-                    <li><strong>วิกฤตการณ์ 21:00 น.:</strong> กราฟเส้นสีแดงกระโดดพุ่งทะลุเพดานในเวลา 2 ทุ่ม-3 ทุ่ม ของ Day 2 มีการให้ส่วนลดรวมกว่า <strong>24,967 บาท ภายในชั่วโมงเดียว!</strong> สะท้อนปริมาณซูชิที่ทำเผื่อไว้มากเกินไป จนต้องหั่นราคา 70% หนี Food Waste</li>
+                    <li><strong>วิกฤตการณ์ 21:00 น.:</strong> กราฟเส้นสีแดงกระโดดพุ่งทะลุเพดานในเวลา 2 ทุ่ม-3 ทุ่ม ของ Day 2 มีการให้ส่วนลดรวมกว่า <strong>24,967 บาท ภายในชั่วโมงเดียว!</strong> สะท้อนปริมาณซูชิที่ทำเผื่อไว้มากเกินไป</li>
                 </ul>
             </div>
         </div>
@@ -584,7 +608,7 @@
                     <div class="action-block">
                         <h4>แผนปฏิบัติการ (Action Plan)</h4>
                         <p class="solution-text">1. <strong>ปรับ Par Level ทันที:</strong> หั่นยอดสั่งผลิตเบนโตะเซ็ตกลุ่ม Money Drainers ลง 30-40% ทันทีหลังเวลา 16:00 น.</p>
-                        <p class="solution-text">2. <strong>ลดจำนวนการผลิตสินค้าที่ขายไม่ดี:</strong> สินค้า Top 10 ที่ขายไม่ดี (เช่น ข้าวหน้าไก่, หมูทอด) ให้ลดจำนวนผลิตลง เพื่อลดการสูญเสีย </p>
+                        <p class="solution-text">2. <strong>ลดจำนวนการผลิตสินค้าที่ขายไม่ไดี:</strong> สินค้า Top 10 ที่ขายไม่ดี (เช่น ข้าวหน้าไก่, หมูทอด) ลดจำนวนลงเพื่อลดการสูญเสีย Waste</p>
                         <p class="solution-text">3. <strong>Focus Hero Product:</strong> ให้ความสำคัญกับการจัดตู้โชว์ด้วย <strong>Salmon Sushi 7 pcs</strong> ซึ่งเป็นเมนูเดียวที่ขายราคาเต็มได้สม่ำเสมอที่สุด</p>
                     </div>
                 </div>
@@ -671,16 +695,39 @@
                     },
                     options: { ...commonOptions, scales: { y: { beginAtZero: true } } }
                 });
+                
+                // Chart: Basket Count (Doughnut)
+                const basketData = [
+                    {"Segment": "Grab & Go (<200฿)", "Count": 214, "Revenue": 12485, "color": "#bdc3c7"},
+                    {"Segment": "Solo Meal (200-500฿)", "Count": 85, "Revenue": 23946, "color": "#3498db"},
+                    {"Segment": "Couple/Group (>500฿)", "Count": 11, "Revenue": 7541, "color": "#2ecc71"}
+                ];
+                new Chart(document.getElementById('basketCountChart').getContext('2d'), {
+                    type: 'doughnut',
+                    data: { labels: basketData.map(d => d.Segment), datasets: [{ data: basketData.map(d => d.Count), backgroundColor: basketData.map(d => d.color), borderWidth: 2, hoverOffset: 5 }] },
+                    options: { maintainAspectRatio: false, responsive: true, plugins: { legend: { position: 'bottom', labels: { padding: 15 } } }, cutout: '65%' }
+                });
+
+                // Chart: Basket Revenue (Doughnut)
+                new Chart(document.getElementById('basketRevChart').getContext('2d'), {
+                    type: 'doughnut',
+                    data: { labels: basketData.map(d => d.Segment), datasets: [{ data: basketData.map(d => d.Revenue), backgroundColor: basketData.map(d => d.color), borderWidth: 2, hoverOffset: 5 }] },
+                    options: { maintainAspectRatio: false, responsive: true, plugins: { legend: { position: 'bottom', labels: { padding: 15 } } }, cutout: '65%' }
+                });
+
+                // Hourly Data
+                const hourlyDay1 = [{"Hour": 5, "Net": 795, "Discount": 0}, {"Hour": 6, "Net": 2816, "Discount": 14}, {"Hour": 7, "Net": 480, "Discount": 0}, {"Hour": 8, "Net": 525, "Discount": 0}, {"Hour": 9, "Net": 2818, "Discount": 0}, {"Hour": 10, "Net": 883, "Discount": 0}, {"Hour": 11, "Net": 6799, "Discount": 0}, {"Hour": 12, "Net": 2587, "Discount": 0}, {"Hour": 13, "Net": 1858, "Discount": 0}, {"Hour": 14, "Net": 2874, "Discount": 0}, {"Hour": 15, "Net": 5989, "Discount": 52}, {"Hour": 16, "Net": 5648, "Discount": 0}, {"Hour": 17, "Net": 299, "Discount": 0}, {"Hour": 18, "Net": 985, "Discount": 0}, {"Hour": 19, "Net": 1800, "Discount": 0}, {"Hour": 20, "Net": 940, "Discount": 0}, {"Hour": 21, "Net": 9327, "Discount": 20990}, {"Hour": 22, "Net": 338, "Discount": 787}, {"Hour": 23, "Net": 0, "Discount": 0}];
+                const hourlyDay2 = [{"Hour": 5, "Net": 30, "Discount": 0}, {"Hour": 6, "Net": 765, "Discount": 0}, {"Hour": 7, "Net": 715, "Discount": 0}, {"Hour": 8, "Net": 625, "Discount": 0}, {"Hour": 9, "Net": 1065, "Discount": 0}, {"Hour": 10, "Net": 2145, "Discount": 0}, {"Hour": 11, "Net": 2606, "Discount": 14}, {"Hour": 12, "Net": 2105, "Discount": 0}, {"Hour": 13, "Net": 2060, "Discount": 76}, {"Hour": 14, "Net": 4803, "Discount": 24}, {"Hour": 15, "Net": 2085, "Discount": 24}, {"Hour": 16, "Net": 3106, "Discount": 0}, {"Hour": 17, "Net": 923, "Discount": 0}, {"Hour": 18, "Net": 3782, "Discount": 0}, {"Hour": 19, "Net": 1918, "Discount": 14}, {"Hour": 20, "Net": 595, "Discount": 450}, {"Hour": 21, "Net": 11286, "Discount": 24967}, {"Hour": 22, "Net": 3358, "Discount": 7539}, {"Hour": 23, "Net": 0, "Discount": 0}];
+                const labelsHour = hourlyDay1.map(d => d.Hour + ':00 น.');
 
                 // Chart: Hourly Net Comparison
-                const labelsHour = ['5:00 น.','6:00 น.','7:00 น.','8:00 น.','9:00 น.','10:00 น.','11:00 น.','12:00 น.','13:00 น.','14:00 น.','15:00 น.','16:00 น.','17:00 น.','18:00 น.','19:00 น.','20:00 น.','21:00 น.','22:00 น.','23:00 น.'];
                 new Chart(document.getElementById('hourlyNetChart').getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: labelsHour,
                         datasets: [
-                            { label: 'ยอดรับจริง Day 1', data: [795,2816,480,525,2818,883,6799,2587,1858,2874,5989,5648,299,985,1800,940,9327,338,0], borderColor: '#bdc3c7', backgroundColor: 'rgba(189, 195, 199, 0.2)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4 },
-                            { label: 'ยอดรับจริง Day 2', data: [30,765,715,625,1065,2145,2606,2105,2060,4803,2085,3106,923,3782,1918,595,11286,3358,0], borderColor: '#2ecc71', backgroundColor: 'rgba(46, 204, 113, 0.2)', fill: true, tension: 0.4, borderWidth: 4, pointRadius: 5 }
+                            { label: 'ยอดรับจริง Day 1', data: hourlyDay1.map(d => d.Net), borderColor: '#bdc3c7', backgroundColor: 'rgba(189, 195, 199, 0.2)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                            { label: 'ยอดรับจริง Day 2', data: hourlyDay2.map(d => d.Net), borderColor: '#2ecc71', backgroundColor: 'rgba(46, 204, 113, 0.2)', fill: true, tension: 0.4, borderWidth: 4, pointRadius: 5 }
                         ]
                     },
                     options: { ...commonOptions, interaction: { mode: 'index', intersect: false }, scales: { y: { beginAtZero: true } } }
@@ -692,8 +739,8 @@
                     data: {
                         labels: labelsHour,
                         datasets: [
-                            { label: 'ส่วนลดป้ายเหลือง Day 1', data: [0,14,0,0,0,0,0,0,0,0,52,0,0,0,0,0,20990,787,0], borderColor: '#e67e22', borderDash: [5, 5], tension: 0.4, borderWidth: 3, pointRadius: 4 },
-                            { label: 'ส่วนลดป้ายเหลือง Day 2 (วิกฤต)', data: [0,0,0,0,0,0,14,0,76,24,24,0,0,0,14,450,24967,7539,0], borderColor: '#e74c3c', backgroundColor: 'rgba(231, 76, 60, 0.2)', fill: true, tension: 0.4, borderWidth: 4, pointRadius: 5 }
+                            { label: 'ส่วนลดป้ายเหลือง Day 1', data: hourlyDay1.map(d => d.Discount), borderColor: '#e67e22', borderDash: [5, 5], tension: 0.4, borderWidth: 3, pointRadius: 4 },
+                            { label: 'ส่วนลดป้ายเหลือง Day 2 (วิกฤต)', data: hourlyDay2.map(d => d.Discount), borderColor: '#e74c3c', backgroundColor: 'rgba(231, 76, 60, 0.2)', fill: true, tension: 0.4, borderWidth: 4, pointRadius: 5 }
                         ]
                     },
                     options: { ...commonOptions, interaction: { mode: 'index', intersect: false }, scales: { y: { beginAtZero: true } } }
