@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> NIGIBEN | Live Executive Dashboard</title>
+    <title>Nigiwai Group | Dynamic Executive Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <style>
@@ -25,23 +22,16 @@
         table.dataTable tbody td { border-bottom: 1px solid #f1f5f9; font-size: 0.875rem; color: #334155; padding: 0.75rem; text-align: center; vertical-align: middle; }
         table.dataTable tbody tr:hover { background-color: #f8fafc; }
 
-        /* สีสันตัวเลข */
         .val-zero { color: #94a3b8; }
         .val-positive { color: #16a34a; font-weight: 600; background-color: #dcfce7; padding: 0.25rem 0.5rem; border-radius: 9999px; display: inline-block; min-width: 2.5rem; }
         .val-negative { color: #dc2626; font-weight: 600; background-color: #fee2e2; padding: 0.25rem 0.5rem; border-radius: 9999px; display: inline-block; min-width: 2.5rem; }
         .waste-val { color: #dc2626; font-weight: 600; }
-        
-        /* สไตล์สำหรับช่องที่ Edit ได้ */
-        .editable-cell { cursor: pointer; transition: all 0.2s; position: relative; }
-        .editable-cell:hover { background-color: #eff6ff; border-radius: 0.25rem; box-shadow: inset 0 0 0 1px #93c5fd; }
-        .editable-cell:focus { outline: none; background-color: #fff; box-shadow: inset 0 0 0 2px #3b82f6; border-radius: 0.25rem; }
 
         .table-container::-webkit-scrollbar { height: 8px; width: 8px; }
         .table-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Loading Overlay */
         #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     </style>
 </head>
@@ -49,8 +39,8 @@
 
     <div id="loader">
         <i class="fas fa-circle-notch fa-spin text-5xl text-amber-500 mb-4"></i>
-        <p class="font-bold text-slate-700 text-lg">กำลังเชื่อมต่อข้อมูลจาก Google Sheets...</p>
-        <p class="text-sm text-slate-500 mt-1">Live Data Synchronization (API)</p>
+        <p class="font-bold text-slate-700 text-lg">กำลังประมวลผลข้อมูลโครงสร้างใหม่จาก Google Sheets...</p>
+        <p class="text-sm text-slate-500 mt-1">Live Dynamic Synchronization</p>
     </div>
 
     <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
@@ -61,14 +51,14 @@
                         <i class="fas fa-gem text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-xl tracking-wide text-slate-800">NIGIBEN</h1>
-                        <p class="text-[11px] text-slate-500 uppercase tracking-widest font-semibold">Live Executive Data Hub</p>
+                        <h1 class="font-bold text-xl tracking-wide text-slate-800">NIGIWAO GROUP</h1>
+                        <p class="text-[11px] text-slate-500 uppercase tracking-widest font-semibold">Live Dynamic Data Hub</p>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-4">
                     <span class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-md text-[11px] font-semibold border border-emerald-100">
-                        <i class="fas fa-cloud-arrow-down"></i> LIVE SYNC ACTIVE
+                        <i class="fas fa-bolt"></i> FULLY DYNAMIC SYNC
                     </span>
                     <button onclick="location.reload()" class="w-9 h-9 flex items-center justify-center rounded-md hover:bg-slate-100 text-slate-500 transition-colors border border-transparent hover:border-slate-200" title="Refresh Data">
                         <i class="fas fa-sync-alt"></i>
@@ -84,17 +74,17 @@
             <div>
                 <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-3">
                     <i class="fas fa-satellite-dish text-amber-500 animate-pulse"></i>
-                    ตารางสต็อกสินค้า Real-time (ผูกข้อมูลจาก Google Sheets)
+                    ตารางสต็อกสินค้าอัตโนมัติ (Dynamic Days Generation)
                 </h2>
-                <p class="text-slate-500 mt-1">ข้อมูลถูกดึงมาจากไฟล์ออนไลน์โดยตรง สามารถกดที่หัวคอลัมน์เพื่อ Sort และ <strong class="text-blue-600">กดที่ตัวเลขเพื่อแก้ไข</strong> ระบบจะคำนวณใหม่ให้ทันที</p>
-                <p class="text-emerald-600 mt-1 text-sm"><i class="fas fa-info-circle mr-1"></i>ยอดคงเหลือ 24 ก.พ. = ยอดรับเข้า(รวมยกมา) - ขาย - แจก - สูญเสีย</p>
+                <p class="text-slate-500 mt-1">ระบบจะตรวจจับและสร้างคอลัมน์ของวันใหม่ๆ (เช่น วันที่ 25, 26) ให้อัตโนมัติเมื่อมีการอัปเดตใน Sheet</p>
+                <p class="text-emerald-600 mt-1 text-sm"><i class="fas fa-info-circle mr-1"></i>ปิดฟังก์ชันแก้ไขตัวเลข (Read-Only) ข้อมูลทั้งหมดจะดึงจาก Google Sheets โดยตรง</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Remaining (24 Feb)</p>
+                    <p id="kpi-cf-title" class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Remaining</p>
                     <h3 id="kpi-cf" class="text-3xl font-bold text-slate-800">...</h3>
                 </div>
                 <div class="w-14 h-14 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500">
@@ -104,7 +94,7 @@
             
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Waste (2 Days)</p>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Waste (All Days)</p>
                     <h3 id="kpi-waste" class="text-3xl font-bold text-rose-600">...</h3>
                 </div>
                 <div class="w-14 h-14 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500">
@@ -135,42 +125,19 @@
 
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                <h3 class="font-bold text-slate-700 text-lg"><i class="fas fa-table-list mr-2 text-slate-400"></i>ข้อมูลสินค้าทั้งหมด</h3>
-                <span class="text-xs text-slate-500 bg-slate-200 px-2 py-1 rounded"><i class="fas fa-pen text-[10px] mr-1"></i>ดับเบิ้ลคลิก/คลิกที่ตัวเลขเพื่อแก้ไข</span>
+                <h3 class="font-bold text-slate-700 text-lg"><i class="fas fa-table-list mr-2 text-slate-400"></i>ข้อมูลสินค้าทั้งหมด (Dynamic Layout)</h3>
+                <span class="text-xs text-slate-500 bg-slate-200 px-2 py-1 rounded"><i class="fas fa-lock text-[10px] mr-1"></i>Read-Only</span>
             </div>
             <div class="p-6 table-container overflow-x-auto">
                 <table id="inventoryTable" class="w-full whitespace-nowrap" width="100%">
-                    <thead>
-                        <tr>
-                            <th class="bg-slate-800 text-white rounded-tl-md" rowspan="2" style="background-color: #1e293b;">กลุ่มสินค้า</th>
-                            <th class="bg-slate-800 text-white" rowspan="2" style="background-color: #1e293b;">ลำดับ</th>
-                            <th class="text-left bg-slate-800 text-white" rowspan="2" style="background-color: #1e293b; padding-left: 1rem;">รหัสสินค้า</th>
-                            <th class="text-left bg-slate-800 text-white" rowspan="2" style="background-color: #1e293b;">ชื่อสินค้า (Item Name)</th>
-                            <th colspan="5" style="background-color: #f1f5f9; border-right: 1px solid #cbd5e1;">ยอดวันที่ 23 ก.พ. 2569</th>
-                            <th colspan="5" style="background-color: #e2e8f0; border-right: 1px solid #cbd5e1;" class="rounded-tr-md">ยอดวันที่ 24 ก.พ. 2569</th>
-                        </tr>
-                        <tr>
-                            <th style="background-color: #f8fafc;">รับเข้า</th>
-                            <th style="background-color: #f8fafc;">ขาย</th>
-                            <th style="background-color: #f8fafc;">แจก/โปรโมชั่น</th>
-                            <th style="background-color: #f8fafc; color: #dc2626;">สูญเสีย</th>
-                            <th style="background-color: #f8fafc; border-right: 1px solid #cbd5e1;">คงเหลือ</th>
-                            
-                            <th style="background-color: #f1f5f9;">รับเข้า(รวมยกมา)</th>
-                            <th style="background-color: #f1f5f9;">ขาย</th>
-                            <th style="background-color: #f1f5f9;">แจก/โปรโมชั่น</th>
-                            <th style="background-color: #f1f5f9; color: #dc2626;">สูญเสีย</th>
-                            <th style="background-color: #f1f5f9;">คงเหลือ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
+                    <thead></thead>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
         
         <div class="mt-8 mb-12 text-center text-slate-400 text-sm">
-            &copy; 2026 Nigiwai Group Executive Portal. Live Sync Enabled.
+            &copy; 2026 Nigiwai Group Executive Portal. Dynamic API Sync Enabled.
         </div>
     </main>
 
@@ -179,7 +146,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
     <script>
-        // 🚨 แก้ไขลิงก์เป็น Google Visualization API เพื่อไม่ให้โดนบล็อก
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/11Mu-cO632cHm1oqp4CJpbIP4BUrIoEr7Rr5H3gbK3C0/gviz/tq?tqx=out:csv&gid=1104128225";
 
         function fmtStd(v) { return v === 0 ? '<span class="val-zero">0</span>' : v; }
@@ -201,52 +167,85 @@
                 header: false,
                 complete: function(results) {
                     var data = results.data;
-                    var tbodyHtml = "";
+                    if(data.length < 3) return; 
                     
-                    // วนลูปเริ่มจากแถวที่ 3 (ข้าม Header ที่อยู่ใน Sheet)
+                    var row_dates = data[1];
+                    var row_headers = data[2];
+                    
+                    var days = [];
+                    for (var col = 11; col < row_headers.length; col += 8) {
+                        if (row_headers[col] === 'ยกมา') {
+                            var dateStr = row_dates[col + 2] || 'New Day'; 
+                            days.push({ startIndex: col, dateStr: dateStr });
+                        }
+                    }
+
+                    var thead1 = '<tr>';
+                    thead1 += '<th class="bg-slate-800 text-white rounded-tl-md" rowspan="2" style="background-color: #1e293b;">กลุ่มสินค้า</th>';
+                    thead1 += '<th class="bg-slate-800 text-white" rowspan="2" style="background-color: #1e293b;">ลำดับ</th>';
+                    thead1 += '<th class="text-left bg-slate-800 text-white" rowspan="2" style="background-color: #1e293b; padding-left: 1rem;">รหัสสินค้า</th>';
+                    thead1 += '<th class="text-left bg-slate-800 text-white" rowspan="2" style="background-color: #1e293b;">ชื่อสินค้า (Item Name)</th>';
+                    
+                    var thead2 = '<tr>';
+                    
+                    for (var d = 0; d < days.length; d++) {
+                        var isLastDay = (d === days.length - 1);
+                        var bgClass = (d % 2 === 0) ? '#f1f5f9' : '#e2e8f0';
+                        var cellBgClass = (d % 2 === 0) ? '#f8fafc' : '#f1f5f9';
+                        var roundedClass = isLastDay ? 'rounded-tr-md' : '';
+                        
+                        thead1 += `<th colspan="5" style="background-color: ${bgClass}; border-right: 1px solid #cbd5e1;" class="${roundedClass}">ยอดวันที่ ${days[d].dateStr}</th>`;
+                        
+                        thead2 += `<th style="background-color: ${cellBgClass};">รับเข้า${d > 0 ? '(รวมยกมา)' : ''}</th>`;
+                        thead2 += `<th style="background-color: ${cellBgClass};">ขาย</th>`;
+                        thead2 += `<th style="background-color: ${cellBgClass};">แจก/โปรโมชั่น</th>`;
+                        thead2 += `<th style="background-color: ${cellBgClass}; color: #dc2626;">สูญเสีย</th>`;
+                        thead2 += `<th style="background-color: ${cellBgClass}; border-right: 1px solid #cbd5e1;">คงเหลือ</th>`;
+                    }
+                    thead1 += '</tr>';
+                    thead2 += '</tr>';
+                    $('#inventoryTable thead').html(thead1 + thead2);
+
+                    var tbodyHtml = "";
                     for (var i = 3; i < data.length; i++) {
                         var row = data[i];
                         if (!row || !row[4]) continue; 
 
-                        var no = row[0] || '';
                         var category = row[1] || '';
+                        var no = row[0] || '';
                         var code = row[2] || '';
                         var name_th = row[5] || '';
-
-                        var in_23 = parseNum(row[12]);
-                        var sold_23 = parseNum(row[13]);
-                        var ga_23 = parseNum(row[14]);
-                        var waste_23 = parseNum(row[15]);
-                        var cf_23 = parseNum(row[16]);
-
-                        var raw_in_24 = parseNum(row[20]);
-                        var sold_24 = parseNum(row[21]);
-                        var ga_24 = parseNum(row[22]);
-                        var waste_24 = parseNum(row[23]);
-
-                        // กฎพิเศษสำหรับน้ำทิพย์ 
-                        if (name_th === 'น้ำเปล่า น้ำทิพย์') { sold_24 = 199; }
-
-                        var in_24_calc = raw_in_24 + cf_23; 
-                        var cf_24_calc = in_24_calc - sold_24 - ga_24 - waste_24; 
-
+                        
                         tbodyHtml += "<tr>";
                         tbodyHtml += '<td class="font-medium text-slate-600">' + category + '</td>';
                         tbodyHtml += '<td class="font-mono text-slate-500">' + no + '</td>';
                         tbodyHtml += '<td class="text-left font-mono text-sm text-slate-500 pl-4">' + code + '</td>';
                         tbodyHtml += '<td class="text-left font-medium text-slate-700">' + name_th + '</td>';
                         
-                        tbodyHtml += '<td class="editable-cell" contenteditable="true" data-col="in23">' + fmtStd(in_23) + '</td>';
-                        tbodyHtml += '<td class="editable-cell" contenteditable="true" data-col="sold23">' + fmtStd(sold_23) + '</td>';
-                        tbodyHtml += '<td class="editable-cell" contenteditable="true" data-col="ga23">' + fmtStd(ga_23) + '</td>';
-                        tbodyHtml += '<td class="editable-cell" contenteditable="true" data-col="waste23">' + fmtWaste(waste_23) + '</td>';
-                        tbodyHtml += '<td style="border-right: 1px dashed #cbd5e1;" data-col="cf23">' + fmtStock(cf_23) + '</td>';
+                        var prev_cf = 0; 
                         
-                        tbodyHtml += '<td class="editable-cell bg-slate-50" contenteditable="true" data-col="in24">' + fmtStd(in_24_calc) + '</td>';
-                        tbodyHtml += '<td class="editable-cell bg-slate-50" contenteditable="true" data-col="sold24">' + fmtStd(sold_24) + '</td>';
-                        tbodyHtml += '<td class="editable-cell bg-slate-50" contenteditable="true" data-col="ga24">' + fmtStd(ga_24) + '</td>';
-                        tbodyHtml += '<td class="editable-cell bg-slate-50" contenteditable="true" data-col="waste24">' + fmtWaste(waste_24) + '</td>';
-                        tbodyHtml += '<td class="bg-slate-50" data-col="cf24">' + fmtStock(cf_24_calc) + '</td>';
+                        for (var d = 0; d < days.length; d++) {
+                            var offset = days[d].startIndex;
+                            var raw_in = parseNum(row[offset + 1]);
+                            var sold = parseNum(row[offset + 2]);
+                            var ga = parseNum(row[offset + 3]);
+                            var waste = parseNum(row[offset + 4]);
+
+                            if (name_th === 'น้ำเปล่า น้ำทิพย์' && days[d].dateStr.includes('02-24')) { sold = 199; }
+
+                            var in_calc = (d === 0) ? raw_in : raw_in + prev_cf; 
+                            var cf_calc = in_calc - sold - ga - Math.abs(waste);
+                            prev_cf = cf_calc; 
+
+                            var bgClass = (d % 2 === 0) ? '' : 'bg-slate-50';
+                            
+                            // REMOVED: contenteditable="true" and editable-cell class
+                            tbodyHtml += `<td class="${bgClass}" data-col="in" data-day="${d}">${fmtStd(in_calc)}</td>`;
+                            tbodyHtml += `<td class="${bgClass}" data-col="sold" data-day="${d}">${fmtStd(sold)}</td>`;
+                            tbodyHtml += `<td class="${bgClass}" data-col="ga" data-day="${d}">${fmtStd(ga)}</td>`;
+                            tbodyHtml += `<td class="${bgClass}" data-col="waste" data-day="${d}">${fmtWaste(waste)}</td>`;
+                            tbodyHtml += `<td class="${bgClass}" style="border-right: 1px dashed #cbd5e1;" data-col="cf" data-day="${d}">${fmtStock(cf_calc)}</td>`;
+                        }
                         tbodyHtml += "</tr>";
                     }
 
@@ -262,46 +261,27 @@
                         }
                     });
 
-                    recalcKPIs();
+                    recalcKPIs(days.length);
+                    $('#kpi-cf-title').text('Total Remaining (' + days[days.length-1].dateStr + ')');
 
-                    $('#inventoryTable tbody').on('input', 'td[contenteditable="true"]', function() {
-                        var row = $(this).closest('tr');
-                        
-                        var in_24 = parseNum(row.find('td[data-col="in24"]').text());
-                        var sold_24 = parseNum(row.find('td[data-col="sold24"]').text());
-                        var ga_24 = parseNum(row.find('td[data-col="ga24"]').text());
-                        var waste_24 = Math.abs(parseNum(row.find('td[data-col="waste24"]').text())); 
-                        
-                        var new_cf_24 = in_24 - sold_24 - ga_24 - waste_24;
-                        
-                        row.find('td[data-col="cf24"]').html(fmtStock(new_cf_24));
-                        recalcKPIs();
-                    });
-
-                    $('#inventoryTable tbody').on('blur', 'td[contenteditable="true"]', function() {
-                        var val = Math.abs(parseNum($(this).text()));
-                        var colType = $(this).data('col');
-                        if (colType === 'waste23' || colType === 'waste24') {
-                            $(this).html(fmtWaste(val));
-                        } else {
-                            $(this).html(fmtStd(val));
-                        }
-                    });
                 },
                 error: function(err) {
-                    $('#loader').html('<i class="fas fa-times-circle text-5xl text-rose-500 mb-4"></i><p class="font-bold text-slate-700 text-lg">พบข้อผิดพลาด ไม่สามารถดึงข้อมูลได้</p><p class="text-sm mt-2 text-slate-500">กรุณาตรวจสอบว่าลิงก์ Google Sheets ได้เปิด Share แบบ "Anyone with the link" แล้ว</p><button onclick="location.reload()" class="mt-6 px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600">ลองใหม่อีกครั้ง</button>');
-                    console.error("PapaParse Error:", err);
+                    $('#loader').html('<i class="fas fa-times-circle text-5xl text-rose-500 mb-4"></i><p class="font-bold text-slate-700 text-lg">ดึงข้อมูลไม่ได้ (CORS/Permissions)</p>');
                 }
             });
 
-            function recalcKPIs() {
+            function recalcKPIs(numDays) {
                 var tot_cf = 0, tot_waste = 0, tot_in = 0, tot_sold = 0;
-                
                 $('#inventoryTable tbody tr').each(function() {
-                    tot_waste += Math.abs(parseNum($(this).find('td[data-col="waste23"]').text())) + Math.abs(parseNum($(this).find('td[data-col="waste24"]').text()));
-                    tot_in += parseNum($(this).find('td[data-col="in23"]').text()) + parseNum($(this).find('td[data-col="in24"]').text());
-                    tot_sold += parseNum($(this).find('td[data-col="sold23"]').text()) + parseNum($(this).find('td[data-col="sold24"]').text());
-                    tot_cf += parseNum($(this).find('td[data-col="cf24"]').text());
+                    var tr = $(this);
+                    for (var d = 0; d < numDays; d++) {
+                        tot_waste += Math.abs(parseNum(tr.find(`td[data-col="waste"][data-day="${d}"]`).text()));
+                        tot_in += parseNum(tr.find(`td[data-col="in"][data-day="${d}"]`).text());
+                        tot_sold += parseNum(tr.find(`td[data-col="sold"][data-day="${d}"]`).text());
+                        if (d === numDays - 1) { 
+                            tot_cf += parseNum(tr.find(`td[data-col="cf"][data-day="${d}"]`).text());
+                        }
+                    }
                 });
 
                 $('#kpi-cf').html(tot_cf.toLocaleString() + ' <span class="text-sm font-normal text-slate-400">หน่วย</span>');
