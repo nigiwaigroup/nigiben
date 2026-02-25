@@ -172,10 +172,15 @@
                     var row_dates = data[1];
                     var row_headers = data[2];
                     
+                    // ปรับลอจิกใหม่: สแกนแสกนหาคำว่า "ยกมา" ทุกๆ คอลัมน์ ไม่ว่าจะเว้นระยะกี่ช่อง
                     var days = [];
-                    for (var col = 11; col < row_headers.length; col += 8) {
-                        if (row_headers[col] === 'ยกมา') {
-                            var dateStr = row_dates[col + 2] || 'New Day'; 
+                    for (var col = 10; col < row_headers.length; col++) {
+                        var headerText = String(row_headers[col]).trim();
+                        if (headerText === 'ยกมา') {
+                            var dateStr = (row_dates[col + 2] !== undefined) ? String(row_dates[col + 2]).trim() : ''; 
+                            if (!dateStr || dateStr === '') {
+                                dateStr = 'วันที่ ' + (days.length + 1);
+                            }
                             days.push({ startIndex: col, dateStr: dateStr });
                         }
                     }
@@ -231,6 +236,7 @@
                             var ga = parseNum(row[offset + 3]);
                             var waste = parseNum(row[offset + 4]);
 
+                            // กฎพิเศษสำหรับน้ำทิพย์
                             if (name_th === 'น้ำเปล่า น้ำทิพย์' && days[d].dateStr.includes('02-24')) { sold = 199; }
 
                             var in_calc = (d === 0) ? raw_in : raw_in + prev_cf; 
@@ -239,7 +245,6 @@
 
                             var bgClass = (d % 2 === 0) ? '' : 'bg-slate-50';
                             
-                            // REMOVED: contenteditable="true" and editable-cell class
                             tbodyHtml += `<td class="${bgClass}" data-col="in" data-day="${d}">${fmtStd(in_calc)}</td>`;
                             tbodyHtml += `<td class="${bgClass}" data-col="sold" data-day="${d}">${fmtStd(sold)}</td>`;
                             tbodyHtml += `<td class="${bgClass}" data-col="ga" data-day="${d}">${fmtStd(ga)}</td>`;
@@ -262,7 +267,9 @@
                     });
 
                     recalcKPIs(days.length);
-                    $('#kpi-cf-title').text('Total Remaining (' + days[days.length-1].dateStr + ')');
+                    if(days.length > 0) {
+                        $('#kpi-cf-title').text('Total Remaining (' + days[days.length-1].dateStr + ')');
+                    }
 
                 },
                 error: function(err) {
