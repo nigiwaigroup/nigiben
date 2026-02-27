@@ -128,24 +128,6 @@
 
         .fallback-error { padding: 20px; background: #fee; border: 1px solid #fcc; color: #c00; border-radius: 8px; text-align: center; margin-bottom: 20px; display: none; }
         
-        /* AI Feature Styles */
-        .ai-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; border: none; padding: 10px 24px; border-radius: 30px; font-family: 'Noto Sans Thai', sans-serif; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3); transition: transform 0.2s; margin-top: 15px;}
-        .ai-btn:hover { transform: scale(1.05); }
-        .ai-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
-        .ai-modal-overlay.active { display: flex; opacity: 1; }
-        .ai-modal-content { background: white; width: 90%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; }
-        .ai-modal-overlay.active .ai-modal-content { transform: translateY(0); }
-        .ai-modal-header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .ai-modal-header h3 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.3rem; }
-        .ai-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-        .ai-modal-body { padding: 25px; overflow-y: auto; color: var(--text-main); line-height: 1.6; }
-        .ai-modal-body h3, .ai-modal-body h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #e1e8ed; padding-bottom: 10px;}
-        .ai-modal-body ul, .ai-modal-body ol { padding-left: 20px; margin-bottom: 20px; }
-        .ai-modal-body li { margin-bottom: 8px; }
-        .ai-modal-body strong { color: var(--accent-color); }
-        .ai-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .dashboard-footer { text-align: center; padding: 30px 20px 50px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; border-top: 1px dashed #e1e8ed; max-width: 1400px; margin: 0 auto; }
 
         @media (max-width: 992px) {
@@ -153,7 +135,7 @@
             .two-cols, .ranking-grid { grid-template-columns: 1fr; }
             .kpi-compare-row { flex-wrap: wrap; justify-content: center; gap: 10px; }
             .kpi-col { width: 45%; }
-            .data-table { block; overflow-x: auto; white-space: nowrap; }
+            .data-table { display: block; overflow-x: auto; white-space: nowrap; }
         }
         
         @media (max-width: 768px) {
@@ -173,8 +155,6 @@
     <div class="dashboard-header">
         <h1>Nigiben Executive Dashboard</h1>
         <p>🚨 4-Day Strategy & Crisis Monitoring (23-26 Feb) | นิกิเบน ดอนเมือง (DMK T2 F3)</p>
-        <br>
-        <button class="ai-btn" onclick="openAIModal()">✨ รับคำแนะนำจาก AI (Executive Insights)</button>
     </div>
 
     <div class="container">
@@ -292,7 +272,7 @@
             <div class="chart-header">Top 3 สินค้าที่มักถูกซื้อในบิลเดียวกัน (Combo Insights)</div>
             <div class="kpi-container" style="margin-top: 20px;">
                 <div class="kpi-card" style="border-top: 4px solid #3498db; padding: 20px;">
-                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span></div>
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🥤</div>
                     <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">Salmon Varity + น้ำดื่ม</h4>
                     <p style="font-size: 0.85rem; color: var(--text-muted);">พบการซื้อคู่กันใน <strong>42%</strong> ของบิลที่ซื้อแซลมอน</p>
                 </div>
@@ -592,23 +572,6 @@
     <!-- Footer -->
     <div class="dashboard-footer">
         Nigiben Executive Report : 2026
-    </div>
-
-    <!-- AI Insights Modal -->
-    <div class="ai-modal-overlay" id="aiModal">
-        <div class="ai-modal-content">
-            <div class="ai-modal-header">
-                <h3>✨ Gemini AI: Executive Analysis & Action Plan</h3>
-                <button class="ai-close-btn" onclick="closeAIModal()">✖</button>
-            </div>
-            <div class="ai-modal-body" id="aiModalBody">
-                <div id="aiLoading" style="text-align: center; padding: 40px 0;">
-                    <div class="ai-spinner"></div>
-                    <p style="color: var(--text-muted); font-weight: 500; margin-top: 15px;">AI กำลังประมวลผลข้อมูล 4 วันล่าสุด และสร้างแผนกลยุทธ์...</p>
-                </div>
-                <div id="aiResult" style="display: none;"></div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -1017,92 +980,6 @@
                 document.getElementById('jsError').style.display = 'block';
             }
         };
-
-        // --- Gemini AI LLM Integration ---
-        const apiKey = "AIzaSyDkTYvppQ08hA5xJQnMOVboAbDnJnnA24w"; 
-        
-        function openAIModal() {
-            const modal = document.getElementById('aiModal');
-            modal.classList.add('active');
-            document.getElementById('aiLoading').style.display = 'block';
-            document.getElementById('aiResult').style.display = 'none';
-            generateAIInsights();
-        }
-
-        function closeAIModal() {
-            document.getElementById('aiModal').classList.remove('active');
-        }
-
-        async function fetchWithRetry(url, options, maxRetries = 5) {
-            const delays = [1000, 2000, 4000, 8000, 16000]; // Exponential backoff
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return await response.json();
-                } catch (error) {
-                    if (i === maxRetries - 1) throw error;
-                    await new Promise(res => setTimeout(res, delays[i]));
-                }
-            }
-        }
-
-        async function generateAIInsights() {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            // System instruction to act as a Consultant
-            const systemInstruction = { 
-                parts: [{ text: "คุณคือที่ปรึกษาผู้บริหารระดับสูงด้าน Retail & F&B ตอบคำถามเป็นภาษาไทยแบบมืออาชีพ กระชับ ตรงประเด็น วิเคราะห์ปัญหาแบบผู้บริหาร และต้องมี Action Plan 3 ข้อที่สามารถนำไปสั่งการสาขาได้ทันที จัดรูปแบบข้อความด้วย Markdown ให้อ่านง่าย" }] 
-            };
-
-            // Inject contextual insights from the dashboard into the prompt
-            const userPrompt = `
-            Context: กรุณาวิเคราะห์ข้อมูลยอดขาย 4 วันล่าสุด (23-26 ก.พ.) ของร้าน Nigiben สาขาสนามบินดอนเมือง
-            
-            [Data Highlights]
-            - ยอด Gross วันล่าสุด: 64.9k | ยอด Net วันล่าสุด: 35.2k
-            - อัตราส่วนลด (Discount Rate) คงตัวในระดับวิกฤตที่ 45.7%
-            - ปัญหาหลัก (The Jaws Effect): ส่วนต่างระหว่าง Gross และ Net กว้างมาก
-            - จุดรั่วไหลของกำไร: 97.6% ของส่วนลดทั้งหมดใน 4 วัน (ยอดรวม 106,095 บาท) มาจากการทำ "Flash Sale 21.00-22.00 น."
-            - Water Paradox: ยอดขายน้ำดื่ม Namthip สูงถึง 242 ขวด แต่ยอดใช้จ่ายต่อบิลกลับลดลงเหลือเพียง 114 บาท สะท้อนว่าคนเข้าร้านเพื่อซื้อน้ำ แต่ไม่ซื้ออาหารเพิ่ม
-            - Dead Stock: เมนู Oyakodon และ Salmon Head ขายได้ 0-1 ชิ้นต่อวัน
-            - Profit Bleeder: สินค้า Hero อย่าง "Salmon Varity Set M" ถูกผลิตเกินและต้องนำมาลดป้ายเหลืองเคลียร์สต๊อกช่วงดึกมากที่สุด
-
-            **ข้อจำกัดสำคัญ (Crucial Constraint): ห้ามแนะนำให้ยกเลิกหรือระงับโปรโมชั่น Flash Sale เด็ดขาด** เนื่องจากสาขาจำเป็นต้องใช้โปรโมชั่นนี้ในการระบายอาหารสดเพื่อลด Food Waste ให้เป็นศูนย์ก่อนปิดร้าน
-
-            จากข้อมูลและข้อจำกัดนี้ ช่วยเขียนสรุปวิเคราะห์ Executive Summary สั้นๆ และเสนอ 3 Immediate Action Plans สำหรับสั่งการผู้จัดการสาขาในวันพรุ่งนี้ โดยเน้นให้คำแนะนำในด้าน:
-            1. การบริหารรอบการผลิตระหว่างวัน (Cut-off time) เพื่อลดปริมาณของที่จะหลุดไปถึงช่วง Flash Sale
-            2. การปรับเทคนิคทำ Flash Sale (เช่น ลดแบบขั้นบันได หรือ ซื้อพ่วง) ที่ช่วยเซฟ Margin มากกว่าการหั่นราคา 70% รวดเดียว
-            3. กลยุทธ์การจัดวาง (Shelving/Upsell) เพื่อเปลี่ยนคนที่เดินมาซื้อน้ำ ให้หยิบของทานเล่นติดมือไปด้วย
-            `;
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: systemInstruction
-            };
-
-            try {
-                const result = await fetchWithRetry(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (aiText) {
-                    // Use marked.js to render Markdown format to HTML
-                    document.getElementById('aiResult').innerHTML = marked.parse(aiText);
-                } else {
-                    document.getElementById('aiResult').innerHTML = '<p style="color:red;">ไม่สามารถสร้างคำแนะนำได้ในขณะนี้ กรุณาลองใหม่</p>';
-                }
-            } catch (error) {
-                console.error("Gemini API Error:", error);
-                document.getElementById('aiResult').innerHTML = `<p style="color:red;">เกิดข้อผิดพลาดในการเชื่อมต่อ AI: ${error.message}</p>`;
-            } finally {
-                document.getElementById('aiLoading').style.display = 'none';
-                document.getElementById('aiResult').style.display = 'block';
-            }
-        }
     </script>
 </body>
 </html>
