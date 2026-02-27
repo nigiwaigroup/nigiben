@@ -128,6 +128,24 @@
 
         .fallback-error { padding: 20px; background: #fee; border: 1px solid #fcc; color: #c00; border-radius: 8px; text-align: center; margin-bottom: 20px; display: none; }
         
+        /* AI Feature Styles */
+        .ai-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; border: none; padding: 10px 24px; border-radius: 30px; font-family: 'Noto Sans Thai', sans-serif; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3); transition: transform 0.2s; margin-top: 15px;}
+        .ai-btn:hover { transform: scale(1.05); }
+        .ai-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
+        .ai-modal-overlay.active { display: flex; opacity: 1; }
+        .ai-modal-content { background: white; width: 90%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; }
+        .ai-modal-overlay.active .ai-modal-content { transform: translateY(0); }
+        .ai-modal-header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .ai-modal-header h3 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.3rem; }
+        .ai-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .ai-modal-body { padding: 25px; overflow-y: auto; color: var(--text-main); line-height: 1.6; }
+        .ai-modal-body h3, .ai-modal-body h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #e1e8ed; padding-bottom: 10px;}
+        .ai-modal-body ul, .ai-modal-body ol { padding-left: 20px; margin-bottom: 20px; }
+        .ai-modal-body li { margin-bottom: 8px; }
+        .ai-modal-body strong { color: var(--accent-color); }
+        .ai-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .dashboard-footer { text-align: center; padding: 30px 20px 50px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; border-top: 1px dashed #e1e8ed; max-width: 1400px; margin: 0 auto; }
 
         @media (max-width: 992px) {
@@ -135,7 +153,7 @@
             .two-cols, .ranking-grid { grid-template-columns: 1fr; }
             .kpi-compare-row { flex-wrap: wrap; justify-content: center; gap: 10px; }
             .kpi-col { width: 45%; }
-            .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+            .data-table { block; overflow-x: auto; white-space: nowrap; }
         }
         
         @media (max-width: 768px) {
@@ -163,6 +181,26 @@
         <!-- 1. KPI OVERVIEW -->
         <h2 class="section-title">📊 1. Performance Overview (วิเคราะห์ภาพรวม 4 วัน)</h2>
         <div class="kpi-container">
+            <!-- ยอดรวมทั้ง 4 วัน (Box ใหม่) -->
+            <div class="kpi-card" style="background: linear-gradient(to bottom, #ffffff, #f0f4f8); border: 2px solid var(--primary-color);">
+                <div class="kpi-title" style="color: var(--primary-color); font-weight: 800;">สรุปผลการดำเนินงานรวม 4 วัน</div>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ddd; padding-bottom: 5px;">
+                        <span style="font-size: 0.85rem; color: #7f8c8d;">ยอดขายรวม (Gross):</span>
+                        <span style="font-size: 1.1rem; font-weight: 700;">฿274,287</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ddd; padding-bottom: 5px;">
+                        <span style="font-size: 0.85rem; color: #7f8c8d;">ส่วนลดรวมทั้งหมด:</span>
+                        <span style="font-size: 1.1rem; font-weight: 700; color: var(--accent-color);">-฿113,613</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px;">
+                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--primary-color);">คงเหลือเงินสด (Net):</span>
+                        <span style="font-size: 1.3rem; font-weight: 800; color: var(--success-color);">฿160,674</span>
+                    </div>
+                </div>
+                <div class="kpi-diff" style="color:#1e3c72; background:#e1e8f0; margin-top: 15px;">💰 อัตรากำไรสุทธิเฉลี่ย 58.5%</div>
+            </div>
+
             <div class="kpi-card">
                 <div class="kpi-title">ยอดรวมก่อนหักส่วนลด (Gross Sales)</div>
                 <div class="kpi-compare-row">
@@ -809,9 +847,9 @@
                     data: {
                         labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
                         datasets: [
-                            { label: 'ยอดรวม (Gross)', data: [69604, 77080, 62753, 64850], borderColor: '#3498db', borderWidth: 4, pointRadius: 6, tension: 0.3, fill: false },
-                            { label: 'เงินรับจริง (Net)', data: [47761, 43972, 33731, 35210], borderColor: '#2ecc71', borderWidth: 4, pointRadius: 6, tension: 0.3, fill: false },
-                            { label: 'ส่วนลดสะสม (Disc)', data: [21843, 33108, 29022, 29640], borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 3, tension: 0.3, fill: false }
+                            { label: 'ยอดรวม (Gross)', data: [69604, 77080, 62753, 64850], borderColor: '#3498db', borderWidth: 4, pointRadius: 6, fill: false },
+                            { label: 'เงินรับจริง (Net)', data: [47761, 43972, 33731, 35210], borderColor: '#2ecc71', borderWidth: 4, pointRadius: 6, fill: false },
+                            { label: 'ส่วนลดสะสม (Disc)', data: [21843, 33108, 29022, 29640], borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 3, fill: false }
                         ]
                     },
                     options: lineOpts
