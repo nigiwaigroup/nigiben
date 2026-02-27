@@ -153,7 +153,7 @@
             .two-cols, .ranking-grid { grid-template-columns: 1fr; }
             .kpi-compare-row { flex-wrap: wrap; justify-content: center; gap: 10px; }
             .kpi-col { width: 45%; }
-            .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+            .data-table { block; overflow-x: auto; white-space: nowrap; }
         }
         
         @media (max-width: 768px) {
@@ -292,7 +292,7 @@
             <div class="chart-header">Top 3 สินค้าที่มักถูกซื้อในบิลเดียวกัน (Combo Insights)</div>
             <div class="kpi-container" style="margin-top: 20px;">
                 <div class="kpi-card" style="border-top: 4px solid #3498db; padding: 20px;">
-                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🥤</div>
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span></div>
                     <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">Salmon Varity + น้ำดื่ม</h4>
                     <p style="font-size: 0.85rem; color: var(--text-muted);">พบการซื้อคู่กันใน <strong>42%</strong> ของบิลที่ซื้อแซลมอน</p>
                 </div>
@@ -440,7 +440,7 @@
                     <li><strong>โซน 150 - 250 บาท (The Sweet Spot):</strong> สินค้ากลุ่ม Super Maki S (200.-) หรือ Aburi Set (275.-) เป็นกลุ่มที่ลูกค้าสนามบินตัดสินใจซื้อง่ายสุด มักขายออกใน <strong>"ราคาเต็ม"</strong> ไม่ค่อยเหลือเป็น Waste</li>
                     <li><strong>โซน >300 บาท (High Margin, High Risk):</strong> กลุ่ม Salmon Varity M (385.-) และ Mori Set (310.-) ทำยอด Gross สูงมาก แต่มีความอ่อนไหวเรื่องราคา หากขายไม่หมดมักเป็นต้นเหตุหลักที่ทำให้ร้านต้องอัดโปรลดราคาหนักตอนดึก</li>
                 </ul>
-                <p style="margin-top: 10px; color: var(--accent-color); font-weight: bold;">📌 แผนปรับโครงสร้างราคา: ควรเน้นดันสินค้าในช่วงราคา 150-250 บาทขึ้นมาโชว์ในตู้แช่ระดับสายตามากขึ้น เพราะเป็นจุดที่ได้กำไรสุทธิสม่ำเสมอที่สุด และแบกความเสี่ยงต่ำกว่า</p>
+                <p style="margin-top: 10px; color: var(--accent-color); font-weight: bold;">📌 แผนปรับโครงสร้างราคา: ควรเน้นดันสินค้าในช่วงราคา 150-250 บาทขึ้นมาโชว์ในตู้แช่น้ำระดับสายตามากขึ้น เพราะเป็นจุดที่ได้กำไรสุทธิสม่ำเสมอที่สุด และแบกความเสี่ยงต่ำกว่า</p>
             </div>
         </div>
 
@@ -683,6 +683,7 @@
                 });
             });
             updateRanking(); // โหลดครั้งแรก
+            renderCharts();
         });
 
         // ฟังก์ชันอัปเดตตารางจัดอันดับ
@@ -754,7 +755,7 @@
             return html;
         }
 
-        window.onload = function() {
+        function renderCharts() {
             try {
                 if (typeof Chart === 'undefined') throw new Error('Chart.js not loaded');
 
@@ -845,9 +846,9 @@
                     data: {
                         labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
                         datasets: [
-                            { label: 'ยอดรวม (Gross)', data: [69604, 77080, 62753, 64850], borderColor: '#3498db', borderWidth: 4, pointRadius: 6, fill: false },
-                            { label: 'เงินรับจริง (Net)', data: [47761, 43972, 33731, 35210], borderColor: '#2ecc71', borderWidth: 4, pointRadius: 6, fill: false },
-                            { label: 'ส่วนลดสะสม (Disc)', data: [21843, 33108, 29022, 29640], borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 3, fill: false }
+                            { label: 'ยอดรวม (Gross)', data: [69604, 77080, 62753, 64850], borderColor: '#3498db', borderWidth: 4, pointRadius: 6, tension: 0.3, fill: false },
+                            { label: 'เงินรับจริง (Net)', data: [47761, 43972, 33731, 35210], borderColor: '#2ecc71', borderWidth: 4, pointRadius: 6, tension: 0.3, fill: false },
+                            { label: 'ส่วนลดสะสม (Disc)', data: [21843, 33108, 29022, 29640], borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 3, tension: 0.3, fill: false }
                         ]
                     },
                     options: lineOpts
@@ -1018,7 +1019,7 @@
         };
 
         // --- Gemini AI LLM Integration ---
-        const apiKey = "AIzaSyDkTYvppQ08hA5xJQnMOVboAbDnJnnA24w"; // Execution environment provides the key
+        const apiKey = "AIzaSyDkTYvppQ08hA5xJQnMOVboAbDnJnnA24w"; 
         
         function openAIModal() {
             const modal = document.getElementById('aiModal');
