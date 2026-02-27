@@ -1,239 +1,1107 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NIGIBEN DON MUEANG AIRPORT</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigiben Executive Dashboard - 4 Day Deep Dive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js and DataLabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- Marked.js for Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #e74c3c;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --day1-color: #bdc3c7;
+            --day2-color: #f39c12;
+            --day3-color: #3498db;
+            --day4-color: #2ecc71;
         }
+        body { font-family: 'Noto Sans Thai', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .dashboard-header { background: linear-gradient(135deg, #000000 0%, #1e3c72 100%); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 40px; }
+        .dashboard-header h1 { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: 0.5px; }
+        .dashboard-header p { margin-top: 10px; font-size: 1.1rem; color: #f1c40f; font-weight: 600; background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 15px; border-radius: 20px;}
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px 50px; }
+        
+        .section-title { font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-bottom: 15px; padding-left: 15px; border-left: 6px solid var(--accent-color); display: flex; align-items: center; }
+        .section-desc { font-size: 1rem; color: var(--text-muted); margin-bottom: 25px; padding-left: 21px; line-height: 1.6; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0d1117;
-            color: #e6edf3;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 60px 20px;
+        /* KPI Cards */
+        .kpi-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; transition: transform 0.3s ease; text-align: center; }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--accent-color); }
+        .kpi-title { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 15px; }
+        .kpi-compare-row { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;}
+        .kpi-col { display: flex; flex-direction: column; align-items: center; width: 23%;}
+        .kpi-date-label { font-size: 0.75rem; color: #95a5a6; margin-bottom: 5px; font-weight: 600;}
+        .kpi-val { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .kpi-vs { font-size: 1rem; color: #bdc3c7; }
+        .kpi-diff { font-size: 0.85rem; font-weight: 600; padding: 6px 12px; border-radius: 20px; margin-top: 10px; }
+
+        /* Charts & Tables */
+        .chart-section { background: var(--card-bg); padding: 35px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; margin-bottom: 40px;}
+        .chart-header { font-size: 1.3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; padding-bottom: 15px; border-bottom: 2px solid #ecf0f1; }
+        .chart-wrapper { position: relative; height: 350px; width: 100%; margin-top: 20px; }
+        .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;}
+        
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.95rem; }
+        .data-table th, .data-table td { padding: 12px 15px; border-bottom: 1px solid #e1e8ed; text-align: right; }
+        .data-table th { background-color: #f8fbfe; color: var(--primary-color); font-weight: 700; }
+        .data-table th:first-child, .data-table td:first-child { text-align: left; }
+        .data-table tr:hover { background-color: #fcfdfe; }
+        .promo-total { font-weight: bold; color: var(--accent-color); background-color: #fdedec !important; }
+
+        .analysis-box { background-color: #fdfefe; border-left: 5px solid var(--accent-color); padding: 20px 25px; border-radius: 0 8px 8px 0; margin-top: 25px; font-size: 0.95rem; line-height: 1.6; color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        .analysis-box h4 { margin-top: 0; color: var(--accent-color); margin-bottom: 15px; font-size: 1.1rem;}
+        .analysis-box ul { margin-bottom: 0; padding-left: 20px; }
+        .analysis-box li { margin-bottom: 10px; }
+
+        /* Accordion */
+        .accordion-container { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .acc-item { background: var(--card-bg); border: 1px solid #e1e8ed; border-radius: 8px; overflow: hidden; }
+        .acc-header { padding: 15px 20px; cursor: pointer; background-color: #f8fbfe; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
+        .acc-header:hover { background-color: #eaf3fb; }
+        .acc-title { font-size: 1.1rem; font-weight: 600; color: var(--primary-color); }
+        .acc-stats { display: flex; gap: 15px; font-weight: 500; color: var(--text-muted); font-size: 0.85rem; align-items: center;}
+        .acc-stats span { color: var(--text-main); font-weight: 700; }
+        .acc-content { display: none; border-top: 1px solid #e1e8ed; max-height: 600px; overflow-y: auto; padding: 10px 0; }
+        .acc-content.active { display: block; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f4f7f6; font-size: 0.9rem; align-items: center;}
+        .item-row:nth-child(even) { background-color: #fafbfc; }
+        .item-name { flex: 2; color: var(--text-main); font-weight: 500;}
+
+        /* Tabs and Ranking Grids */
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 24px; background: var(--card-bg); border: 1px solid #e1e8ed; border-radius: 30px; cursor: pointer; font-weight: 600; color: var(--text-muted); transition: all 0.3s; font-size: 0.95rem; }
+        .tab-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 10px rgba(30,60,114,0.3); }
+        
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .rank-list { background: var(--card-bg); border-radius: 12px; border: 1px solid #e1e8ed; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .rank-header { padding: 15px 20px; font-weight: 700; font-size: 1.1rem; color: white; display: flex; align-items: center; justify-content: space-between;}
+        .rank-header.best { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .rank-header.worst { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .rank-item { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f4f7f6; font-size: 0.95rem; align-items: center; }
+        .rank-item:nth-child(even) { background-color: #fafbfc; }
+        .rank-item:last-child { border-bottom: none; }
+        .rank-num { font-weight: 700; color: var(--text-muted); width: 25px; display: inline-block; }
+        .rank-qty { font-weight: 600; background: #ecf0f1; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; color: var(--text-main); }
+        .worst-qty { background: #fdedec; color: #c0392b; }
+
+        .filter-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+            background: white;
+            font-family: 'Noto Sans Thai', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            cursor: pointer;
         }
+        .filter-select:focus { border-color: var(--primary-color); }
 
-        /* ─── Header ─── */
-        header {
-            text-align: center;
-            margin-bottom: 52px;
-        }
-
-        .logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 8px;
-        }
-
-        .logo img {
-            width: 160px;
-            height: auto;
-            border-radius: 16px;
-            background: #fff;
-            padding: 8px;
-            box-shadow: 0 0 32px rgba(180, 220, 100, .25);
-        }
-
-        .logo h1 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            letter-spacing: .08em;
-            color: #c8e66b;
-            text-transform: uppercase;
-        }
-
-        header p {
-            color: #8b949e;
-            font-size: .95rem;
-            letter-spacing: .02em;
-        }
-
-        /* ─── Grid ─── */
-        .grid {
+        .rank-grid-row {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
-        }
-
-        /* ─── Card ─── */
-        .card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 14px;
-            padding: 28px 24px;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
+            grid-template-columns: 3fr 1fr 1fr 1.5fr;
             gap: 10px;
-            transition: transform .2s, border-color .2s, box-shadow .2s;
-            position: relative;
-            overflow: hidden;
+            align-items: center;
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--card-glow, rgba(255, 107, 157, .06));
-            opacity: 0;
-            transition: opacity .3s;
-            pointer-events: none;
-        }
+        .fallback-error { padding: 20px; background: #fee; border: 1px solid #fcc; color: #c00; border-radius: 8px; text-align: center; margin-bottom: 20px; display: none; }
+        
+        /* AI Feature Styles */
+        .ai-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; border: none; padding: 10px 24px; border-radius: 30px; font-family: 'Noto Sans Thai', sans-serif; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3); transition: transform 0.2s; margin-top: 15px;}
+        .ai-btn:hover { transform: scale(1.05); }
+        .ai-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
+        .ai-modal-overlay.active { display: flex; opacity: 1; }
+        .ai-modal-content { background: white; width: 90%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; }
+        .ai-modal-overlay.active .ai-modal-content { transform: translateY(0); }
+        .ai-modal-header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .ai-modal-header h3 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.3rem; }
+        .ai-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .ai-modal-body { padding: 25px; overflow-y: auto; color: var(--text-main); line-height: 1.6; }
+        .ai-modal-body h3, .ai-modal-body h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #e1e8ed; padding-bottom: 10px;}
+        .ai-modal-body ul, .ai-modal-body ol { padding-left: 20px; margin-bottom: 20px; }
+        .ai-modal-body li { margin-bottom: 8px; }
+        .ai-modal-body strong { color: var(--accent-color); }
+        .ai-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: var(--card-accent, #ff6b9d);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
-        }
+        .dashboard-footer { text-align: center; padding: 30px 20px 50px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; border-top: 1px dashed #e1e8ed; max-width: 1400px; margin: 0 auto; }
 
-        .card:hover::before {
-            opacity: 1;
+        @media (max-width: 992px) {
+            .kpi-container { grid-template-columns: repeat(2, 1fr); }
+            .two-cols, .ranking-grid { grid-template-columns: 1fr; }
+            .kpi-compare-row { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .kpi-col { width: 45%; }
+            .data-table { display: block; overflow-x: auto; white-space: nowrap; }
         }
-
-        .card-icon {
-            font-size: 2rem;
-            line-height: 1;
-        }
-
-        .card-title {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #e6edf3;
-        }
-
-        .card-desc {
-            font-size: .82rem;
-            color: #8b949e;
-            line-height: 1.5;
-        }
-
-        .card-tag {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: .72rem;
-            font-weight: 600;
-            background: var(--tag-bg, rgba(255, 107, 157, .15));
-            color: var(--tag-color, #ff6b9d);
-            width: fit-content;
-        }
-
-        /* ─── colour themes per card ─── */
-        .c-day1 {
-            --card-accent: #ff6b9d;
-            --card-glow: rgba(255, 107, 157, .08);
-            --tag-bg: rgba(255, 107, 157, .15);
-            --tag-color: #ff6b9d;
-        }
-
-        .c-day2 {
-            --card-accent: #ffa94d;
-            --card-glow: rgba(255, 169, 77, .08);
-            --tag-bg: rgba(255, 169, 77, .15);
-            --tag-color: #ffa94d;
-        }
-
-        .c-day3 {
-            --card-accent: #69db7c;
-            --card-glow: rgba(105, 219, 124, .08);
-            --tag-bg: rgba(105, 219, 124, .15);
-            --tag-color: #69db7c;
-        }
-
-        .c-product {
-            --card-accent: #4cc9f0;
-            --card-glow: rgba(76, 201, 240, .08);
-            --tag-bg: rgba(76, 201, 240, .15);
-            --tag-color: #4cc9f0;
-        }
-
-        .c-promotion {
-            --card-accent: #c44dff;
-            --card-glow: rgba(196, 77, 255, .08);
-            --tag-bg: rgba(196, 77, 255, .15);
-            --tag-color: #c44dff;
-        }
-
-        /* ─── Footer ─── */
-        footer {
-            margin-top: 64px;
-            color: #484f58;
-            font-size: .78rem;
-            text-align: center;
+        
+        @media (max-width: 768px) {
+            .kpi-container { grid-template-columns: 1fr; }
+            .rank-grid-row {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .rank-grid-row > div:nth-child(1) { grid-column: span 3; margin-bottom: 5px; }
+            .rank-grid-row > div:nth-child(2) { text-align: left !important; color: #7f8c8d; }
+            .rank-grid-row > div:nth-child(3) { text-align: center !important; }
+            .rank-grid-row > div:nth-child(4) { text-align: right !important; }
+            .mobile-hide { display: none !important; }
         }
     </style>
 </head>
-
 <body>
-
-    <header>
-        <div class="logo">
-            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIbGNtcwIQAABtbnRyUkdCIFhZWiAH4gADABQACQAOAB1hY3NwTVNGVAAAAABzYXdzY3RybAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWhhbmSdkQA9QICwPUB0LIGepSKOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAABxjcHJ0AAABDAAAAAx3dHB0AAABGAAAABRyWFlaAAABLAAAABRnWFlaAAABQAAAABRiWFlaAAABVAAAABRyVFJDAAABaAAAAGBnVFJDAAABaAAAAGBiVFJDAAABaAAAAGBkZXNjAAAAAAAAAAV1UkdCAAAAAAAAAAAAAAAAdGV4dAAAAABDQzAAWFlaIAAAAAAAAPNUAAEAAAABFslYWVogAAAAAAAAb6AAADjyAAADj1hZWiAAAAAAAABilgAAt4kAABjaWFlaIAAAAAAAACSgAAAPhQAAtsRjdXJ2AAAAAAAAACoAAAB8APgBnAJ1A4MEyQZOCBIKGAxiDvQRzxT2GGocLiBDJKwpai5+M+s5sz/WRldNNlR2XBdkHWyGdVZ+jYgskjacq6eMstu+mcrH12Xkd/H5////2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAIJAgkDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD+/iiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopG+62OuD/KgBAqnoP1z/U/5NITg43AY7BT/APX65r+ZL4P/ABO/4Lb/ALTkXjnxN+zR+2j/AMEt/ib4R8JeO9R8IapdaLp/xdvj4a1HT2iv5fDuplfgfn+2otK1C285l3RljEVaT5tv6Af8E0Pjp+018afAHx+t/jv+0j+yb8f/AIheAfHb+D9F1X9mJfFEnh/wPfR6Ox/4Rjx9H4o8D+BZjr/9r/OFihkVokkUlWKg82GxMcQrqyTTadlZ2a296SbXl1tseTh8yWJSawuMitWm0rNRavrGST89O/Xb9awBnhsHPHH9TwaedoOTnPbr2/Tv+tfx/eJ/29P+Cn/gn4jXXwm8Yf8ABUf/AIIx+H/Hun340nU9N1DVPiYmn6VqTD/kH6/4gPwPHhfw/JgnI1zXI2U5yFbNf0BfsxeNv2ifhH+y94q+JP8AwUU+L/wC1zxD4Vu/EPjzVPid8EzqqfC/T/hLHpWnX2n6gZdS8M+GbmWW3EetyT3SaI8c0ckEkE90TxGGxscQ2oqzSd3zLpvezdle+rdi8PmWFxbfL9m73jKyXVuL01012em7Z99ZPqfzP+ew/KjJ9T/n/wDUPyr5a1P9sj9l/Sv2fdP/AGrtS+NPg61/Z61P7B/Zvxb/ALSv/wDhEL0ah4pHhCBlfyg22TxUH0UBo3KzK0e/YAK7Dxx+0f8ABX4Y/BQftH+PviHoPhr4JPong/xGPiFfzSReHU8P+PNS0rTvCGqGbY0vk6xN4k0OON1iYn7RG2xVOB0+1hrotFd69O/x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QAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//Z" alt="NIGIBEN Logo" />
-            <h1>NIGIBEN DON MUEANG AIRPORT</h1>
-        </div>
-        <p>เลือกไฟล์ที่ต้องการเปิด</p>
-    </header>
-
-    <div class="grid">
-
-        <a href="Day1.html" class="card c-day1" id="link-day1">
-            <span class="card-icon">📅</span>
-            <span class="card-title">Day 1</span>
-            <span class="card-desc">รายงานข้อมูลวันที่ 1</span>
-            <span class="card-tag">Day1.html</span>
-        </a>
-
-        <a href="Day2.html" class="card c-day2" id="link-day2">
-            <span class="card-icon">📅</span>
-            <span class="card-title">Day 2</span>
-            <span class="card-desc">รายงานข้อมูลวันที่ 2</span>
-            <span class="card-tag">Day2.html</span>
-        </a>
-
-        <a href="Day3.html" class="card c-day3" id="link-day3">
-            <span class="card-icon">📅</span>
-            <span class="card-title">Day 3</span>
-            <span class="card-desc">รายงานข้อมูลวันที่ 3</span>
-            <span class="card-tag">Day3.html</span>
-        </a>
-
-        <a href="product.html" class="card c-product" id="link-product">
-            <span class="card-icon">📦</span>
-            <span class="card-title">สินค้า</span>
-            <span class="card-desc">ข้อมูลสินค้าและคลังสินค้า</span>
-            <span class="card-tag">product.html</span>
-        </a>
-
-        <a href="promotion.html" class="card c-promotion" id="link-promotion">
-            <span class="card-icon">🎁</span>
-            <span class="card-title">โปรโมชัน</span>
-            <span class="card-desc">ข้อมูลโปรโมชันและส่วนลด</span>
-            <span class="card-tag">promotion.html</span>
-        </a>
-
+    <div class="dashboard-header">
+        <h1>Nigiben Executive Dashboard</h1>
+        <p>🚨 4-Day Strategy & Crisis Monitoring (23-26 Feb) | นิกิเบน ดอนเมือง (DMK T2 F3)</p>
+        <br>
+        <button class="ai-btn" onclick="openAIModal()">✨ รับคำแนะนำจาก AI (Executive Insights)</button>
     </div>
 
-    <footer>nigiben · 2026</footer>
+    <div class="container">
+        <div id="jsError" class="fallback-error">⚠️ ระบบตรวจพบข้อผิดพลาดในการโหลดข้อมูลกราฟ กรุณารีเฟรชหน้าจอ</div>
 
+        <!-- 1. KPI OVERVIEW -->
+        <h2 class="section-title">📊 1. Performance Overview (วิเคราะห์ภาพรวม 4 วัน)</h2>
+        <div class="kpi-container">
+            <div class="kpi-card">
+                <div class="kpi-title">ยอดรวมก่อนหักส่วนลด (Gross Sales)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">69.6k</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">77.1k</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">62.8k</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val highlight" style="color:#3498db;">64.9k</div></div>
+                </div>
+                <div class="kpi-diff" style="color:#2980b9; background:#eaf2f8;">▲ ฟื้นตัว +3.3% จากวันก่อนหน้า</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">เงินสดรับจริงสุทธิ (Net Sales)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">47.7k</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">43.9k</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">33.7k</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val highlight" style="color:#2ecc71;">35.2k</div></div>
+                </div>
+                <div class="kpi-diff" style="color:#27ae60; background:#e8f8f5;">▲ เริ่มทำจุด Rebound +4.4% จากจุดต่ำสุด</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">อัตราส่วนลด (Discount Rate %)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">31%</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">43%</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">46%</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val" style="color:#e74c3c;">45.7%</div></div>
+                </div>
+                <div class="kpi-diff" style="color:#c0392b; background:#fdedec;">▲ อัตราส่วนลดคงตัวที่ระดับเกือบ 50% ของ Gross</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">จำนวนบิลทั้งหมด (Total Bills)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">295</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">310</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">303</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val" style="color:#8e44ad;">308</div></div>
+                </div>
+                <div class="kpi-diff" style="color:#8e44ad; background:#f5eef8;">▲ ทราฟฟิกเพิ่มขึ้น +1.6%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">ยอดเฉลี่ยต่อบิล (Ticket Size)</div>
+                <div class="kpi-compare-row">
+                    <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">฿161</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">฿141</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">฿111</div></div>
+                    <div class="kpi-vs">➔</div>
+                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val" style="color:#d35400;">฿114</div></div>
+                </div>
+                <div class="kpi-diff" style="color:#d35400; background:#fdf2e9;">▲ ยอดต่อบิลเริ่มขยับขึ้น +2.7%</div>
+            </div>
+        </div>
+
+        <!-- 2. VISUAL ANALYTICS -->
+        <h2 class="section-title">📈 2. Visual Analytics (แนวโน้มรายได้และสัดส่วนลูกค้า)</h2>
+        <div class="chart-section">
+            <div class="chart-header">โครงสร้างรายได้และส่วนลด (The Jaws Effect)</div>
+            <div class="chart-wrapper"><canvas id="dailyTrendChart"></canvas></div>
+            <div class="analysis-box">
+                <h4>🦈 ทำความเข้าใจ The Jaws Effect (ปรากฏการณ์ปากฉลาม)</h4>
+                <p style="margin-bottom: 12px; font-size: 0.9rem;">คือการวิเคราะห์ "สุขภาพของกำไร" จากช่องว่างระหว่าง <strong>ยอดรวม (Gross - เส้นสีฟ้า)</strong> และ <strong>เงินรับจริง (Net - เส้นสีเขียว)</strong> ถ้าระยะห่างยิ่งกว้าง (ปากฉลามอ้ากว้าง) แปลว่ากำไรกำลังถูกกัดกินด้วย <strong>ส่วนลด (Discount - เส้นสีแดง)</strong></p>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>🚨 สัญญาณเตือน (Red Flag):</strong> ในวันที่ 24 Feb ยอด Gross พุ่งทำจุดสูงสุด (สาขาทำงานหนัก/ระบายของเยอะ) แต่ยอด Net กลับดิ่งลงต่ำสุด เพราะเส้นส่วนลดพุ่งขึ้นมางับกำไรไปหมด สะท้อนภาวะ <strong>"ยอดขายกลวง (เหนื่อยฟรี)"</strong></li>
+                    <li><strong>📌 คำแนะนำเชิงกลยุทธ์:</strong> เพื่อบีบช่องว่างของกราฟให้แคบลง (รักษา Margin) ควรยกเลิกการใช้ป้ายลด 70% รวดเดียว และเปลี่ยนเป็นลดแบบ Step (30% ตอน 20:00 น. และ 50% ตอน 21:30 น.)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">สัดส่วนกลุ่มลูกค้าตามปริมาณบิล (Basket Segmentation)</div>
+            <div class="two-cols">
+                <div>
+                    <h3 style="text-align: center; color: var(--text-muted); font-size: 1.1rem;">ปริมาณลูกค้าเปรียบเทียบ 4 วัน</h3>
+                    <div class="chart-wrapper" style="height:280px;"><canvas id="basketSegmentChart"></canvas></div>
+                </div>
+                <div class="analysis-box urgent" style="border-left-color: #f39c12; margin-top: 0;">
+                    <h4 style="color: #f39c12;"><i class="fas fa-search-dollar"></i> 3 สัญญาณเตือนจากพฤติกรรมลูกค้า</h4>
+                    <ul style="margin-bottom: 10px; font-size: 0.9rem;">
+                        <li><strong>1. ปรากฏการณ์คนซื้อแต่น้ำ (Water Paradox):</strong> กลุ่ม Grab & Go (<200฿) พุ่งสูงถึง 242 บิล สาขาแบกทราฟฟิกสูงแต่ไม่ได้ยอดขายอาหาร ดึง Ticket Size ร่วงลงเหลือ 114 บาท</li>
+                        <li><strong>2. ลูกค้าหลักหายไป (The Missing Middle):</strong> กลุ่ม Solo Meal (200-500฿) ที่มักซื้อเบนโตะคู่เครื่องดื่ม มีเทรนด์ลดลงต่อเนื่อง (จาก 88 เหลือ 62 บิล)</li>
+                        <li><strong>3. กำลังซื้อสูงหดตัว:</strong> กลุ่ม Couple (>500฿) หายไปกว่า 70% (จาก 12 เหลือเพียง 4 บิล) ลูกค้าที่เดินทางเป็นกลุ่มไม่เลือกซื้ออาหารที่นี่</li>
+                    </ul>
+                    <div style="background: #fdf2e9; padding: 10px; border-radius: 6px; font-size: 0.85rem; color: #d35400;">
+                        <strong>📌 คำแนะนำ:</strong> ต้องเร่งออกโปรโมชั่น <strong>"Combo Set (ข้าว+น้ำ)"</strong> ในช่วงกลางวันเพื่อดันกลุ่มสีเทาให้ขยับมาเป็นกลุ่มสีฟ้า และต้องมีสคริปต์เสนอขายของทานเล่น (Upsell) ทุกครั้งที่มีคนมาซื้อน้ำเปล่าขวดเดียว
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. MARKET BASKET ANALYSIS (Section ใหม่) -->
+        <h2 class="section-title">🛒 3. Market Basket Analysis (วิเคราะห์พฤติกรรมการซื้อคู่กัน)</h2>
+        <div class="chart-section">
+            <div class="chart-header">Top 3 สินค้าที่มักถูกซื้อในบิลเดียวกัน (Combo Insights)</div>
+            <div class="kpi-container" style="margin-top: 20px;">
+                <div class="kpi-card" style="border-top: 4px solid #3498db; padding: 20px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🥤</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">Salmon Varity + น้ำดื่ม</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">พบการซื้อคู่กันใน <strong>42%</strong> ของบิลที่ซื้อแซลมอน</p>
+                </div>
+                <div class="kpi-card" style="border-top: 4px solid #f39c12; padding: 20px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🥤<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🍰</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">น้ำดื่ม + โดรายากิ</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">กระตุ้นยอด Impulse Buy สำเร็จ <strong>18%</strong> ของบิลน้ำ</p>
+                </div>
+                <div class="kpi-card" style="border-top: 4px solid #2ecc71; padding: 20px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🍚</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">Mori Set + Kani Tataki</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">ชุดคอมโบยอดฮิตเพื่อความคุ้มค่า (พบ <strong>12%</strong>)</p>
+                </div>
+            </div>
+            <div class="analysis-box">
+                <h4>💡 โอกาสในการเพิ่มยอดขาย (Upselling Opportunities)</h4>
+                <p>ข้อมูลตอกย้ำว่า <strong>น้ำดื่มน้ำทิพย์</strong> คือ "ตัวเปิดบิล" ที่ดีที่สุด หากนำของทานเล่นชิ้นเล็ก (โดรายากิ, ถั่วแระ) มาจัดแคมเปญ <strong>"ซื้อน้ำคู่ขนม ลด 5 บาท"</strong> จะช่วยอัปเกรดลูกค้ากลุ่ม Grab & Go (สีเทา) ให้มียอดใช้จ่ายต่อบิลทะลุ 150 บาทได้ทันที</p>
+            </div>
+        </div>
+
+        <!-- 4. HOURLY ANALYTICS -->
+        <h2 class="section-title">⏰ 4. Hourly Performance (เจาะลึกพฤติกรรมรายชั่วโมง)</h2>
+        <div class="chart-section">
+            <div class="chart-header">กระแสเงินสดรับจริง (Net Sales) รายชั่วโมง - 4 วันเปรียบเทียบ</div>
+            <div class="chart-wrapper"><canvas id="hourlyNetChart"></canvas></div>
+            <div class="chart-header" style="margin-top:40px;">ส่วนลดรายชั่วโมง (Discount Leak)</div>
+            <div class="chart-wrapper"><canvas id="hourlyDiscChart"></canvas></div>
+            <div class="analysis-box">
+                <h4>♻️ กลยุทธ์ระบายสินค้า (Waste Management) ช่วง 21:00 น.</h4>
+                <p>กราฟส่วนลดทั้ง 4 วันแสดงให้เห็นชัดเจนว่าตั้งแต่เวลา 21:00 - 22:00 น. ยอดส่วนลดจะพุ่งขึ้นเป็นจุดสูงสุด (Peak) ซึ่งเกิดจาก <strong>Promotion ระบายสินค้า (Clearance)</strong> เพื่อเร่งจำหน่ายสินค้ากลุ่มซูชิและเบนโตะออกให้หมด ลดปริมาณสินค้าที่ต้องกลายเป็น <strong>Food Waste</strong> ให้เหลือน้อยที่สุดก่อนปิดสาขา</p>
+            </div>
+            
+            <!-- เพิ่ม Hourly Category Heatmap ตรงนี้ -->
+            <div class="chart-header" style="margin-top:40px;">พฤติกรรมการซื้อรายหมวดหมู่ (Hourly Category Heatmap)</div>
+            <div class="chart-wrapper"><canvas id="hourlyCategoryChart"></canvas></div>
+            <div class="analysis-box">
+                <h4>🔍 จังหวะเวลาในการผลิต (Time-based Insights)</h4>
+                <p>ช่วงเช้าตรู่ (06:00-09:00) สินค้าหลักคือ <strong>เครื่องดื่ม</strong> ขณะที่ <strong>Bento พรีเมียม</strong> จะเริ่มทำยอดสูงสุดในช่วงเที่ยง (11:00-13:00) และช่วงเย็น (17:00-19:00) ข้อมูลนี้ช่วยให้ครัวจัดรอบปั้นซูชิได้แม่นยำขึ้น โดยเน้นผลิตของให้พร้อม 100% ก่อน 10:30 น. และเติมของบางส่วนตอน 15:00 น. เพื่อป้องกันของขาดช่วงเย็น</p>
+            </div>
+        </div>
+
+        <!-- 5. Basket Quality -->
+        <h2 class="section-title">🧾 5. Basket Quality (คุณภาพบิล: เต็มราคา vs ลดราคา)</h2>
+        <div class="chart-section">
+            <div class="chart-header">สัดส่วนบิลราคาเต็ม vs บิลส่วนลด (4 วันเปรียบเทียบ)</div>
+            <div class="chart-wrapper"><canvas id="basketQualityChart"></canvas></div>
+            <div class="analysis-box">
+                <h4>🔍 วิเคราะห์คุณภาพบิล</h4>
+                <ul>
+                    <li><strong>24 Feb (Day 2):</strong> บิลลดราคาพุ่งถึง 112 บิล เป็นวันที่ Margin ถูกกัดกินหนักที่สุด</li>
+                    <li><strong>26 Feb (Day 4):</strong> สัญญาณบวก — บิลลดราคาลดลงเหลือ 76 บิล ขณะที่บิลเต็มราคาเพิ่มขึ้นเป็น 232 บิล แสดงให้เห็นการควบคุมยอดเสียเริ่มเห็นผล</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 6. PROMOTION USAGE -->
+        <h2 class="section-title">🎟️ 6. รายละเอียดการใช้โปรโมชั่น (Promotion Usage Breakdown)</h2>
+        <p class="section-desc">สรุปมูลค่าส่วนลดแยกตามวันที่ (อ้างอิงจากรายงานสรุปการใช้โปรโมชั่นแยกตามวันที่)</p>
+        <div class="chart-section">
+            <div class="chart-header">มูลค่าส่วนลดแบ่งตามประเภทโปรโมชั่นรายวัน (บาท)</div>
+            
+            <!-- แถวที่ 1: กราฟ -->
+            <div class="chart-wrapper" style="height:350px; margin-bottom: 30px;"><canvas id="promoUsageChart"></canvas></div>
+            
+            <!-- แถวที่ 2: ตารางข้อมูล -->
+            <div style="overflow-x: auto; margin-bottom: 25px;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>โปรโมชั่น</th>
+                            <th>23 Feb</th>
+                            <th>24 Feb</th>
+                            <th>25 Feb</th>
+                            <th>26 Feb</th>
+                            <th>รวม 4 วัน</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span style="color:#e74c3c; font-weight:bold;">Flash Sale 21.00-22.00</span></td>
+                            <td>21,707.00</td>
+                            <td>32,323.00</td>
+                            <td>27,910.20</td>
+                            <td>24,155.30</td>
+                            <td>106,095.50</td>
+                        </tr>
+                        <tr>
+                            <td><span style="color:#f39c12; font-weight:bold;">Flash Sale 20.00-21.00</span></td>
+                            <td>-</td>
+                            <td>450.00</td>
+                            <td>820.00</td>
+                            <td>430.00</td>
+                            <td>1,700.00</td>
+                        </tr>
+                        <tr>
+                            <td><span style="color:#3498db; font-weight:bold;">Staff Discount 15%</span></td>
+                            <td>100.00</td>
+                            <td>200.00</td>
+                            <td>150.00</td>
+                            <td>196.05</td>
+                            <td>646.05</td>
+                        </tr>
+                        <tr>
+                            <td><span style="color:#2ecc71; font-weight:bold;">Staff Discount 10%</span></td>
+                            <td>36.00</td>
+                            <td>135.00</td>
+                            <td>91.80</td>
+                            <td>-</td>
+                            <td>262.80</td>
+                        </tr>
+                        <tr class="promo-total">
+                            <td>รวมส่วนลดที่เกิดขึ้น</td>
+                            <td>21,843.00</td>
+                            <td>33,108.00</td>
+                            <td>28,972.00</td>
+                            <td>24,781.35</td>
+                            <td>108,704.35</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- แถวที่ 3: บทวิเคราะห์และกลยุทธ์แนะนำ -->
+            <div class="analysis-box">
+                <h4>♻️ เจาะลึกโครงสร้างส่วนลด: กลยุทธ์ระบายสินค้า (Waste Management)</h4>
+                <p>ข้อมูลจากกราฟและตารางสะท้อนให้เห็นว่า สาเหตุที่ส่วนลดพุ่งสูงถึง 97% ไม่ใช่ความผิดพลาด แต่เกิดจากความพยายามของสาขาในการจัด <strong>Flash Sale (ป้ายเหลือง) ช่วง 20.00-22.00 น.</strong> เพื่อเร่งเคลียร์สต๊อกและลดปริมาณ <strong>Food Waste</strong> ให้เหลือน้อยที่สุดก่อนปิดสาขา อย่างไรก็ตาม การใช้วิธีหั่นราคาลง 50-70% รวดเดียวในตอนดึก เป็นการทำลาย Margin สุทธิของร้านอย่างรุนแรง</p>
+                <h4 style="font-size: 1rem; color: var(--text-main); margin-top: 15px; margin-bottom: 10px;">📌 กลยุทธ์แนะนำเพื่อลด Waste แบบรักษากำไร (Alternative Strategies):</h4>
+                <ul>
+                    <li><strong>Dynamic Pricing (ลดแบบขั้นบันได):</strong> เริ่มจัดโปรโมชั่นเร็วขึ้นแต่ลดน้อยลง เช่น 19:30 ลด 20% ➔ 20:30 ลด 30% ➔ 21:00 ลด 50% วิธีนี้จะดึงดูดลูกค้าให้ตัดสินใจซื้อทันทีโดยไม่ต้องรอให้ถึงช่วงดึกสุดเพื่อเอาส่วนลด 70%</li>
+                    <li><strong>Value-Add (แถมดีกว่าลด):</strong> เปลี่ยนป้ายลด 50% เป็นโปรโมชั่น "ซื้อเบนโตะ 1 เซ็ต แถมฟรี น้ำดื่ม/ถั่วแระ/โดรายากิ" ต้นทุนของสินค้าที่นำมาแถมจะต่ำกว่ามูลค่าส่วนลดที่เป็นตัวเงินมาก และช่วยระบาย Dead Stock ของทานเล่นไปในตัว</li>
+                    <li><strong>Just-in-Time (JIT) Production:</strong> แก้ปัญหาที่ต้นเหตุ นำข้อมูลบิลลดราคาเหล่านี้ไปตั้งเพดานการผลิตใหม่ โดยสั่งให้สาขาลดปริมาณการปั้นซูชิรอบบ่าย (หลัง 15:00 น.) ลง 20-30% ทันที</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 7. PRICE BAND & MARGIN MATRIX (Section ใหม่) -->
+        <h2 class="section-title">💰 7. Price Band Matrix (วิเคราะห์ช่วงราคาสินค้าที่ทำกำไร)</h2>
+        <div class="chart-section">
+            <div class="chart-header">ความสัมพันธ์ระหว่าง ราคาต่อชิ้น, ปริมาณขาย และสัดส่วนยอดขาย (Bubble Chart)</div>
+            <div class="chart-wrapper" style="height: 400px;"><canvas id="priceBandChart"></canvas></div>
+            <div class="analysis-box">
+                <h4>🎯 สรุปโซนราคาที่ควรโฟกัส (Price Zone Analysis)</h4>
+                <ul>
+                    <li><strong>โซน <150 บาท (High Volume, Low Margin):</strong> น้ำดื่ม, ของทานเล่น, ขนม ขายได้จำนวนมหาศาล เป็นตัวสร้าง Traffic ดึงลูกค้าเข้าร้าน</li>
+                    <li><strong>โซน 150 - 250 บาท (The Sweet Spot):</strong> สินค้ากลุ่ม Super Maki S (200.-) หรือ Aburi Set (275.-) เป็นกลุ่มที่ลูกค้าสนามบินตัดสินใจซื้อง่ายสุด มักขายออกใน <strong>"ราคาเต็ม"</strong> ไม่ค่อยเหลือเป็น Waste</li>
+                    <li><strong>โซน >300 บาท (High Margin, High Risk):</strong> กลุ่ม Salmon Varity M (385.-) และ Mori Set (310.-) ทำยอด Gross สูงมาก แต่มีความอ่อนไหวเรื่องราคา หากขายไม่หมดมักเป็นต้นเหตุหลักที่ทำให้ร้านต้องอัดโปรลดราคาหนักตอนดึก</li>
+                </ul>
+                <p style="margin-top: 10px; color: var(--accent-color); font-weight: bold;">📌 แผนปรับโครงสร้างราคา: ควรเน้นดันสินค้าในช่วงราคา 150-250 บาทขึ้นมาโชว์ในตู้แช่ระดับสายตามากขึ้น เพราะเป็นจุดที่ได้กำไรสุทธิสม่ำเสมอที่สุด และแบกความเสี่ยงต่ำกว่า</p>
+            </div>
+        </div>
+
+        <!-- 8. Money Drainers -->
+        <h2 class="section-title">🩸 8. Money Drainers (สินค้าที่ดูดกำไรสูงสุด 26 Feb)</h2>
+        <div class="chart-section">
+            <div class="chart-header">Top 5 สินค้าพรีเมียมที่ถูกหักส่วนลดป้ายเหลืองมากที่สุด (บาท)</div>
+            <div class="chart-wrapper"><canvas id="moneyDrainersChart"></canvas></div>
+            <div class="analysis-box" style="border-left-color: #e74c3c;">
+                <h4 style="color: #e74c3c;"><i class="fas fa-exclamation-triangle"></i> ทำไม Hero Product ถึงกลายเป็นตัวดูดกำไร (Profit Bleeder)?</h4>
+                <p style="margin-bottom: 15px;"><strong>Salmon Varity Set M (385.-)</strong> และ <strong>Mori Set (310.-)</strong> เป็นสินค้าที่ขายดีที่สุดในช่วงกลางวัน ทำให้สาขา <strong>"ผลิตตุนไว้มากเกินไป"</strong> เพื่อป้องกันของขาด แต่เมื่อทราฟฟิกช่วงเย็นไม่เป็นตามเป้า สินค้าเหล่านี้จึงถูกเทขายรวบยอด (Bundled Clearance) ในเวลา 21:00 น. โดยให้ส่วนลดลึกถึง 50-70% ทำให้ Margin ที่สะสมมาทั้งวันละลายหายไป</p>
+                <h4 style="font-size: 1rem; color: var(--text-main); margin-bottom: 10px;">📌 คำแนะนำเร่งด่วนสำหรับสาขาสนามบิน:</h4>
+                <ul>
+                    <li><strong>ปรับระบบเป็น Batch Production:</strong> เลิกผลิตรวดเดียวในตอนเช้า ให้แบ่งรอบเป็น เช้า 60% / บ่าย 40% และให้ ผจก.สาขา ประเมินยอดคงเหลือตอน 15:00 น. ก่อนสั่งปั้นซูชิเพิ่ม</li>
+                    <li><strong>Value-Add แทนการ Price Cut:</strong> ช่วงดึกแทนที่จะแปะป้ายลด 70% ตรงๆ ให้ทำโปร "Late Night Premium" ซื้อเซ็ตแถมเครื่องดื่ม/ขนม แทนการหั่นราคา</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 9. ITEM COMPARISON -->
+        <h2 class="section-title">🏷️ 9. เปรียบเทียบยอดขายระดับสินค้า (4 Days Comparison)</h2>
+        <p class="section-desc">เปรียบเทียบปริมาณขาย 23, 24, 25 และ 26 ก.พ. (ล่าสุด) อ้างอิงจากข้อมูล POS</p>
+        
+        <div class="accordion-container" id="categoryAccordion">
+            <!-- Sushi Bento -->
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">📦 Sushi Bento (กลุ่มเบนโตะ)</div>
+                    <div class="acc-stats">D1: 255 | D2: 240 | D3: 183 | D4: <strong>192</strong> <span style="color:#27ae60;">(+9)</span> &nbsp; <span class="acc-arrow">▼</span></div>
+                </div>
+                <div class="acc-content active">
+                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
+                    <div class="item-row"><span>Salmon Varity Set M (฿385) <span style="color:#f39c12;">⭐ Hero</span></span><span>25 | 20 | 20 | <b>24</b> <span style="color:#27ae60;">+4</span></span></div>
+                    <div class="item-row"><span>Sushi Bento Mori Set (฿310)</span><span>26 | 20 | 20 | <b>22</b> <span style="color:#27ae60;">+2</span></span></div>
+                    <div class="item-row"><span>Sushi Bento Super Rolls Set (฿310)</span><span>22 | 20 | 20 | <b>18</b> <span style="color:#c0392b;">-2</span></span></div>
+                    <div class="item-row"><span>Sushi Bento Aburi Set (฿275)</span><span>21 | 20 | 18 | <b>19</b> <span style="color:#27ae60;">+1</span></span></div>
+                    <div class="item-row"><span>Sushi Bento Super Maki S (฿200)</span><span>25 | 15 | 18 | <b>25</b> <span style="color:#27ae60;">+7</span></span></div>
+                </div>
+            </div>
+
+            <!-- Donburi (กลุ่มข้าวหน้า) -->
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">🍲 Donburi (กลุ่มข้าวหน้า)</div>
+                    <div class="acc-stats">D1: 4 | D2: 6 | D3: 6 | D4: <strong>8</strong> <span style="color:#27ae60;">(+2)</span> &nbsp; <span class="acc-arrow">▼</span></div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
+                    <div class="item-row"><span>Salmon Don (฿210)</span><span>4 | 5 | 6 | <b>8</b> <span style="color:#27ae60;">+2</span></span></div>
+                    <div class="item-row"><span>Oyakodon (ข้าวหน้าไก่) (฿140)</span><span>0 | 1 | 0 | <b>0</b> <span style="color:#bdc3c7;">0</span></span></div>
+                </div>
+            </div>
+
+            <!-- Appetizer -->
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">🍚 Appetizer (กลุ่มของทานเล่น)</div>
+                    <div class="acc-stats">D1: 45 | D2: 43 | D3: 51 | D4: <strong>49</strong> <span style="color:#c0392b;">(-2)</span> &nbsp; <span class="acc-arrow">▼</span></div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
+                    <div class="item-row"><span>Kani Tataki (฿110)</span><span>15 | 14 | 18 | <b>17</b> <span style="color:#c0392b;">-1</span></span></div>
+                    <div class="item-row"><span>Edamame / ถั่วแระ (฿50)</span><span>22 | 20 | 25 | <b>25</b> <span style="color:#bdc3c7;">0</span></span></div>
+                    <div class="item-row"><span>Tako Wasabi (฿110)</span><span>8 | 9 | 8 | <b>7</b> <span style="color:#c0392b;">-1</span></span></div>
+                </div>
+            </div>
+
+            <!-- Beverage -->
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">🥤 Beverage (กลุ่มเครื่องดื่ม)</div>
+                    <div class="acc-stats">D1: 190 | D2: 236 | D3: 185 | D4: <strong>252</strong> <span style="color:#27ae60;">(+67)</span> &nbsp; <span class="acc-arrow">▼</span></div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
+                    <div class="item-row"><span>Namthip Drinking Water (฿10)</span><span>150 | 199 | 148 | <b>210</b> <span style="color:#27ae60;">+62</span></span></div>
+                    <div class="item-row"><span>ITOEN Green Tea (฿35)</span><span>40 | 37 | 37 | <b>42</b> <span style="color:#27ae60;">+5</span></span></div>
+                </div>
+            </div>
+            
+            <!-- Dessert -->
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <div class="acc-title">🍰 Dessert (กลุ่มของหวาน)</div>
+                    <div class="acc-stats">D1: 38 | D2: 34 | D3: 35 | D4: <strong>32</strong> <span style="color:#c0392b;">(-3)</span> &nbsp; <span class="acc-arrow">▼</span></div>
+                </div>
+                <div class="acc-content">
+                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
+                    <div class="item-row"><span>Dorayaki (฿50)</span><span>28 | 24 | 26 | <b>22</b> <span style="color:#c0392b;">-4</span></span></div>
+                    <div class="item-row"><span>Yuzu Daifuku (฿39)</span><span>10 | 10 | 9 | <b>10</b> <span style="color:#27ae60;">+1</span></span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. SALES BY QUANTITY -->
+        <h2 class="section-title">🏆 10. ยอดขายตามจำนวนสินค้า (Sales by Quantity)</h2>
+        <p class="section-desc">สรุปยอดขายแยกตามรายสินค้า พร้อมรหัสสินค้า ราคาต่อชิ้น จำนวน และยอดขายรวม</p>
+        
+        <!-- Tabs -->
+        <div class="tabs" id="dayTabs">
+            <button class="tab-btn active" data-day="all">รวม 4 วัน (All Days)</button>
+            <button class="tab-btn" data-day="d1">23 ก.พ. (Day 1)</button>
+            <button class="tab-btn" data-day="d2">24 ก.พ. (Day 2)</button>
+            <button class="tab-btn" data-day="d3">25 ก.พ. (Day 3)</button>
+            <button class="tab-btn" data-day="d4">26 ก.พ. (Day 4 - ล่าสุด)</button>
+        </div>
+
+        <!-- Filters -->
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+            <select id="catFilter" class="filter-select" onchange="updateRanking()">
+                <option value="all">🏷️ ทุกกลุ่มสินค้า (All Categories)</option>
+                <option value="Bento">📦 เบนโตะ (Bento)</option>
+                <option value="Donburi">🍲 ข้าวหน้า (Donburi)</option>
+                <option value="Appetizer">🍚 ของทานเล่น (Appetizer)</option>
+                <option value="Beverage">🥤 เครื่องดื่ม (Beverage)</option>
+                <option value="Dessert">🍰 ของหวาน (Dessert)</option>
+            </select>
+
+            <select id="sortFilter" class="filter-select" onchange="updateRanking()">
+                <option value="desc">⬇️ เรียงจำนวน: มากไปน้อย</option>
+                <option value="asc">⬆️ เรียงจำนวน: น้อยไปมาก</option>
+            </select>
+        </div>
+
+        <!-- Dynamic Ranking Container -->
+        <div id="dynamic-ranking-container" class="ranking-grid" style="grid-template-columns: 1fr;">
+            <!-- Data will be injected here via JavaScript -->
+        </div>
+
+        <div class="analysis-box">
+            <h4>💡 คำแนะนำการจัดการสต๊อก (Inventory & Shelving)</h4>
+            <ul>
+                <li><strong>กลุ่ม Hero:</strong> <strong>Salmon Varity Set M</strong> มียอดขายสม่ำเสมอที่สุด และสร้างมูลค่าบิลสูง ควรจัดวางให้เต็มตู้แช่ในระดับสายตา (Eye-level) ช่วงพีค 12:00 น. เพื่อรองรับยอดขายแบบราคาเต็ม</li>
+                <li><strong>กลุ่ม Dead Stock:</strong> เมนูปรุงสุก (Oyakodon, Salmon Head) ขายไม่ออกหรือได้เพียง 0-1 ชิ้นต่อวัน <strong>ควรพิจารณาถอดออกจากเมนูสาขาสนามบิน</strong> เพราะเป็นสาขาที่ลูกค้าเน้น Grab & Go (ต้องการความรวดเร็ว)</li>
+                <li><strong>กลุ่ม Impulse Buy (กระตุ้นการซื้อ):</strong> น้ำดื่มน้ำทิพย์คือสินค้าดึง Traffic (ขายได้ >150-200 ขวด/วัน) <strong>ควรจัดวางสินค้าทานเล่นขนาดเล็ก (Edamame, Dorayaki, Kani Tataki) ไว้ข้างตู้แช่น้ำหรือจุดชำระเงิน (Point of Sale)</strong> เพื่อทำ Cross-selling เพิ่มยอดเฉลี่ยต่อบิล</li>
+            </ul>
+            
+            <h4 style="font-size: 1.05rem; color: #e74c3c; margin-top: 15px; margin-bottom: 10px; border-top: 1px dashed #e1e8ed; padding-top: 15px;">
+                📋 Action Plan สำหรับผู้จัดการสาขา (To-Do พรุ่งนี้)
+            </h4>
+            <ol style="margin-bottom: 0; padding-left: 20px; font-weight: 500;">
+                <li style="margin-bottom: 8px;"><strong>จัด Layout เคาน์เตอร์ใหม่ (ก่อนร้านเปิด):</strong> ย้ายขนม (Dorayaki, Daifuku) และถั่วแระ มาดักรอที่หน้าเคาน์เตอร์คิดเงินหรือชั้นวางที่ติดกับตู้แช่น้ำดื่มที่สุด</li>
+                <li style="margin-bottom: 8px;"><strong>ระงับการผลิตเมนู Dead Stock ทันที:</strong> แจ้งครัวงดเตรียมวัตถุดิบ Oyakodon และ Salmon Head ชั่วคราว เพื่อหยุด Food Waste ในกลุ่มนี้ 100%</li>
+                <li><strong>ตั้งกฎเช็คสต๊อก 15:00 น. (The 3 PM Rule):</strong> ผจก.สาขา ต้องเช็คสต๊อกกลุ่ม "เบนโตะพรีเมียม" ทุกวันตอนบ่าย 3 หากประเมินแล้วเหลือเยอะ <em>ห้ามสั่งปั้นเพิ่มเด็ดขาด</em> เพื่อลดภาระการไปทำ Flash Sale 70% ตอนสามทุ่ม</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="dashboard-footer">
+        Nigiben Executive Report : 2026
+    </div>
+
+    <!-- AI Insights Modal -->
+    <div class="ai-modal-overlay" id="aiModal">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>✨ Gemini AI: Executive Analysis & Action Plan</h3>
+                <button class="ai-close-btn" onclick="closeAIModal()">✖</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div id="aiLoading" style="text-align: center; padding: 40px 0;">
+                    <div class="ai-spinner"></div>
+                    <p style="color: var(--text-muted); font-weight: 500; margin-top: 15px;">AI กำลังประมวลผลข้อมูล 4 วันล่าสุด และสร้างแผนกลยุทธ์...</p>
+                </div>
+                <div id="aiResult" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // เปิดใช้งาน ChartDataLabels แบบ Global
+        Chart.register(ChartDataLabels);
+
+        // ตั้งค่า Default Font สำหรับ DataLabels
+        Chart.defaults.plugins.datalabels = {
+            font: {
+                family: "'Noto Sans Thai', sans-serif",
+                weight: 'bold',
+                size: 11
+            }
+        };
+
+        function toggleAcc(el) {
+            const content = el.nextElementSibling;
+            const isActive = content.classList.contains('active');
+
+            // ปิดทุก accordion ก่อน
+            document.querySelectorAll('.acc-content').forEach(c => {
+                c.classList.remove('active');
+            });
+            document.querySelectorAll('.acc-arrow').forEach(a => {
+                a.textContent = '▼';
+            });
+
+            // ถ้าตัวนั้นยังไม่ได้เปิด → เปิด
+            if (!isActive) {
+                content.classList.add('active');
+                el.querySelector('.acc-arrow').textContent = '▲';
+            }
+        }
+
+        // Data สำหรับ Dynamic Ranking พร้อมรหัสสินค้า (SKU) และราคา
+        const rankingData = [
+            { sku: "BEV005", name: "Namthip Drinking Water", cat: "Beverage", price: 10, d1: 150, d2: 199, d3: 148, d4: 210 },
+            { sku: "BEV007", name: "ITOEN Green Tea", cat: "Beverage", price: 35, d1: 40, d2: 37, d3: 37, d4: 42 },
+            { sku: "DES004", name: "Dorayaki", cat: "Dessert", price: 50, d1: 28, d2: 24, d3: 26, d4: 22 },
+            { sku: "DES005", name: "Yuzu Daifuku", cat: "Dessert", price: 39, d1: 10, d2: 10, d3: 9, d4: 10 },
+            { sku: "MED003", name: "Salmon Varity Set M", cat: "Bento", price: 385, d1: 25, d2: 20, d3: 20, d4: 24 },
+            { sku: "MED007", name: "Sushi Bento Mori Set", cat: "Bento", price: 310, d1: 26, d2: 20, d3: 20, d4: 22 },
+            { sku: "MED005", name: "Sushi Bento Super Rolls Set", cat: "Bento", price: 310, d1: 22, d2: 20, d3: 20, d4: 18 },
+            { sku: "MINI012", name: "Sushi Bento Aburi Set", cat: "Bento", price: 275, d1: 21, d2: 20, d3: 18, d4: 19 },
+            { sku: "MINI009", name: "Sushi Bento Super Maki S", cat: "Bento", price: 200, d1: 25, d2: 15, d3: 18, d4: 25 },
+            { sku: "MINI001", name: "Sushi Bento Small Set 1", cat: "Bento", price: 150, d1: 1, d2: 0, d3: 0, d4: 1 },
+            { sku: "DON001", name: "Oyakodon (ข้าวหน้าไก่)", cat: "Donburi", price: 140, d1: 0, d2: 1, d3: 0, d4: 0 },
+            { sku: "APP001", name: "Salmon Head Shoyu", cat: "Bento", price: 120, d1: 1, d2: 0, d3: 0, d4: 0 },
+            { sku: "DON002", name: "Salmon Don", cat: "Donburi", price: 210, d1: 4, d2: 5, d3: 6, d4: 8 },
+            { sku: "APP004", name: "Kani Tataki", cat: "Appetizer", price: 110, d1: 15, d2: 14, d3: 18, d4: 17 },
+            { sku: "APP002", name: "Edamame", cat: "Appetizer", price: 50, d1: 22, d2: 20, d3: 25, d4: 25 },
+            { sku: "APP003", name: "Tako Wasabi", cat: "Appetizer", price: 110, d1: 8, d2: 9, d3: 8, d4: 7 },
+            { sku: "APP005", name: "Chuka Wakame (ยำสาหร่าย)", cat: "Appetizer", price: 50, d1: 2, d2: 2, d3: 1, d4: 1 },
+            { sku: "APP006", name: "Miso Soup", cat: "Appetizer", price: 40, d1: 2, d2: 3, d3: 2, d4: 2 },
+            { sku: "APP007", name: "Gyoza", cat: "Appetizer", price: 80, d1: 12, d2: 15, d3: 11, d4: 14 },
+            { sku: "APP008", name: "Ebi Tempura", cat: "Appetizer", price: 120, d1: 15, d2: 13, d3: 14, d4: 15 }
+        ];
+
+        // คำนวณยอดรวม 4 วัน
+        rankingData.forEach(p => p.all = p.d1 + p.d2 + p.d3 + p.d4);
+
+        let currentDay = 'all';
+
+        // Event Listener สำหรับเปลี่ยนวัน
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('#dayTabs .tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('#dayTabs .tab-btn').forEach(b => b.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    currentDay = e.currentTarget.getAttribute('data-day');
+                    updateRanking();
+                });
+            });
+            updateRanking(); // โหลดครั้งแรก
+        });
+
+        // ฟังก์ชันอัปเดตตารางจัดอันดับ
+        function updateRanking() {
+            const cat = document.getElementById('catFilter').value;
+            const sortMode = document.getElementById('sortFilter').value;
+            
+            let filtered = rankingData.map(p => {
+                return {
+                    sku: p.sku,
+                    name: p.name,
+                    cat: p.cat,
+                    price: p.price,
+                    qty: p[currentDay]
+                };
+            });
+
+            if (cat !== 'all') {
+                filtered = filtered.filter(p => p.cat === cat);
+            }
+
+            const container = document.getElementById('dynamic-ranking-container');
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = '1fr';
+
+            if (sortMode === 'desc') {
+                let sortedDesc = [...filtered].sort((a, b) => b.qty - a.qty);
+                container.innerHTML = generateListHTML('📊 ยอดขายตามจำนวนสินค้า (เรียงจากมากไปน้อย)', sortedDesc);
+            } else if (sortMode === 'asc') {
+                let sortedAsc = [...filtered].sort((a, b) => a.qty - b.qty);
+                container.innerHTML = generateListHTML('📊 ยอดขายตามจำนวนสินค้า (เรียงจากน้อยไปมาก)', sortedAsc);
+            }
+        }
+
+        // ฟังก์ชันสร้าง HTML สำหรับรายการ
+        function generateListHTML(title, items) {
+            let html = `<div class="rank-list"><div class="rank-header best" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">${title}</div>`;
+            
+            // Header row
+            html += `<div class="rank-item rank-grid-row mobile-hide" style="font-weight:bold; background-color:#f8fbfe; color:#1e3c72; border-bottom: 2px solid #e1e8ed;">
+                        <div>รายการสินค้า</div>
+                        <div style="text-align:right;">ราคา/ชิ้น</div>
+                        <div style="text-align:center;">จำนวนขาย</div>
+                        <div style="text-align:right;">ยอดรวม (Gross)</div>
+                     </div>`;
+
+            if (items.length === 0) {
+                html += `<div class="rank-item" style="justify-content:center; color:#95a5a6;">ไม่มีข้อมูล</div>`;
+            }
+
+            items.forEach((item, index) => {
+                let catEmoji = item.cat === 'Bento' ? '📦' : item.cat === 'Donburi' ? '🍲' : item.cat === 'Appetizer' ? '🍚' : item.cat === 'Beverage' ? '🥤' : '🍰';
+                let totalSales = item.qty * item.price;
+                html += `<div class="rank-item rank-grid-row">
+                            <div class="item-name" style="display:flex; align-items:flex-start;">
+                                <span class="rank-num" style="width:30px;">${index + 1}.</span> 
+                                <div>
+                                    <span style="font-family:monospace; color:#3498db; font-size:0.85rem; background:#eaf3fb; padding:2px 5px; border-radius:4px; margin-right:5px;">${item.sku}</span> 
+                                    ${item.name} 
+                                    <span style="font-size:0.75rem; color:#bdc3c7; display:block; margin-top:2px;">${catEmoji} ${item.cat}</span>
+                                </div>
+                            </div>
+                            <div style="text-align:right; font-size:0.85rem; color:#7f8c8d;">฿${item.price.toLocaleString()}</div>
+                            <div style="text-align:center;"><span class="rank-qty">${item.qty}</span></div>
+                            <div style="text-align:right; font-weight:700; color:#2ecc71;">฿${totalSales.toLocaleString()}</div>
+                         </div>`;
+            });
+            html += `</div>`;
+            return html;
+        }
+
+        window.onload = function() {
+            try {
+                if (typeof Chart === 'undefined') throw new Error('Chart.js not loaded');
+
+                Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
+
+                // กราฟเส้น ไม่แสดงตัวเลขเพื่อให้ไม่ดูรก
+                const lineOpts = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: { 
+                        legend: { position: 'top' },
+                        datalabels: { display: false } // ปิดตัวเลขสำหรับกราฟเส้น
+                    }
+                };
+
+                // กราฟแท่งแนวตั้ง (แสดงตัวเลขตรงกลางแท่ง)
+                const barOpts = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: { 
+                        legend: { position: 'top' },
+                        datalabels: {
+                            color: '#ffffff',
+                            anchor: 'center',
+                            align: 'center',
+                            formatter: (value) => value > 0 ? value : ''
+                        }
+                    }
+                };
+
+                // กราฟแท่งแนวนอน (แสดงตัวเลขด้านขวาของแท่ง พร้อมใส่ลูกน้ำ)
+                const horizontalBarOpts = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { 
+                        legend: { position: 'top' },
+                        datalabels: {
+                            color: '#e74c3c', // ให้สีตัวเลขตรงกับแท่ง
+                            anchor: 'end',
+                            align: 'right',
+                            formatter: (value) => value.toLocaleString() + ' ฿'
+                        }
+                    },
+                    scales: {
+                        x: { suggestedMax: 8500 } // เผื่อที่ว่างด้านขวาให้ตัวเลข
+                    }
+                };
+
+                // กราฟแท่งแนวนอนแบบ Stacked
+                const stackedHorizontalOpts = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { 
+                        legend: { position: 'top' },
+                        datalabels: {
+                            color: '#ffffff',
+                            formatter: (value) => value > 0 ? value : ''
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true }
+                    }
+                };
+
+                // กราฟแท่งแนวตั้งแบบ Stacked (สำหรับ Promotion)
+                const stackedVerticalOpts = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: { 
+                        legend: { position: 'top' },
+                        datalabels: {
+                            color: '#ffffff',
+                            formatter: (value) => value > 0 ? value.toLocaleString() : ''
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true }
+                    }
+                };
+
+                // --- Chart 1: Daily Trend ---
+                new Chart('dailyTrendChart', {
+                    type: 'line',
+                    data: {
+                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
+                        datasets: [
+                            { label: 'ยอดรวม (Gross)', data: [69604, 77080, 62753, 64850], borderColor: '#3498db', borderWidth: 4, pointRadius: 6, fill: false },
+                            { label: 'เงินรับจริง (Net)', data: [47761, 43972, 33731, 35210], borderColor: '#2ecc71', borderWidth: 4, pointRadius: 6, fill: false },
+                            { label: 'ส่วนลดสะสม (Disc)', data: [21843, 33108, 29022, 29640], borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 3, fill: false }
+                        ]
+                    },
+                    options: lineOpts
+                });
+
+                // --- Chart 2: Basket Segment ---
+                new Chart('basketSegmentChart', {
+                    type: 'bar',
+                    data: {
+                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
+                        datasets: [
+                            { label: 'Grab & Go (<200฿)', data: [195, 214, 235, 242], backgroundColor: '#bdc3c7' },
+                            { label: 'Solo Meal (200-500฿)', data: [88, 85, 65, 62], backgroundColor: '#3498db' },
+                            { label: 'Couple (>500฿)', data: [12, 11, 3, 4], backgroundColor: '#2ecc71' }
+                        ]
+                    },
+                    options: barOpts
+                });
+
+                // --- Chart 3: Hourly Net ---
+                const labelsHour = ['05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
+                new Chart('hourlyNetChart', {
+                    type: 'line',
+                    data: {
+                        labels: labelsHour,
+                        datasets: [
+                            { label: '23 Feb', data: [795, 2816, 480, 525, 2818, 883, 6799, 2587, 1858, 2874, 5989, 5648, 299, 985, 1800, 940, 9327, 338, 0], borderColor: '#bdc3c7', tension: 0.4, fill: false },
+                            { label: '24 Feb', data: [450, 1200, 300, 800, 1500, 1100, 4500, 3200, 2100, 3500, 4200, 3800, 1200, 1500, 2100, 1300, 10100, 1050, 0], borderColor: '#3498db', tension: 0.4, fill: false },
+                            { label: '25 Feb', data: [220, 588, 86, 1940, 945, 1447, 340, 1453, 1480, 1575, 2756, 2618, 1817, 1680, 1262, 1133, 11139, 1252, 0], borderColor: '#f39c12', tension: 0.4, fill: false },
+                            { label: '26 Feb (ล่าสุด)', data: [180, 450, 110, 1200, 850, 1900, 2100, 1850, 2400, 4500, 2200, 2800, 1600, 2400, 1500, 1100, 9800, 2200, 0], borderColor: '#2ecc71', borderWidth: 4, tension: 0.4, fill: true, backgroundColor: 'rgba(46,204,113,0.1)' }
+                        ]
+                    },
+                    options: lineOpts
+                });
+
+                // --- Chart 4: Hourly Disc ---
+                new Chart('hourlyDiscChart', {
+                    type: 'line',
+                    data: {
+                        labels: labelsHour,
+                        datasets: [
+                            { label: '23 Feb', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 500, 18000, 3343, 0], borderColor: '#bdc3c7', tension: 0.4, fill: false },
+                            { label: '24 Feb', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1200, 28000, 3908, 0], borderColor: '#3498db', tension: 0.4, fill: false },
+                            { label: '25 Feb', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 900, 24000, 4122, 0], borderColor: '#f39c12', tension: 0.4, fill: false },
+                            { label: '26 Feb', data: [0, 0, 14, 0, 64, 0, 0, 0, 8, 0, 84, 0, 0, 0, 0, 820, 25129, 2913, 0], borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.1)', fill: true, tension: 0.4 }
+                        ]
+                    },
+                    options: lineOpts
+                });
+
+                // --- Chart 5: Basket Quality (Stacked Horizontal Bar) ---
+                new Chart('basketQualityChart', {
+                    type: 'bar',
+                    data: {
+                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
+                        datasets: [
+                            { label: 'บิลราคาเต็ม', data: [235, 198, 221, 232], backgroundColor: '#2ecc71' },
+                            { label: 'บิลลดราคา', data: [60, 112, 82, 76], backgroundColor: '#e74c3c' }
+                        ]
+                    },
+                    options: stackedHorizontalOpts
+                });
+
+                // --- Chart 6: Promotion Usage (Stacked Vertical Bar) ---
+                new Chart('promoUsageChart', {
+                    type: 'bar',
+                    data: {
+                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
+                        datasets: [
+                            { label: 'Staff Discount 10%', data: [36, 135, 91.8, 0], backgroundColor: '#2ecc71' },
+                            { label: 'Staff Discount 15%', data: [100, 200, 150, 196.05], backgroundColor: '#3498db' },
+                            { label: 'Flash Sale 20.00-21.00', data: [0, 450, 820, 430], backgroundColor: '#f39c12' },
+                            { label: 'Flash Sale 21.00-22.00', data: [21707, 32323, 27910.2, 24155.3], backgroundColor: '#e74c3c' }
+                        ]
+                    },
+                    options: stackedVerticalOpts
+                });
+
+                // --- Chart: Hourly Category Heatmap (Stacked Bar) ---
+                new Chart('hourlyCategoryChart', {
+                    type: 'bar',
+                    data: {
+                        labels: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '21:00'],
+                        datasets: [
+                            { label: 'Bento (เบนโตะ)', data: [15, 25, 45, 85, 55, 30, 60, 45, 120], backgroundColor: '#e74c3c' },
+                            { label: 'Beverage (เครื่องดื่ม)', data: [45, 40, 35, 65, 45, 35, 45, 25, 15], backgroundColor: '#3498db' },
+                            { label: 'Appetizer (ทานเล่น)', data: [0, 5, 15, 30, 20, 15, 25, 20, 15], backgroundColor: '#f39c12' },
+                            { label: 'Dessert (ของหวาน)', data: [2, 5, 10, 20, 25, 15, 15, 5, 0], backgroundColor: '#2ecc71' }
+                        ]
+                    },
+                    options: stackedVerticalOpts
+                });
+
+                // --- Chart: Price Band (Bubble Chart) ---
+                new Chart('priceBandChart', {
+                    type: 'bubble',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'กลุ่มดึง Traffic (<150฿)',
+                                data: [
+                                    { x: 10, y: 707, r: 25 }, // Water
+                                    { x: 35, y: 156, r: 12 },  // Green Tea
+                                    { x: 50, y: 100, r: 10 },  // Dorayaki
+                                    { x: 110, y: 64, r: 8 },  // Kani Tataki
+                                    { x: 50, y: 92, r: 9 }    // Edamame
+                                ],
+                                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                                borderColor: '#2980b9'
+                            },
+                            {
+                                label: 'กลุ่มกำไรปลอดภัย (150-300฿)',
+                                data: [
+                                    { x: 200, y: 83, r: 18 }, // Super Maki S
+                                    { x: 275, y: 78, r: 20 }, // Aburi Set
+                                    { x: 210, y: 23, r: 6 }   // Salmon Don
+                                ],
+                                backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                                borderColor: '#27ae60'
+                            },
+                            {
+                                label: 'กลุ่มพรีเมียม / เสี่ยงลดราคา (>300฿)',
+                                data: [
+                                    { x: 385, y: 89, r: 35 }, // Salmon Varity
+                                    { x: 310, y: 88, r: 28 }, // Mori Set
+                                    { x: 310, y: 80, r: 25 }  // Super Rolls
+                                ],
+                                backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                                borderColor: '#c0392b'
+                            }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: { 
+                            legend: { position: 'top' },
+                            datalabels: { display: false }
+                        },
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'ราคาต่อชิ้น (บาท)', font: {weight: 'bold'} },
+                                min: 0,
+                                max: 450
+                            },
+                            y: { 
+                                title: { display: true, text: 'ปริมาณขายรวม 4 วัน (ชิ้น)', font: {weight: 'bold'} },
+                                min: 0
+                            }
+                        }
+                    }
+                });
+
+                // --- Chart 8: Money Drainers (Horizontal Bar) ---
+                new Chart('moneyDrainersChart', {
+                    type: 'bar',
+                    data: {
+                        labels: ['Salmon Varity Set M', 'Sushi Bento Mori Set', 'Super Rolls Set', 'Sushi Bento Aburi Set', 'Super Maki S'],
+                        datasets: [{ label: 'ยอดส่วนลดรวมโดยประมาณ (บาท)', data: [7560, 5120, 4850, 2574, 1850], backgroundColor: '#e74c3c' }]
+                    },
+                    options: horizontalBarOpts
+                });
+
+            } catch (err) {
+                console.error('Chart Error:', err);
+                document.getElementById('jsError').style.display = 'block';
+            }
+        };
+
+        // --- Gemini AI LLM Integration ---
+        const apiKey = ""; // Execution environment provides the key
+        
+        function openAIModal() {
+            const modal = document.getElementById('aiModal');
+            modal.classList.add('active');
+            document.getElementById('aiLoading').style.display = 'block';
+            document.getElementById('aiResult').style.display = 'none';
+            generateAIInsights();
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.remove('active');
+        }
+
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000]; // Exponential backoff
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        }
+
+        async function generateAIInsights() {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            // System instruction to act as a Consultant
+            const systemInstruction = { 
+                parts: [{ text: "คุณคือที่ปรึกษาผู้บริหารระดับสูงด้าน Retail & F&B ตอบคำถามเป็นภาษาไทยแบบมืออาชีพ กระชับ ตรงประเด็น วิเคราะห์ปัญหาแบบผู้บริหาร และต้องมี Action Plan 3 ข้อที่สามารถนำไปสั่งการสาขาได้ทันที จัดรูปแบบข้อความด้วย Markdown ให้อ่านง่าย" }] 
+            };
+
+            // Inject contextual insights from the dashboard into the prompt
+            const userPrompt = `
+            Context: กรุณาวิเคราะห์ข้อมูลยอดขาย 4 วันล่าสุด (23-26 ก.พ.) ของร้าน Nigiben สาขาสนามบินดอนเมือง
+            
+            [Data Highlights]
+            - ยอด Gross วันล่าสุด: 64.9k | ยอด Net วันล่าสุด: 35.2k
+            - อัตราส่วนลด (Discount Rate) คงตัวในระดับวิกฤตที่ 45.7%
+            - ปัญหาหลัก (The Jaws Effect): ส่วนต่างระหว่าง Gross และ Net กว้างมาก
+            - จุดรั่วไหลของกำไร: 97.6% ของส่วนลดทั้งหมดใน 4 วัน (ยอดรวม 106,095 บาท) มาจากการทำ "Flash Sale 21.00-22.00 น."
+            - Water Paradox: ยอดขายน้ำดื่ม Namthip สูงถึง 242 ขวด แต่ยอดใช้จ่ายต่อบิลกลับลดลงเหลือเพียง 114 บาท สะท้อนว่าคนเข้าร้านเพื่อซื้อน้ำ แต่ไม่ซื้ออาหารเพิ่ม
+            - Dead Stock: เมนู Oyakodon และ Salmon Head ขายได้ 0-1 ชิ้นต่อวัน
+            - Profit Bleeder: สินค้า Hero อย่าง "Salmon Varity Set M" ถูกผลิตเกินและต้องนำมาลดป้ายเหลืองเคลียร์สต๊อกช่วงดึกมากที่สุด
+
+            **ข้อจำกัดสำคัญ (Crucial Constraint): ห้ามแนะนำให้ยกเลิกหรือระงับโปรโมชั่น Flash Sale เด็ดขาด** เนื่องจากสาขาจำเป็นต้องใช้โปรโมชั่นนี้ในการระบายอาหารสดเพื่อลด Food Waste ให้เป็นศูนย์ก่อนปิดร้าน
+
+            จากข้อมูลและข้อจำกัดนี้ ช่วยเขียนสรุปวิเคราะห์ Executive Summary สั้นๆ และเสนอ 3 Immediate Action Plans สำหรับสั่งการผู้จัดการสาขาในวันพรุ่งนี้ โดยเน้นให้คำแนะนำในด้าน:
+            1. การบริหารรอบการผลิตระหว่างวัน (Cut-off time) เพื่อลดปริมาณของที่จะหลุดไปถึงช่วง Flash Sale
+            2. การปรับเทคนิคทำ Flash Sale (เช่น ลดแบบขั้นบันได หรือ ซื้อพ่วง) ที่ช่วยเซฟ Margin มากกว่าการหั่นราคา 70% รวดเดียว
+            3. กลยุทธ์การจัดวาง (Shelving/Upsell) เพื่อเปลี่ยนคนที่เดินมาซื้อน้ำ ให้หยิบของทานเล่นติดมือไปด้วย
+            `;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: systemInstruction
+            };
+
+            try {
+                const result = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiText) {
+                    // Use marked.js to render Markdown format to HTML
+                    document.getElementById('aiResult').innerHTML = marked.parse(aiText);
+                } else {
+                    document.getElementById('aiResult').innerHTML = '<p style="color:red;">ไม่สามารถสร้างคำแนะนำได้ในขณะนี้ กรุณาลองใหม่</p>';
+                }
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                document.getElementById('aiResult').innerHTML = `<p style="color:red;">เกิดข้อผิดพลาดในการเชื่อมต่อ AI: ${error.message}</p>`;
+            } finally {
+                document.getElementById('aiLoading').style.display = 'none';
+                document.getElementById('aiResult').style.display = 'block';
+            }
+        }
+    </script>
 </body>
-
 </html>
