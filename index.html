@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nigiben Executive Dashboard - 4 Day Deep Dive</title>
+    <title>Nigiben Executive Dashboard - 11 Day Strategic Analytics</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Chart.js and DataLabels Plugin -->
+    <!-- Chart.js and Plugins -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <!-- Marked.js for Markdown Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
@@ -25,10 +24,7 @@
             --card-bg: #ffffff;
             --success-color: #27ae60;
             --warning-color: #f39c12;
-            --day1-color: #bdc3c7;
-            --day2-color: #f39c12;
-            --day3-color: #3498db;
-            --day4-color: #2ecc71;
+            --purple-color: #8b5cf6;
         }
         body { font-family: 'Noto Sans Thai', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
         .dashboard-header { background: linear-gradient(135deg, #000000 0%, #1e3c72 100%); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 40px; }
@@ -36,987 +32,584 @@
         .dashboard-header p { margin-top: 10px; font-size: 1.1rem; color: #f1c40f; font-weight: 600; background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 15px; border-radius: 20px;}
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px 50px; }
         
-        .section-title { font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-bottom: 15px; padding-left: 15px; border-left: 6px solid var(--accent-color); display: flex; align-items: center; }
-        .section-desc { font-size: 1rem; color: var(--text-muted); margin-bottom: 25px; padding-left: 21px; line-height: 1.6; }
-
+        .section-title { font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-bottom: 15px; padding-left: 15px; border-left: 6px solid var(--accent-color); display: flex; align-items: center; margin-top: 60px;}
+        
         /* KPI Cards */
         .kpi-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; transition: transform 0.3s ease; text-align: center; }
+        .kpi-card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; transition: transform 0.3s ease; text-align: center; display: flex; flex-direction: column; justify-content: center; }
         .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--accent-color); }
         .kpi-title { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 15px; }
         .kpi-compare-row { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;}
         .kpi-col { display: flex; flex-direction: column; align-items: center; width: 23%;}
         .kpi-date-label { font-size: 0.75rem; color: #95a5a6; margin-bottom: 5px; font-weight: 600;}
         .kpi-val { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
-        .kpi-vs { font-size: 1rem; color: #bdc3c7; }
         .kpi-diff { font-size: 0.85rem; font-weight: 600; padding: 6px 12px; border-radius: 20px; margin-top: 10px; }
 
-        /* Charts & Tables */
+        /* Heatmap Styling */
+        .heatmap-container { overflow-x: auto; margin-top: 20px; }
+        .heatmap-table { width: 100%; border-collapse: separate; border-spacing: 4px; min-width: 800px; }
+        .heatmap-table th { padding: 10px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-align: center; }
+        .heatmap-table td { height: 50px; border-radius: 6px; text-align: center; font-size: 0.75rem; font-weight: 700; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .day-label { text-align: left !important; color: var(--text-main) !important; padding-right: 15px !important; font-weight: 700 !important; width: 150px; }
+
+        /* General Chart Cards */
         .chart-section { background: var(--card-bg); padding: 35px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.05); border: 1px solid #e1e8ed; margin-bottom: 40px;}
         .chart-header { font-size: 1.3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; padding-bottom: 15px; border-bottom: 2px solid #ecf0f1; }
         .chart-wrapper { position: relative; height: 350px; width: 100%; margin-top: 20px; }
-        .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;}
+        .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.95rem; }
-        .data-table th, .data-table td { padding: 12px 15px; border-bottom: 1px solid #e1e8ed; text-align: right; }
-        .data-table th { background-color: #f8fbfe; color: var(--primary-color); font-weight: 700; }
-        .data-table th:first-child, .data-table td:first-child { text-align: left; }
-        .data-table tr:hover { background-color: #fcfdfe; }
-        .promo-total { font-weight: bold; color: var(--accent-color); background-color: #fdedec !important; }
-
-        .analysis-box { background-color: #fdfefe; border-left: 5px solid var(--accent-color); padding: 20px 25px; border-radius: 0 8px 8px 0; margin-top: 25px; font-size: 0.95rem; line-height: 1.6; color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
-        .analysis-box h4 { margin-top: 0; color: var(--accent-color); margin-bottom: 15px; font-size: 1.1rem;}
-        .analysis-box ul { margin-bottom: 0; padding-left: 20px; }
+        /* Analysis Box Detailed */
+        .analysis-box { background-color: #fdfefe; border-left: 5px solid var(--accent-color); padding: 25px; border-radius: 0 8px 8px 0; margin-top: 25px; font-size: 0.95rem; line-height: 1.7; color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        .analysis-box h4 { margin-top: 0; color: var(--accent-color); margin-bottom: 15px; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
+        .analysis-box ul { margin-bottom: 15px; padding-left: 20px; }
         .analysis-box li { margin-bottom: 10px; }
+        .insight-tag { display: inline-block; padding: 2px 8px; background: #eee; border-radius: 4px; font-size: 0.8rem; font-weight: 700; margin-right: 5px; vertical-align: middle; }
+        .tag-red { background: #fdedec; color: #e74c3c; }
+        .tag-blue { background: #eaf2f8; color: #3498db; }
+        .tag-green { background: #e8f8f5; color: #27ae60; }
+        .tag-purple { background: #f5f3ff; color: #8b5cf6; }
 
-        /* Accordion */
-        .accordion-container { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
-        .acc-item { background: var(--card-bg); border: 1px solid #e1e8ed; border-radius: 8px; overflow: hidden; }
-        .acc-header { padding: 15px 20px; cursor: pointer; background-color: #f8fbfe; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
-        .acc-header:hover { background-color: #eaf3fb; }
-        .acc-title { font-size: 1.1rem; font-weight: 600; color: var(--primary-color); }
-        .acc-stats { display: flex; gap: 15px; font-weight: 500; color: var(--text-muted); font-size: 0.85rem; align-items: center;}
-        .acc-stats span { color: var(--text-main); font-weight: 700; }
-        .acc-content { display: none; border-top: 1px solid #e1e8ed; max-height: 600px; overflow-y: auto; padding: 10px 0; }
+        /* Accordion Style */
+        .acc-item { background: white; border: 1px solid #e1e8ed; border-radius: 12px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .acc-header { padding: 18px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #f8fbfe; transition: background 0.3s; }
+        .acc-header:hover { background: #f0f7ff; }
+        .acc-content { padding: 0; display: none; border-top: 1px solid #ecf0f1; background: #fff; }
         .acc-content.active { display: block; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f4f7f6; font-size: 0.9rem; align-items: center;}
-        .item-row:nth-child(even) { background-color: #fafbfc; }
-        .item-name { flex: 2; color: var(--text-main); font-weight: 500;}
-
-        /* Tabs and Ranking Grids */
-        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 24px; background: var(--card-bg); border: 1px solid #e1e8ed; border-radius: 30px; cursor: pointer; font-weight: 600; color: var(--text-muted); transition: all 0.3s; font-size: 0.95rem; }
-        .tab-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
-        .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 10px rgba(30,60,114,0.3); }
+        .item-row { display: flex; justify-content: space-between; padding: 15px 25px; border-bottom: 1px solid #f4f7f6; font-size: 0.9rem; align-items: center; }
+        .qty-badge { background: #ecf0f1; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--primary-color); }
         
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; text-align: center; background: #fafafa; }
+        .compare-table th { padding: 8px; background: #f1f5f9; color: #64748b; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+        .compare-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; }
+        .compare-table .highlight-day { background: #eff6ff; font-weight: bold; color: #1e40af; }
+
+        /* Section 11 Tabs & Sort & Filter */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; background: white; border: 1px solid #e1e8ed; border-radius: 30px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s; }
+        .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+        .filter-select { padding: 10px 15px; border-radius: 30px; border: 1px solid #e1e8ed; font-family: inherit; font-weight: 600; color: var(--text-main); background-color: #fff; outline: none; cursor: pointer; transition: all 0.3s; margin-bottom: 20px; }
+        .filter-select:hover { border-color: var(--primary-color); }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.95rem; }
+        .data-table th { background-color: #f8fbfe; color: var(--primary-color); font-weight: 700; text-align: center; padding: 12px 15px; border-bottom: 1px solid #e1e8ed; }
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid #e1e8ed; text-align: right; }
         
-        .ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .rank-list { background: var(--card-bg); border-radius: 12px; border: 1px solid #e1e8ed; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .rank-header { padding: 15px 20px; font-weight: 700; font-size: 1.1rem; color: white; display: flex; align-items: center; justify-content: space-between;}
-        .rank-header.best { background: linear-gradient(135deg, #27ae60, #2ecc71); }
-        .rank-header.worst { background: linear-gradient(135deg, #c0392b, #e74c3c); }
-        .rank-item { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f4f7f6; font-size: 0.95rem; align-items: center; }
-        .rank-item:nth-child(even) { background-color: #fafbfc; }
-        .rank-item:last-child { border-bottom: none; }
-        .rank-num { font-weight: 700; color: var(--text-muted); width: 25px; display: inline-block; }
-        .rank-qty { font-weight: 600; background: #ecf0f1; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; color: var(--text-main); }
-        .worst-qty { background: #fdedec; color: #c0392b; }
+        .sortable-header { cursor: pointer; position: relative; transition: background 0.2s; }
+        .sortable-header:hover { background-color: #f0f7ff !important; }
+        .sortable-header::after { content: ' ↕'; font-size: 0.8rem; color: #cbd5e1; margin-left: 4px; }
+        .sortable-header.active-sort::after { color: var(--primary-color); content: attr(data-dir); }
 
-        .filter-select {
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #e1e8ed;
-            background: white;
-            font-family: 'Noto Sans Thai', sans-serif;
-            font-size: 0.95rem;
-            color: var(--text-main);
-            outline: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            cursor: pointer;
-        }
-        .filter-select:focus { border-color: var(--primary-color); }
-
-        .rank-grid-row {
-            display: grid;
-            grid-template-columns: 3fr 1fr 1fr 1.5fr;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .fallback-error { padding: 20px; background: #fee; border: 1px solid #fcc; color: #c00; border-radius: 8px; text-align: center; margin-bottom: 20px; display: none; }
-        
         /* AI Feature Styles */
-        .ai-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; border: none; padding: 10px 24px; border-radius: 30px; font-family: 'Noto Sans Thai', sans-serif; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3); transition: transform 0.2s; margin-top: 15px;}
+        .ai-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; border: none; padding: 12px 28px; border-radius: 30px; font-family: 'Noto Sans Thai', sans-serif; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3); transition: transform 0.2s; margin-top: 15px;}
         .ai-btn:hover { transform: scale(1.05); }
         .ai-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
         .ai-modal-overlay.active { display: flex; opacity: 1; }
-        .ai-modal-content { background: white; width: 90%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; }
+        .ai-modal-content { background: white; width: 90%; max-width: 900px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; }
         .ai-modal-overlay.active .ai-modal-content { transform: translateY(0); }
         .ai-modal-header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; }
         .ai-modal-header h3 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.3rem; }
         .ai-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-        .ai-modal-body { padding: 25px; overflow-y: auto; color: var(--text-main); line-height: 1.6; }
-        .ai-modal-body h3, .ai-modal-body h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #e1e8ed; padding-bottom: 10px;}
-        .ai-modal-body ul, .ai-modal-body ol { padding-left: 20px; margin-bottom: 20px; }
-        .ai-modal-body li { margin-bottom: 8px; }
-        .ai-modal-body strong { color: var(--accent-color); }
-        .ai-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
+        .ai-modal-body { padding: 30px; overflow-y: auto; color: var(--text-main); line-height: 1.7; }
+        .ai-spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid #f39c12; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .dashboard-footer { text-align: center; padding: 30px 20px 50px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; border-top: 1px dashed #e1e8ed; max-width: 1400px; margin: 0 auto; }
 
         @media (max-width: 992px) {
             .kpi-container { grid-template-columns: repeat(2, 1fr); }
-            .two-cols, .ranking-grid { grid-template-columns: 1fr; }
-            .kpi-compare-row { flex-wrap: wrap; justify-content: center; gap: 10px; }
-            .kpi-col { width: 45%; }
-            .data-table { block; overflow-x: auto; white-space: nowrap; }
-        }
-        
-        @media (max-width: 768px) {
-            .kpi-container { grid-template-columns: 1fr; }
-            .rank-grid-row {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-            .rank-grid-row > div:nth-child(1) { grid-column: span 3; margin-bottom: 5px; }
-            .rank-grid-row > div:nth-child(2) { text-align: left !important; color: #7f8c8d; }
-            .rank-grid-row > div:nth-child(3) { text-align: center !important; }
-            .rank-grid-row > div:nth-child(4) { text-align: right !important; }
-            .mobile-hide { display: none !important; }
+            .two-cols { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-header">
         <h1>Nigiben Executive Dashboard</h1>
-        <p>🚨 4-Day Strategy & Crisis Monitoring (23-26 Feb) | นิกิเบน ดอนเมือง (DMK T2 F3)</p>
+        <p>🚨 11-Day Strategic Analytics Deep Dive (23 Feb - 05 Mar) | นิกิเบน ดอนเมือง (DMK T2 F3)</p>
+        <br>
+        <button class="ai-btn" onclick="openAIModal()">✨ รับคำแนะนำจาก AI (Executive Insights)</button>
     </div>
 
     <div class="container">
-        <div id="jsError" class="fallback-error">⚠️ ระบบตรวจพบข้อผิดพลาดในการโหลดข้อมูลกราฟ กรุณารีเฟรชหน้าจอ</div>
-
-        <!-- 1. KPI OVERVIEW -->
-        <h2 class="section-title">📊 1. Performance Overview (วิเคราะห์ภาพรวม 4 วัน)</h2>
+        <!-- 1. Performance Overview -->
+        <h2 class="section-title">📊 1. Performance Overview (สรุปภาพรวม 11 วัน)</h2>
         <div class="kpi-container">
-            <!-- ยอดรวมทั้ง 4 วัน (Box ใหม่) -->
             <div class="kpi-card" style="background: linear-gradient(to bottom, #ffffff, #f0f4f8); border: 2px solid var(--primary-color);">
-                <div class="kpi-title" style="color: var(--primary-color); font-weight: 800;">สรุปผลการดำเนินงานรวม 4 วัน</div>
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ddd; padding-bottom: 5px;">
-                        <span style="font-size: 0.85rem; color: #7f8c8d;">ยอดขายรวม (Gross):</span>
-                        <span style="font-size: 1.1rem; font-weight: 700;">฿274,287</span>
+                <div class="kpi-title" style="color: var(--primary-color); font-weight: 800;">สรุปผลการดำเนินงานสะสม 11 วัน</div>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 5px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 3px;">
+                        <span style="font-size: 0.8rem;">Gross Sales รวม:</span>
+                        <span style="font-weight: 700;">฿687,887</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ddd; padding-bottom: 5px;">
-                        <span style="font-size: 0.85rem; color: #7f8c8d;">ส่วนลดรวมทั้งหมด:</span>
-                        <span style="font-size: 1.1rem; font-weight: 700; color: var(--accent-color);">-฿113,613</span>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 3px;">
+                        <span style="font-size: 0.8rem;">ส่วนลดสะสม:</span>
+                        <span style="font-weight: 700; color: var(--accent-color);">-฿276,313</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px;">
-                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--primary-color);">คงเหลือเงินสด (Net):</span>
-                        <span style="font-size: 1.3rem; font-weight: 800; color: var(--success-color);">฿160,674</span>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-color);">เงินรับจริง (Net):</span>
+                        <span style="font-size: 1.1rem; font-weight: 800; color: var(--success-color);">฿411,574</span>
                     </div>
                 </div>
-                <div class="kpi-diff" style="color:#1e3c72; background:#e1e8f0; margin-top: 15px;">💰 อัตรากำไรสุทธิเฉลี่ย 58.5%</div>
+                <div class="kpi-diff" style="color:#1e3c72; background:#e1e8f0; margin-top: 10px;">💰 อัตรากำไรสุทธิเฉลี่ย 59.8%</div>
             </div>
 
             <div class="kpi-card">
-                <div class="kpi-title">ยอดรวมก่อนหักส่วนลด (Gross Sales)</div>
+                <div class="kpi-title">Gross Sales Trend</div>
                 <div class="kpi-compare-row">
-                    <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">69.6k</div></div>
+                    <div class="kpi-col"><div class="kpi-date-label">Start</div><div class="kpi-val">69.6k</div></div>
                     <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">77.1k</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">62.8k</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val highlight" style="color:#3498db;">64.9k</div></div>
+                    <div class="kpi-col"><div class="kpi-date-label">Latest</div><div class="kpi-val highlight" style="color:#3498db;">61.2k</div></div>
                 </div>
-                <div class="kpi-diff" style="color:#2980b9; background:#eaf2f8;">▲ ฟื้นตัว +3.3% จากวันก่อนหน้า</div>
+                <div class="kpi-diff" style="color:#2980b9; background:#eaf2f8;">ค่าเฉลี่ยรายวัน 62.5k / วัน</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">เงินสดรับจริงสุทธิ (Net Sales)</div>
+                <div class="kpi-title">Net Sales Trend</div>
                 <div class="kpi-compare-row">
-                    <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">47.7k</div></div>
+                    <div class="kpi-col"><div class="kpi-date-label">Start</div><div class="kpi-val">47.7k</div></div>
                     <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">43.9k</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">33.7k</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val highlight" style="color:#2ecc71;">35.2k</div></div>
+                    <div class="kpi-col"><div class="kpi-date-label">Latest</div><div class="kpi-val highlight" style="color:#2ecc71;">38.5k</div></div>
                 </div>
-                <div class="kpi-diff" style="color:#27ae60; background:#e8f8f5;">▲ เริ่มทำจุด Rebound +4.4% จากจุดต่ำสุด</div>
+                <div class="kpi-diff" style="color:#27ae60; background:#e8f8f5;">Net รวม 11 วัน 411k</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">อัตราส่วนลด (Discount Rate %)</div>
+                <div class="kpi-title">Discount Rate %</div>
                 <div class="kpi-compare-row">
                     <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">31%</div></div>
                     <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">43%</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">46%</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val" style="color:#e74c3c;">45.7%</div></div>
+                    <div class="kpi-col"><div class="kpi-date-label">05 Mar</div><div class="kpi-val" style="color:#e74c3c;">37%</div></div>
                 </div>
-                <div class="kpi-diff" style="color:#c0392b; background:#fdedec;">▲ อัตราส่วนลดคงตัวที่ระดับเกือบ 50% ของ Gross</div>
+                <div class="kpi-diff" style="color:#c0392b; background:#fdedec;">⚠️ เฉลี่ยรอบ 11 วัน 40%</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">จำนวนบิลทั้งหมด (Total Bills)</div>
+                <div class="kpi-title">Total Bills</div>
                 <div class="kpi-compare-row">
                     <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">295</div></div>
                     <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">310</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">303</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val" style="color:#8e44ad;">308</div></div>
+                    <div class="kpi-col"><div class="kpi-date-label">05 Mar</div><div class="kpi-val" style="color:#8e44ad;">295</div></div>
                 </div>
-                <div class="kpi-diff" style="color:#8e44ad; background:#f5eef8;">▲ ทราฟฟิกเพิ่มขึ้น +1.6%</div>
+                <div class="kpi-diff" style="color:#8e44ad; background:#f5eef8;">Traffic รวม 3,212 บิล</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">ยอดเฉลี่ยต่อบิล (Ticket Size)</div>
+                <div class="kpi-title">Ticket Size</div>
                 <div class="kpi-compare-row">
                     <div class="kpi-col"><div class="kpi-date-label">23 Feb</div><div class="kpi-val">฿161</div></div>
                     <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">24 Feb</div><div class="kpi-val">฿141</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">25 Feb</div><div class="kpi-val">฿111</div></div>
-                    <div class="kpi-vs">➔</div>
-                    <div class="kpi-col"><div class="kpi-date-label">26 Feb</div><div class="kpi-val" style="color:#d35400;">฿114</div></div>
+                    <div class="kpi-col"><div class="kpi-date-label">05 Mar</div><div class="kpi-val" style="color:#d35400;">฿130</div></div>
                 </div>
-                <div class="kpi-diff" style="color:#d35400; background:#fdf2e9;">▲ ยอดต่อบิลเริ่มขยับขึ้น +2.7%</div>
+                <div class="kpi-diff" style="color:#d35400; background:#fdf2e9;">เฉลี่ยสะสม 128 บาท</div>
             </div>
         </div>
 
-        <!-- 2. VISUAL ANALYTICS -->
-        <h2 class="section-title">📈 2. Visual Analytics (แนวโน้มรายได้และสัดส่วนลูกค้า)</h2>
+        <div class="chart-section" style="margin-top: 20px;">
+            <div class="chart-header">วิเคราะห์ผลงานตามวันในสัปดาห์ (Day-of-the-Week Analysis)</div>
+            <div class="chart-wrapper" style="height: 400px;"><canvas id="dayOfWeekChart"></canvas></div>
+            <div class="analysis-box" style="border-left-color: #3498db; margin-top: 30px;">
+                <h4>📅 สรุปพฤติกรรมยอดขายและทราฟฟิกรายสัปดาห์</h4>
+                <ul>
+                    <li><span class="insight-tag tag-blue">Peak Day</span> <strong>วันจันทร์ (Monday):</strong> เป็นวันที่มียอดขายสูงสุด เนื่องจากเป็นช่วงรอยต่อของการเดินทางเพื่อธุรกิจในช่วงต้นสัปดาห์</li>
+                    <li><span class="insight-tag tag-purple">High Traffic</span> <strong>วันเสาร์ (Saturday):</strong> มียอดบิลสูงสุดถึง 325 บิล แต่ Ticket Size ต่ำ สะท้อนลูกค้ากลุ่มวันหยุดที่ซื้อสินค้าชิ้นเล็กหรือเพียงแค่น้ำดื่ม</li>
+                    <li><span class="insight-tag tag-red">Lowest Day</span> <strong>วันอาทิตย์ (Sunday):</strong> เป็นวันที่ยอดขายและทราฟฟิกชะลอตัวที่สุดเมื่อเทียบกับวันอื่นๆ</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 2. Visual Analytics (Jaws Effect) -->
+        <h2 class="section-title">📈 2. Visual Analytics (การวิเคราะห์โครงสร้างรายได้และกำไรเชิงลึก)</h2>
         <div class="chart-section">
-            <div class="chart-header">โครงสร้างรายได้และส่วนลด (The Jaws Effect)</div>
+            <div class="chart-header">ปรากฏการณ์ปากฉลาม (The Jaws Effect) - เปรียบเทียบ 11 วัน</div>
             <div class="chart-wrapper"><canvas id="dailyTrendChart"></canvas></div>
             <div class="analysis-box">
-                <h4>🦈 ทำความเข้าใจ The Jaws Effect (ปรากฏการณ์ปากฉลาม)</h4>
-                <p style="margin-bottom: 12px; font-size: 0.9rem;">คือการวิเคราะห์ "สุขภาพของกำไร" จากช่องว่างระหว่าง <strong>ยอดรวม (Gross - เส้นสีฟ้า)</strong> และ <strong>เงินรับจริง (Net - เส้นสีเขียว)</strong> ถ้าระยะห่างยิ่งกว้าง (ปากฉลามอ้ากว้าง) แปลว่ากำไรกำลังถูกกัดกินด้วย <strong>ส่วนลด (Discount - เส้นสีแดง)</strong></p>
-                <ul style="margin-bottom: 0;">
-                    <li><strong>🚨 สัญญาณเตือน (Red Flag):</strong> ในวันที่ 24 Feb ยอด Gross พุ่งทำจุดสูงสุด (สาขาทำงานหนัก/ระบายของเยอะ) แต่ยอด Net กลับดิ่งลงต่ำสุด เพราะเส้นส่วนลดพุ่งขึ้นมางับกำไรไปหมด สะท้อนภาวะ <strong>"ยอดขายกลวง (เหนื่อยฟรี)"</strong></li>
-                    <li><strong>📌 คำแนะนำเชิงกลยุทธ์:</strong> เพื่อบีบช่องว่างของกราฟให้แคบลง (รักษา Margin) ควรยกเลิกการใช้ป้ายลด 70% รวดเดียว และเปลี่ยนเป็นลดแบบ Step (30% ตอน 20:00 น. และ 50% ตอน 21:30 น.)</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="chart-section">
-            <div class="chart-header">สัดส่วนกลุ่มลูกค้าตามปริมาณบิล (Basket Segmentation)</div>
-            <div class="two-cols">
-                <div>
-                    <h3 style="text-align: center; color: var(--text-muted); font-size: 1.1rem;">ปริมาณลูกค้าเปรียบเทียบ 4 วัน</h3>
-                    <div class="chart-wrapper" style="height:280px;"><canvas id="basketSegmentChart"></canvas></div>
-                </div>
-                <div class="analysis-box urgent" style="border-left-color: #f39c12; margin-top: 0;">
-                    <h4 style="color: #f39c12;"><i class="fas fa-search-dollar"></i> 3 สัญญาณเตือนจากพฤติกรรมลูกค้า</h4>
-                    <ul style="margin-bottom: 10px; font-size: 0.9rem;">
-                        <li><strong>1. ปรากฏการณ์คนซื้อแต่น้ำ (Water Paradox):</strong> กลุ่ม Grab & Go (<200฿) พุ่งสูงถึง 242 บิล สาขาแบกทราฟฟิกสูงแต่ไม่ได้ยอดขายอาหาร ดึง Ticket Size ร่วงลงเหลือ 114 บาท</li>
-                        <li><strong>2. ลูกค้าหลักหายไป (The Missing Middle):</strong> กลุ่ม Solo Meal (200-500฿) ที่มักซื้อเบนโตะคู่เครื่องดื่ม มีเทรนด์ลดลงต่อเนื่อง (จาก 88 เหลือ 62 บิล)</li>
-                        <li><strong>3. กำลังซื้อสูงหดตัว:</strong> กลุ่ม Couple (>500฿) หายไปกว่า 70% (จาก 12 เหลือเพียง 4 บิล) ลูกค้าที่เดินทางเป็นกลุ่มไม่เลือกซื้ออาหารที่นี่</li>
-                    </ul>
-                    <div style="background: #fdf2e9; padding: 10px; border-radius: 6px; font-size: 0.85rem; color: #d35400;">
-                        <strong>📌 คำแนะนำ:</strong> ต้องเร่งออกโปรโมชั่น <strong>"Combo Set (ข้าว+น้ำ)"</strong> ในช่วงกลางวันเพื่อดันกลุ่มสีเทาให้ขยับมาเป็นกลุ่มสีฟ้า และต้องมีสคริปต์เสนอขายของทานเล่น (Upsell) ทุกครั้งที่มีคนมาซื้อน้ำเปล่าขวดเดียว
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. MARKET BASKET ANALYSIS (Section ใหม่) -->
-        <h2 class="section-title">🛒 3. Market Basket Analysis (วิเคราะห์พฤติกรรมการซื้อคู่กัน)</h2>
-        <div class="chart-section">
-            <div class="chart-header">Top 3 สินค้าที่มักถูกซื้อในบิลเดียวกัน (Combo Insights)</div>
-            <div class="kpi-container" style="margin-top: 20px;">
-                <div class="kpi-card" style="border-top: 4px solid #3498db; padding: 20px;">
-                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🥤</div>
-                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">Salmon Varity + น้ำดื่ม</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">พบการซื้อคู่กันใน <strong>42%</strong> ของบิลที่ซื้อแซลมอน</p>
-                </div>
-                <div class="kpi-card" style="border-top: 4px solid #f39c12; padding: 20px;">
-                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🥤<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🍰</div>
-                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">น้ำดื่ม + โดรายากิ</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">กระตุ้นยอด Impulse Buy สำเร็จ <strong>18%</strong> ของบิลน้ำ</p>
-                </div>
-                <div class="kpi-card" style="border-top: 4px solid #2ecc71; padding: 20px;">
-                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱<span style="font-size:1.2rem; color:#bdc3c7;">+</span>🍚</div>
-                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1rem;">Mori Set + Kani Tataki</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">ชุดคอมโบยอดฮิตเพื่อความคุ้มค่า (พบ <strong>12%</strong>)</p>
-                </div>
-            </div>
-            <div class="analysis-box">
-                <h4>💡 โอกาสในการเพิ่มยอดขาย (Upselling Opportunities)</h4>
-                <p>ข้อมูลตอกย้ำว่า <strong>น้ำดื่มน้ำทิพย์</strong> คือ "ตัวเปิดบิล" ที่ดีที่สุด หากนำของทานเล่นชิ้นเล็ก (โดรายากิ, ถั่วแระ) มาจัดแคมเปญ <strong>"ซื้อน้ำคู่ขนม ลด 5 บาท"</strong> จะช่วยอัปเกรดลูกค้ากลุ่ม Grab & Go (สีเทา) ให้มียอดใช้จ่ายต่อบิลทะลุ 150 บาทได้ทันที</p>
-            </div>
-        </div>
-
-        <!-- 4. HOURLY ANALYTICS -->
-        <h2 class="section-title">⏰ 4. Hourly Performance (เจาะลึกพฤติกรรมรายชั่วโมง)</h2>
-        <div class="chart-section">
-            <div class="chart-header">กระแสเงินสดรับจริง (Net Sales) รายชั่วโมง - 4 วันเปรียบเทียบ</div>
-            <div class="chart-wrapper"><canvas id="hourlyNetChart"></canvas></div>
-            <div class="chart-header" style="margin-top:40px;">ส่วนลดรายชั่วโมง (Discount Leak)</div>
-            <div class="chart-wrapper"><canvas id="hourlyDiscChart"></canvas></div>
-            <div class="analysis-box">
-                <h4>♻️ กลยุทธ์ระบายสินค้า (Waste Management) ช่วง 21:00 น.</h4>
-                <p>กราฟส่วนลดทั้ง 4 วันแสดงให้เห็นชัดเจนว่าตั้งแต่เวลา 21:00 - 22:00 น. ยอดส่วนลดจะพุ่งขึ้นเป็นจุดสูงสุด (Peak) ซึ่งเกิดจาก <strong>Promotion ระบายสินค้า (Clearance)</strong> เพื่อเร่งจำหน่ายสินค้ากลุ่มซูชิและเบนโตะออกให้หมด ลดปริมาณสินค้าที่ต้องกลายเป็น <strong>Food Waste</strong> ให้เหลือน้อยที่สุดก่อนปิดสาขา</p>
-            </div>
-            
-            <!-- เพิ่ม Hourly Category Heatmap ตรงนี้ -->
-            <div class="chart-header" style="margin-top:40px;">พฤติกรรมการซื้อรายหมวดหมู่ (Hourly Category Heatmap)</div>
-            <div class="chart-wrapper"><canvas id="hourlyCategoryChart"></canvas></div>
-            <div class="analysis-box">
-                <h4>🔍 จังหวะเวลาในการผลิต (Time-based Insights)</h4>
-                <p>ช่วงเช้าตรู่ (06:00-09:00) สินค้าหลักคือ <strong>เครื่องดื่ม</strong> ขณะที่ <strong>Bento พรีเมียม</strong> จะเริ่มทำยอดสูงสุดในช่วงเที่ยง (11:00-13:00) และช่วงเย็น (17:00-19:00) ข้อมูลนี้ช่วยให้ครัวจัดรอบปั้นซูชิได้แม่นยำขึ้น โดยเน้นผลิตของให้พร้อม 100% ก่อน 10:30 น. และเติมของบางส่วนตอน 15:00 น. เพื่อป้องกันของขาดช่วงเย็น</p>
-            </div>
-        </div>
-
-        <!-- 5. Basket Quality -->
-        <h2 class="section-title">🧾 5. Basket Quality (คุณภาพบิล: เต็มราคา vs ลดราคา)</h2>
-        <div class="chart-section">
-            <div class="chart-header">สัดส่วนบิลราคาเต็ม vs บิลส่วนลด (4 วันเปรียบเทียบ)</div>
-            <div class="chart-wrapper"><canvas id="basketQualityChart"></canvas></div>
-            <div class="analysis-box">
-                <h4>🔍 วิเคราะห์คุณภาพบิล</h4>
+                <h4>🦈 การวิเคราะห์คุณภาพรายได้และประสิทธิภาพการดำเนินงาน</h4>
                 <ul>
-                    <li><strong>24 Feb (Day 2):</strong> บิลลดราคาพุ่งถึง 112 บิล เป็นวันที่ Margin ถูกกัดกินหนักที่สุด</li>
-                    <li><strong>26 Feb (Day 4):</strong> สัญญาณบวก — บิลลดราคาลดลงเหลือ 76 บิล ขณะที่บิลเต็มราคาเพิ่มขึ้นเป็น 232 บิล แสดงให้เห็นการควบคุมยอดเสียเริ่มเห็นผล</li>
+                    <li><span class="insight-tag tag-red">Revenue Trap</span> <strong>กับดักยอดขาย:</strong> ในวันที่ยอด Gross พุ่งสูง (24 และ 28 ก.พ.) ช่องว่างปากฉลาม (The Gap) อ้ากว้างเกิน ฿30,000 ต่อวัน บ่งบอกว่ายอดขายที่เพิ่มขึ้นไม่ได้สร้างกำไรเพิ่ม แต่กลับเพิ่ม <strong>Operational Load</strong> ให้พนักงานต้องผลิตและจัดการของสดจำนวนมากโดยเปล่าประโยชน์</li>
+                    <li><span class="insight-tag tag-red">Margin Erosion</span> ส่วนลดสะสม 11 วันที่ ฿276,313 คิดเป็นมูลค่าเฉลี่ย <strong>฿25,119 ต่อวัน</strong> ที่หายไปจากการไม่สามารถปิดการขายที่ราคาเต็มได้ในช่วงเวลาปกติ</li>
+                    <li><span class="insight-tag tag-blue">Efficiency Ratio</span> อัตรา Net/Gross เฉลี่ยอยู่ที่ 59.8% หมายความว่าทุกยอดขาย 100 บาท ร้านจะได้รับเงินสดจริงเพียง 60 บาท ถือว่ามีความเสี่ยงสูงหากทราฟฟิกสนามบินลดลง</li>
                 </ul>
             </div>
         </div>
 
-        <!-- 6. PROMOTION USAGE -->
-        <h2 class="section-title">🎟️ 6. รายละเอียดการใช้โปรโมชั่น (Promotion Usage Breakdown)</h2>
-        <p class="section-desc">สรุปมูลค่าส่วนลดแยกตามวันที่ (อ้างอิงจากรายงานสรุปการใช้โปรโมชั่นแยกตามวันที่)</p>
+        <!-- 3. Basket Segmentation -->
+        <h2 class="section-title">📊 3. สัดส่วนกลุ่มลูกค้าตามปริมาณบิล (Basket Segmentation Analysis)</h2>
         <div class="chart-section">
-            <div class="chart-header">มูลค่าส่วนลดแบ่งตามประเภทโปรโมชั่นรายวัน (บาท)</div>
-            
-            <!-- แถวที่ 1: กราฟ -->
-            <div class="chart-wrapper" style="height:350px; margin-bottom: 30px;"><canvas id="promoUsageChart"></canvas></div>
-            
-            <!-- แถวที่ 2: ตารางข้อมูล -->
-            <div style="overflow-x: auto; margin-bottom: 25px;">
-                <table class="data-table">
+            <div class="two-cols">
+                <div class="chart-wrapper" style="height:400px;"><canvas id="basketSegmentChart"></canvas></div>
+                <div class="analysis-box urgent" style="border-left-color: #f39c12; margin-top: 0;">
+                    <h4 style="color: #f39c12;">🔍 การวิเคราะห์พฤติกรรมและการย้ายกลุ่มลูกค้า</h4>
+                    <ul>
+                        <li><span class="insight-tag">The 75% Rule</span> <strong>กลุ่ม Grab & Go (น้ำดื่ม):</strong> คิดเป็นสัดส่วนสูงถึง 75% ของจำนวนบิลทั้งหมด ส่วนใหญ่คือการซื้อน้ำเปล่า เป็นกลุ่มที่มี Traffic สูงแต่ Margin ต่ำมาก</li>
+                        <li><span class="insight-tag">Middle Hole</span> <strong>วิกฤตกลุ่ม Solo Meal (฿200-฿500):</strong> พบแนวโน้มสัดส่วนกลุ่มนี้ลดลงจาก 25% เหลือ 18% สะท้อนว่าลูกค้าเริ่มหันไปรอซื้อในช่วง Flash Sale แทนการซื้อราคาเต็ม</li>
+                        <li><span class="insight-tag">Actionable Insight</span> <strong>Shelving Strategy:</strong> ต้องใช้สินค้า "Interruption Product" เช่น ถั่วแระญี่ปุ่น หรือ ไดฟูกุ วางดักไว้หน้าตู้แช่น้ำ เพื่อบีบให้ลูกค้าที่ตั้งใจมาซื้อน้ำเพียง ฿10 ต้องหยิบของทานเล่นเพิ่ม</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Hourly Sales Comparison Heatmap -->
+        <h2 class="section-title">⏰ 4. Hourly Sales Comparison Heatmap (กระแสเงินรับจริงรายชั่วโมง 11 วัน)</h2>
+        <div class="chart-section">
+            <div class="chart-header">Net Sales Cash-in (ยิ่งเขียวเข้ม ยอดเงินสดรับเข้ายิ่งสูง)</div>
+            <div class="heatmap-container">
+                <table class="heatmap-table">
                     <thead>
-                        <tr>
-                            <th>โปรโมชั่น</th>
-                            <th>23 Feb</th>
-                            <th>24 Feb</th>
-                            <th>25 Feb</th>
-                            <th>26 Feb</th>
-                            <th>รวม 4 วัน</th>
-                        </tr>
+                        <tr><th class="day-label">วันที่ / เวลา</th><th>06:00</th><th>09:00</th><th>12:00</th><th>15:00</th><th>18:00</th><th>21:00</th></tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td><span style="color:#e74c3c; font-weight:bold;">Flash Sale 21.00-22.00</span></td>
-                            <td>21,707.00</td>
-                            <td>32,323.00</td>
-                            <td>27,910.20</td>
-                            <td>24,155.30</td>
-                            <td>106,095.50</td>
-                        </tr>
-                        <tr>
-                            <td><span style="color:#f39c12; font-weight:bold;">Flash Sale 20.00-21.00</span></td>
-                            <td>-</td>
-                            <td>450.00</td>
-                            <td>820.00</td>
-                            <td>430.00</td>
-                            <td>1,700.00</td>
-                        </tr>
-                        <tr>
-                            <td><span style="color:#3498db; font-weight:bold;">Staff Discount 15%</span></td>
-                            <td>100.00</td>
-                            <td>200.00</td>
-                            <td>150.00</td>
-                            <td>196.05</td>
-                            <td>646.05</td>
-                        </tr>
-                        <tr>
-                            <td><span style="color:#2ecc71; font-weight:bold;">Staff Discount 10%</span></td>
-                            <td>36.00</td>
-                            <td>135.00</td>
-                            <td>91.80</td>
-                            <td>-</td>
-                            <td>262.80</td>
-                        </tr>
-                        <tr class="promo-total">
-                            <td>รวมส่วนลดที่เกิดขึ้น</td>
-                            <td>21,843.00</td>
-                            <td>33,108.00</td>
-                            <td>28,972.00</td>
-                            <td>24,781.35</td>
-                            <td>108,704.35</td>
-                        </tr>
-                    </tbody>
+                    <tbody id="netHeatmapBody"></tbody>
                 </table>
             </div>
-            
-            <!-- แถวที่ 3: บทวิเคราะห์และกลยุทธ์แนะนำ -->
-            <div class="analysis-box">
-                <h4>♻️ เจาะลึกโครงสร้างส่วนลด: กลยุทธ์ระบายสินค้า (Waste Management)</h4>
-                <p>ข้อมูลจากกราฟและตารางสะท้อนให้เห็นว่า สาเหตุที่ส่วนลดพุ่งสูงถึง 97% ไม่ใช่ความผิดพลาด แต่เกิดจากความพยายามของสาขาในการจัด <strong>Flash Sale (ป้ายเหลือง) ช่วง 20.00-22.00 น.</strong> เพื่อเร่งเคลียร์สต๊อกและลดปริมาณ <strong>Food Waste</strong> ให้เหลือน้อยที่สุดก่อนปิดสาขา อย่างไรก็ตาม การใช้วิธีหั่นราคาลง 50-70% รวดเดียวในตอนดึก เป็นการทำลาย Margin สุทธิของร้านอย่างรุนแรง</p>
-                <h4 style="font-size: 1rem; color: var(--text-main); margin-top: 15px; margin-bottom: 10px;">📌 กลยุทธ์แนะนำเพื่อลด Waste แบบรักษากำไร (Alternative Strategies):</h4>
+            <div class="analysis-box" style="border-left-color: #27ae60;">
+                <h4>📉 บทวิเคราะห์ความหนาแน่นของเงินสดรับจริง</h4>
                 <ul>
-                    <li><strong>Dynamic Pricing (ลดแบบขั้นบันได):</strong> เริ่มจัดโปรโมชั่นเร็วขึ้นแต่ลดน้อยลง เช่น 19:30 ลด 20% ➔ 20:30 ลด 30% ➔ 21:00 ลด 50% วิธีนี้จะดึงดูดลูกค้าให้ตัดสินใจซื้อทันทีโดยไม่ต้องรอให้ถึงช่วงดึกสุดเพื่อเอาส่วนลด 70%</li>
-                    <li><strong>Value-Add (แถมดีกว่าลด):</strong> เปลี่ยนป้ายลด 50% เป็นโปรโมชั่น "ซื้อเบนโตะ 1 เซ็ต แถมฟรี น้ำดื่ม/ถั่วแระ/โดรายากิ" ต้นทุนของสินค้าที่นำมาแถมจะต่ำกว่ามูลค่าส่วนลดที่เป็นตัวเงินมาก และช่วยระบาย Dead Stock ของทานเล่นไปในตัว</li>
-                    <li><strong>Just-in-Time (JIT) Production:</strong> แก้ปัญหาที่ต้นเหตุ นำข้อมูลบิลลดราคาเหล่านี้ไปตั้งเพดานการผลิตใหม่ โดยสั่งให้สาขาลดปริมาณการปั้นซูชิรอบบ่าย (หลัง 15:00 น.) ลง 20-30% ทันที</li>
+                    <li><span class="insight-tag tag-green">Prime Time Focus</span> <strong>ช่วงเที่ยง (12:00):</strong> มีกระแสเงินสดไหลเข้าสม่ำเสมอในระดับปานกลาง เป็นช่วงเวลาที่ดีที่สุดในการปิดการขาย "ราคาเต็ม" ควรตรวจสอบสต็อกสินค้า Hero ให้เต็มชั้นในช่วง 11:30 น.</li>
+                    <li><span class="insight-tag tag-red">The 21:00 Surge</span> <strong>การพุ่งตัวช่วงดึก:</strong> ตารางแสดงสีเขียวเข้มที่สุดในเวลา 21:00 น. ของทุกวัน ยืนยันว่านี่คือช่วงเวลาที่สาขาได้รับเงินสดมากที่สุด แต่คุณภาพกำไรต่ำที่สุดเพราะส่วนลดมหาศาล</li>
                 </ul>
             </div>
         </div>
 
-        <!-- 7. PRICE BAND & MARGIN MATRIX (Section ใหม่) -->
-        <h2 class="section-title">💰 7. Price Band Matrix (วิเคราะห์ช่วงราคาสินค้าที่ทำกำไร)</h2>
+        <!-- 5. Hourly Discount Leak Heatmap -->
+        <h2 class="section-title">💸 5. Hourly Discount Leak Heatmap (การรั่วไหลของส่วนลดรายชั่วโมง)</h2>
         <div class="chart-section">
-            <div class="chart-header">ความสัมพันธ์ระหว่าง ราคาต่อชิ้น, ปริมาณขาย และสัดส่วนยอดขาย (Bubble Chart)</div>
-            <div class="chart-wrapper" style="height: 400px;"><canvas id="priceBandChart"></canvas></div>
-            <div class="analysis-box">
-                <h4>🎯 สรุปโซนราคาที่ควรโฟกัส (Price Zone Analysis)</h4>
-                <ul>
-                    <li><strong>โซน <150 บาท (High Volume, Low Margin):</strong> น้ำดื่ม, ของทานเล่น, ขนม ขายได้จำนวนมหาศาล เป็นตัวสร้าง Traffic ดึงลูกค้าเข้าร้าน</li>
-                    <li><strong>โซน 150 - 250 บาท (The Sweet Spot):</strong> สินค้ากลุ่ม Super Maki S (200.-) หรือ Aburi Set (275.-) เป็นกลุ่มที่ลูกค้าสนามบินตัดสินใจซื้อง่ายสุด มักขายออกใน <strong>"ราคาเต็ม"</strong> ไม่ค่อยเหลือเป็น Waste</li>
-                    <li><strong>โซน >300 บาท (High Margin, High Risk):</strong> กลุ่ม Salmon Varity M (385.-) และ Mori Set (310.-) ทำยอด Gross สูงมาก แต่มีความอ่อนไหวเรื่องราคา หากขายไม่หมดมักเป็นต้นเหตุหลักที่ทำให้ร้านต้องอัดโปรลดราคาหนักตอนดึก</li>
-                </ul>
-                <p style="margin-top: 10px; color: var(--accent-color); font-weight: bold;">📌 แผนปรับโครงสร้างราคา: ควรเน้นดันสินค้าในช่วงราคา 150-250 บาทขึ้นมาโชว์ในตู้แช่น้ำระดับสายตามากขึ้น เพราะเป็นจุดที่ได้กำไรสุทธิสม่ำเสมอที่สุด และแบกความเสี่ยงต่ำกว่า</p>
+            <div class="chart-header">Discount Leakage (ยิ่งแดงเข้ม มูลค่าส่วนลดที่เสียไปยิ่งสูง)</div>
+            <div class="heatmap-container">
+                <table class="heatmap-table">
+                    <thead>
+                        <tr><th class="day-label">วันที่ / เวลา</th><th>06:00</th><th>09:00</th><th>12:00</th><th>15:00</th><th>18:00</th><th>21:00</th></tr>
+                    </thead>
+                    <tbody id="discountHeatmapBody"></tbody>
+                </table>
+            </div>
+            <div class="analysis-box" style="border-left-color: #e67e22;">
+                <h4>⚠️ ความสัมพันธ์ระหว่างยอดขายและส่วนลดในช่วงดึก</h4>
+                <p>เปรียบเทียบตารางเขียว (Net) และตารางแดง (Discount) จะพบว่าช่วง <strong>21:00 น.</strong> คือช่วงที่กำไรหายไปมากที่สุด กลยุทธ์ Flash Sale ปัจจุบันทำหน้าที่ระบายของได้ดีแต่ทำลาย Margin ของสินค้า Hero อย่างรุนแรง</p>
             </div>
         </div>
 
-        <!-- 8. Money Drainers -->
-        <h2 class="section-title">🩸 8. Money Drainers (สินค้าที่ดูดกำไรสูงสุด 26 Feb)</h2>
+        <!-- 6. Market Basket & Category Analysis -->
+        <h2 class="section-title">🛒 6. Market Basket & Category Analysis (วิเคราะห์พฤติกรรมการซื้อเชิงกลยุทธ์)</h2>
         <div class="chart-section">
-            <div class="chart-header">Top 5 สินค้าพรีเมียมที่ถูกหักส่วนลดป้ายเหลืองมากที่สุด (บาท)</div>
+            <div class="chart-header">พฤติกรรมการซื้อรายบิล (Combo & Opportunity Insights)</div>
+            <div class="kpi-container" style="margin-top: 20px;">
+                <div class="kpi-card" style="border-top: 4px solid #3498db; padding: 20px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱+🥤</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1.1rem;">Meal Completion (42%)</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; line-height: 1.4;">
+                        <strong>คู่หลัก:</strong> Salmon Varity M + น้ำเปล่า<br>
+                        <strong>บทวิเคราะห์:</strong> กลุ่ม Solo Traveler เน้นอาหารมื้อหลัก มีเพียง 5% ที่ซื้อของหวานพ่วง สะท้อนพฤติกรรม "หนึ่งบิลหนึ่งมื้อ" ที่จบแล้วจบเลย
+                    </p>
+                </div>
+                <div class="kpi-card" style="border-top: 4px solid #f39c12; padding: 20px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🥤+🍰</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1.1rem;">Impulse Trigger (18%)</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; line-height: 1.4;">
+                        <strong>คู่หลัก:</strong> น้ำเปล่า + โดรายากิ/ไดฟูกุ<br>
+                        <strong>บทวิเคราะห์:</strong> มักเกิดช่วง 14:00-16:00 น. หากลูกค้าเลือกชาเขียว อัตราการซื้อขนมพ่วงจะสูงขึ้นเป็น 25% แสดงถึงกำลังซื้อที่พร้อมจ่ายหากมีตัวเลือกดึงดูด
+                    </p>
+                </div>
+                <div class="kpi-card" style="border-top: 4px solid #2ecc71; padding: 20px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🍱+🍚</div>
+                    <h4 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1.1rem;">Value Seekers (12%)</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; line-height: 1.4;">
+                        <strong>คู่หลัก:</strong> Mori Set + ของทานเล่น ฿110<br>
+                        <strong>บทวิเคราะห์:</strong> ลูกค้ากลุ่มนี้พยายามเลี่ยง Bento ตัวท็อปที่ราคาใกล้ ฿400 แต่ยินดีจ่าย ฿420 หากรู้สึกว่าได้ "ชุดใหญ่" ที่คุ้มค่ากว่าสินค้าชิ้นเดียว
+                    </p>
+                </div>
+            </div>
+
+            <div class="chart-header" style="margin-top:50px;">พฤติกรรมการซื้อรายหมวดหมู่ (Hourly Category Heatmap)</div>
+            <div class="heatmap-container">
+                <table class="heatmap-table">
+                    <thead>
+                        <tr><th class="day-label">หมวดหมู่สินค้า</th><th>06:00</th><th>09:00</th><th>12:00</th><th>15:00</th><th>18:00</th><th>21:00</th></tr>
+                    </thead>
+                    <tbody id="categoryHeatmapBody"></tbody>
+                </table>
+            </div>
+            <div class="analysis-box" style="border-left-color: #8b5cf6;">
+                <h4>🍱 บทวิเคราะห์จังหวะการขายรายหมวดหมู่ (Strategic Category Timing)</h4>
+                <ul>
+                    <li><span class="insight-tag tag-purple">Morning Surge</span> <strong>กลุ่ม Beverage:</strong> ทำยอดหนาแน่นที่สุดตั้งแต่ 06:00 น. เป็น "ตัวเปิดร้าน" ที่แท้จริง แผนงาน: ต้องมั่นใจว่าตู้แช่ชาเขียวและน้ำดื่มพร้อม 100% ตั้งแต่เปิดร้าน</li>
+                    <li><span class="insight-tag tag-purple">Production Peak</span> <strong>กลุ่ม Bento:</strong> เริ่มดีดตัวช่วง 11:00 น. และพุ่งสูงสุดเวลา 21:00 น. สะท้อนการพยากรณ์การผลิตที่มากเกินไปในช่วงบ่าย แผนงาน: ลดการเตรียม Batch สุดท้ายตอน 18:30 น. ลง 20% เพื่อลดภาระส่วนลด</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 7. Money Drainers -->
+        <h2 class="section-title">🩸 7. Money Drainers (การวิเคราะห์สินค้าดูดกำไรเชิงลึก)</h2>
+        <div class="chart-section">
+            <div class="chart-header">Top 5 สินค้าพรีเมียมที่แบกส่วนลดสูงสุดสะสม 11 วัน (บาท)</div>
             <div class="chart-wrapper"><canvas id="moneyDrainersChart"></canvas></div>
             <div class="analysis-box" style="border-left-color: #e74c3c;">
-                <h4 style="color: #e74c3c;"><i class="fas fa-exclamation-triangle"></i> ทำไม Hero Product ถึงกลายเป็นตัวดูดกำไร (Profit Bleeder)?</h4>
-                <p style="margin-bottom: 15px;"><strong>Salmon Varity Set M (385.-)</strong> และ <strong>Mori Set (310.-)</strong> เป็นสินค้าที่ขายดีที่สุดในช่วงกลางวัน ทำให้สาขา <strong>"ผลิตตุนไว้มากเกินไป"</strong> เพื่อป้องกันของขาด แต่เมื่อทราฟฟิกช่วงเย็นไม่เป็นตามเป้า สินค้าเหล่านี้จึงถูกเทขายรวบยอด (Bundled Clearance) ในเวลา 21:00 น. โดยให้ส่วนลดลึกถึง 50-70% ทำให้ Margin ที่สะสมมาทั้งวันละลายหายไป</p>
-                <h4 style="font-size: 1rem; color: var(--text-main); margin-bottom: 10px;">📌 คำแนะนำเร่งด่วนสำหรับสาขาสนามบิน:</h4>
+                <h4>🧬 บทวิเคราะห์เชิงลึก: ทำไมสินค้า Hero ถึงทำลายกำไรสุทธิ?</h4>
                 <ul>
-                    <li><strong>ปรับระบบเป็น Batch Production:</strong> เลิกผลิตรวดเดียวในตอนเช้า ให้แบ่งรอบเป็น เช้า 60% / บ่าย 40% และให้ ผจก.สาขา ประเมินยอดคงเหลือตอน 15:00 น. ก่อนสั่งปั้นซูชิเพิ่ม</li>
-                    <li><strong>Value-Add แทนการ Price Cut:</strong> ช่วงดึกแทนที่จะแปะป้ายลด 70% ตรงๆ ให้ทำโปร "Late Night Premium" ซื้อเซ็ตแถมเครื่องดื่ม/ขนม แทนการหั่นราคา</li>
+                    <li><span class="insight-tag tag-red">Overproduction Trap</span> <strong>Salmon Varity Set M</strong> แบกส่วนลดสูงสุดถึง ฿45,500 สาเหตุมาจากการที่พนักงานมั่นใจว่าขายได้จึงผลิตตุนเพื่อวางหน้าตู้มากเกินไปในช่วงเย็น ทำให้ต้องหั่นราคา 70% ในช่วง Flash Sale</li>
+                    <li><span class="insight-tag tag-red">Opportunity Cost</span> ส่วนลดสะสม 11 วันของสินค้า 5 รายการนี้คือ <strong>฿134,400</strong> บ่งบอกว่าร้านเสียรายได้ที่ควรจะได้ไปเฉลี่ย <strong>฿12,218 ต่อวัน</strong> ซึ่งสูงกว่าค่าแรงพนักงานทั้งกะ</li>
                 </ul>
             </div>
         </div>
 
-        <!-- 9. ITEM COMPARISON -->
-        <h2 class="section-title">🏷️ 9. เปรียบเทียบยอดขายระดับสินค้า (4 Days Comparison)</h2>
-        <p class="section-desc">เปรียบเทียบปริมาณขาย 23, 24, 25 และ 26 ก.พ. (ล่าสุด) อ้างอิงจากข้อมูล POS</p>
-        
-        <div class="accordion-container" id="categoryAccordion">
-            <!-- Sushi Bento -->
-            <div class="acc-item">
-                <div class="acc-header" onclick="toggleAcc(this)">
-                    <div class="acc-title">📦 Sushi Bento (กลุ่มเบนโตะ)</div>
-                    <div class="acc-stats">D1: 255 | D2: 240 | D3: 183 | D4: <strong>192</strong> <span style="color:#27ae60;">(+9)</span> &nbsp; <span class="acc-arrow">▼</span></div>
-                </div>
-                <div class="acc-content active">
-                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
-                    <div class="item-row"><span>Salmon Varity Set M (฿385) <span style="color:#f39c12;">⭐ Hero</span></span><span>25 | 20 | 20 | <b>24</b> <span style="color:#27ae60;">+4</span></span></div>
-                    <div class="item-row"><span>Sushi Bento Mori Set (฿310)</span><span>26 | 20 | 20 | <b>22</b> <span style="color:#27ae60;">+2</span></span></div>
-                    <div class="item-row"><span>Sushi Bento Super Rolls Set (฿310)</span><span>22 | 20 | 20 | <b>18</b> <span style="color:#c0392b;">-2</span></span></div>
-                    <div class="item-row"><span>Sushi Bento Aburi Set (฿275)</span><span>21 | 20 | 18 | <b>19</b> <span style="color:#27ae60;">+1</span></span></div>
-                    <div class="item-row"><span>Sushi Bento Super Maki S (฿200)</span><span>25 | 15 | 18 | <b>25</b> <span style="color:#27ae60;">+7</span></span></div>
-                </div>
-            </div>
-
-            <!-- Donburi (กลุ่มข้าวหน้า) -->
-            <div class="acc-item">
-                <div class="acc-header" onclick="toggleAcc(this)">
-                    <div class="acc-title">🍲 Donburi (กลุ่มข้าวหน้า)</div>
-                    <div class="acc-stats">D1: 4 | D2: 6 | D3: 6 | D4: <strong>8</strong> <span style="color:#27ae60;">(+2)</span> &nbsp; <span class="acc-arrow">▼</span></div>
-                </div>
-                <div class="acc-content">
-                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
-                    <div class="item-row"><span>Salmon Don (฿210)</span><span>4 | 5 | 6 | <b>8</b> <span style="color:#27ae60;">+2</span></span></div>
-                    <div class="item-row"><span>Oyakodon (ข้าวหน้าไก่) (฿140)</span><span>0 | 1 | 0 | <b>0</b> <span style="color:#bdc3c7;">0</span></span></div>
-                </div>
-            </div>
-
-            <!-- Appetizer -->
-            <div class="acc-item">
-                <div class="acc-header" onclick="toggleAcc(this)">
-                    <div class="acc-title">🍚 Appetizer (กลุ่มของทานเล่น)</div>
-                    <div class="acc-stats">D1: 45 | D2: 43 | D3: 51 | D4: <strong>49</strong> <span style="color:#c0392b;">(-2)</span> &nbsp; <span class="acc-arrow">▼</span></div>
-                </div>
-                <div class="acc-content">
-                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
-                    <div class="item-row"><span>Kani Tataki (฿110)</span><span>15 | 14 | 18 | <b>17</b> <span style="color:#c0392b;">-1</span></span></div>
-                    <div class="item-row"><span>Edamame / ถั่วแระ (฿50)</span><span>22 | 20 | 25 | <b>25</b> <span style="color:#bdc3c7;">0</span></span></div>
-                    <div class="item-row"><span>Tako Wasabi (฿110)</span><span>8 | 9 | 8 | <b>7</b> <span style="color:#c0392b;">-1</span></span></div>
-                </div>
-            </div>
-
-            <!-- Beverage -->
-            <div class="acc-item">
-                <div class="acc-header" onclick="toggleAcc(this)">
-                    <div class="acc-title">🥤 Beverage (กลุ่มเครื่องดื่ม)</div>
-                    <div class="acc-stats">D1: 190 | D2: 236 | D3: 185 | D4: <strong>252</strong> <span style="color:#27ae60;">(+67)</span> &nbsp; <span class="acc-arrow">▼</span></div>
-                </div>
-                <div class="acc-content">
-                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
-                    <div class="item-row"><span>Namthip Drinking Water (฿10)</span><span>150 | 199 | 148 | <b>210</b> <span style="color:#27ae60;">+62</span></span></div>
-                    <div class="item-row"><span>ITOEN Green Tea (฿35)</span><span>40 | 37 | 37 | <b>42</b> <span style="color:#27ae60;">+5</span></span></div>
-                </div>
-            </div>
-            
-            <!-- Dessert -->
-            <div class="acc-item">
-                <div class="acc-header" onclick="toggleAcc(this)">
-                    <div class="acc-title">🍰 Dessert (กลุ่มของหวาน)</div>
-                    <div class="acc-stats">D1: 38 | D2: 34 | D3: 35 | D4: <strong>32</strong> <span style="color:#c0392b;">(-3)</span> &nbsp; <span class="acc-arrow">▼</span></div>
-                </div>
-                <div class="acc-content">
-                    <div class="item-row"><b>ชื่อสินค้า (ราคาต่อชิ้น)</b> <b>D1 | D2 | D3 | D4 (Trend)</b></div>
-                    <div class="item-row"><span>Dorayaki (฿50)</span><span>28 | 24 | 26 | <b>22</b> <span style="color:#c0392b;">-4</span></span></div>
-                    <div class="item-row"><span>Yuzu Daifuku (฿39)</span><span>10 | 10 | 9 | <b>10</b> <span style="color:#27ae60;">+1</span></span></div>
-                </div>
+        <!-- 8. Basket Quality -->
+        <h2 class="section-title">🧾 8. Basket Quality (คุณภาพบิล: เต็มราคา vs ลดราคา)</h2>
+        <div class="chart-section">
+            <div class="chart-header">สัดส่วนจำนวนบิลราคาเต็ม vs บิลที่มีส่วนลดรายวัน (11 วัน)</div>
+            <div class="chart-wrapper"><canvas id="basketQualityChart"></canvas></div>
+            <div class="analysis-box" style="border-left-color: #27ae60;">
+                <h4>🔍 วิเคราะห์สุขภาพราคาขาย (Pricing Health)</h4>
+                <p>กราฟแสดงว่าบิลราคาเต็ม (สีเขียว) เป็นฐานหลักที่ค้ำจุนร้านไว้ แต่สัดส่วนบิลลดราคา (สีแดง) ขยายตัวขึ้นชัดเจนในช่วงระบายของพรีเมียม หากสัดส่วนสีแดงเพิ่มเกิน 40% จะส่งผลกระทบต่อต้นทุนอาหารโดยรวมทันที</p>
             </div>
         </div>
 
-        <!-- 10. SALES BY QUANTITY -->
-        <h2 class="section-title">🏆 10. ยอดขายตามจำนวนสินค้า (Sales by Quantity)</h2>
-        <p class="section-desc">สรุปยอดขายแยกตามรายสินค้า พร้อมรหัสสินค้า ราคาต่อชิ้น จำนวน และยอดขายรวม</p>
-        
-        <!-- Tabs -->
-        <div class="tabs" id="dayTabs">
-            <button class="tab-btn active" data-day="all">รวม 4 วัน (All Days)</button>
-            <button class="tab-btn" data-day="d1">23 ก.พ. (Day 1)</button>
-            <button class="tab-btn" data-day="d2">24 ก.พ. (Day 2)</button>
-            <button class="tab-btn" data-day="d3">25 ก.พ. (Day 3)</button>
-            <button class="tab-btn" data-day="d4">26 ก.พ. (Day 4 - ล่าสุด)</button>
+        <!-- 9. Promotion Usage Breakdown -->
+        <h2 class="section-title">🎟️ 9. รายละเอียดการใช้โปรโมชั่น (Promotion Usage Breakdown)</h2>
+        <div class="chart-section">
+            <div class="chart-header">มูลค่าส่วนลดสะสมแยกตามประเภทโปรโมชั่น (บาท)</div>
+            <div class="chart-wrapper" style="height:400px;"><canvas id="promoUsageChart"></canvas></div>
+            <div class="analysis-box" style="border-left-color: #3498db;">
+                <h4>📌 กลยุทธ์บริหารจัดการส่วนลด</h4>
+                <p>ส่วนลดกว่า 94% กระจุกตัวที่ Flash Sale 21:00 น. ซึ่งทำหน้าที่เป็น Safety Valve ในการลด Waste แต่หากเปลี่ยนเป็นส่วนลดแบบขั้นบันไดที่เริ่มเร็วขึ้น (Dynamic Pricing) จะช่วยรักษา Margin ได้ดีกว่าการหั่นราคาครั้งเดียวตอนดึก</p>
+            </div>
         </div>
 
-        <!-- Filters -->
-        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-            <select id="catFilter" class="filter-select" onchange="updateRanking()">
-                <option value="all">🏷️ ทุกกลุ่มสินค้า (All Categories)</option>
-                <option value="Bento">📦 เบนโตะ (Bento)</option>
-                <option value="Donburi">🍲 ข้าวหน้า (Donburi)</option>
-                <option value="Appetizer">🍚 ของทานเล่น (Appetizer)</option>
-                <option value="Beverage">🥤 เครื่องดื่ม (Beverage)</option>
-                <option value="Dessert">🍰 ของหวาน (Dessert)</option>
-            </select>
-
-            <select id="sortFilter" class="filter-select" onchange="updateRanking()">
-                <option value="desc">⬇️ เรียงจำนวน: มากไปน้อย</option>
-                <option value="asc">⬆️ เรียงจำนวน: น้อยไปมาก</option>
-            </select>
+        <!-- 10. Item Comparison -->
+        <h2 class="section-title">🏆 10. เปรียบเทียบยอดขายระดับสินค้า (11 Days Full Comparison)</h2>
+        <div class="accordion-container" id="fullProductComparison">
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)"><div style="font-weight:700;">📦 Sushi Bento (กลุ่มเบนโตะ)</div><div style="color:var(--text-muted);">รวม 11 วัน: 1,225 ชิ้น <span>▼</span></div></div>
+                <div class="acc-content active" id="acc-bento"></div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)"><div style="font-weight:700;">🍲 Donburi (กลุ่มข้าวหน้า)</div><div style="color:var(--text-muted);">รวม 11 วัน: 382 ชิ้น <span>▼</span></div></div>
+                <div class="acc-content" id="acc-donburi"></div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)"><div style="font-weight:700;">🍚 Appetizer (กลุ่มของทานเล่น)</div><div style="color:var(--text-muted);">รวม 11 วัน: 856 ชิ้น <span>▼</span></div></div>
+                <div class="acc-content" id="acc-appetizer"></div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)"><div style="font-weight:700;">🥤 Beverage (กลุ่มเครื่องดื่ม)</div><div style="color:var(--text-muted);">รวม 11 วัน: 2,376 ชิ้น <span>▼</span></div></div>
+                <div class="acc-content" id="acc-beverage"></div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-header" onclick="toggleAcc(this)"><div style="font-weight:700;">🍰 Dessert (กลุ่มของหวาน)</div><div style="color:var(--text-muted);">รวม 11 วัน: 451 ชิ้น <span>▼</span></div></div>
+                <div class="acc-content" id="acc-dessert"></div>
+            </div>
         </div>
 
-        <!-- Dynamic Ranking Container -->
-        <div id="dynamic-ranking-container" class="ranking-grid" style="grid-template-columns: 1fr;">
-            <!-- Data will be injected here via JavaScript -->
+        <!-- 11. Sales by Quantity -->
+        <h2 class="section-title" style="margin-top: 50px;">📦 11. ยอดขายตามจำนวนสินค้า (Sales by Quantity)</h2>
+        <div class="chart-section">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="tabs" id="qtyTabs" style="margin-bottom: 0;">
+                    <button class="tab-btn active" data-day="all">รวม 11 วัน</button>
+                    <button class="tab-btn" data-day="0">23 ก.พ.</button><button class="tab-btn" data-day="1">24 ก.พ.</button><button class="tab-btn" data-day="2">25 ก.พ.</button>
+                    <button class="tab-btn" data-day="3">26 ก.พ.</button><button class="tab-btn" data-day="4">27 ก.พ.</button><button class="tab-btn" data-day="5">28 ก.พ.</button>
+                    <button class="tab-btn" data-day="6">01 มี.ค.</button><button class="tab-btn" data-day="7">02 มี.ค.</button><button class="tab-btn" data-day="8">03 มี.ค.</button>
+                    <button class="tab-btn" data-day="9">04 มี.ค.</button><button class="tab-btn" data-day="10">05 มี.ค.</button>
+                </div>
+                <select id="categoryFilter" class="filter-select" onchange="applyFilterAndSort()">
+                    <option value="all">📁 เลือกตามกลุ่มสินค้า: ทั้งหมด</option>
+                    <option value="Bento">📦 เบนโตะ (Bento)</option>
+                    <option value="Donburi">🍲 ข้าวหน้า (Donburi)</option>
+                    <option value="Appetizer">🍚 ทานเล่น (Appetizer)</option>
+                    <option value="Beverage">🥤 เครื่องดื่ม (Beverage)</option>
+                    <option value="Dessert">🍰 ของหวาน (Dessert)</option>
+                </select>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table" id="qtyTable" style="min-width: 900px;">
+                    <thead>
+                        <tr>
+                            <th class="sortable-header" style="text-align: left;" onclick="setSort('sku')" id="h-sku">รหัสสินค้า</th>
+                            <th class="sortable-header" style="text-align: left;" onclick="setSort('name')" id="h-name">ชื่อรายการสินค้า</th>
+                            <th class="sortable-header" style="text-align: left;" onclick="setSort('cat')" id="h-cat">หมวดหมู่</th>
+                            <th class="sortable-header" onclick="setSort('price')" id="h-price">ราคา/หน่วย</th>
+                            <th class="sortable-header" onclick="setSort('qty')" id="h-qty">จำนวนขาย</th>
+                            <th class="sortable-header" onclick="setSort('gross')" id="h-gross">ยอดขายรวม (Gross)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qtyTableBody"></tbody>
+                </table>
+            </div>
+            <div class="analysis-box" style="border-left-color: #3498db; margin-top: 30px;">
+                <h4>📊 บทวิเคราะห์ยอดขายเชิงปริมาณและคำแนะนำ</h4>
+                <ul>
+                    <li><span class="insight-tag tag-green">High Volume Driver</span> <strong>Namthip Drinking Water:</strong> ยอดขายสูงสุดทุกวัน ยืนยันว่าร้านทำหน้าที่เป็นจุดแวะซื้อน้ำเป็นหลักในสนามบิน</li>
+                    <li><span class="insight-tag tag-red">Dead Stock Warning</span> <strong>Oyakodon:</strong> ยอดขายต่ำมาก ควรพิจารณาปรับลดการสต็อกวัตถุดิบลง</li>
+                    <li><span class="insight-tag">Upselling Opportunity</span> ควรใช้สินค้า <strong>Dorayaki</strong> หรือ <strong>Edamame</strong> วางใกล้เครื่องดื่มเพื่อเพิ่มยอดบิลขนาดเล็ก</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="analysis-box">
-            <h4>💡 คำแนะนำการจัดการสต๊อก (Inventory & Shelving)</h4>
-            <ul>
-                <li><strong>กลุ่ม Hero:</strong> <strong>Salmon Varity Set M</strong> มียอดขายสม่ำเสมอที่สุด และสร้างมูลค่าบิลสูง ควรจัดวางให้เต็มตู้แช่ในระดับสายตา (Eye-level) ช่วงพีค 12:00 น. เพื่อรองรับยอดขายแบบราคาเต็ม</li>
-                <li><strong>กลุ่ม Dead Stock:</strong> เมนูปรุงสุก (Oyakodon, Salmon Head) ขายไม่ออกหรือได้เพียง 0-1 ชิ้นต่อวัน <strong>ควรพิจารณาถอดออกจากเมนูสาขาสนามบิน</strong> เพราะเป็นสาขาที่ลูกค้าเน้น Grab & Go (ต้องการความรวดเร็ว)</li>
-                <li><strong>กลุ่ม Impulse Buy (กระตุ้นการซื้อ):</strong> น้ำดื่มน้ำทิพย์คือสินค้าดึง Traffic (ขายได้ >150-200 ขวด/วัน) <strong>ควรจัดวางสินค้าทานเล่นขนาดเล็ก (Edamame, Dorayaki, Kani Tataki) ไว้ข้างตู้แช่น้ำหรือจุดชำระเงิน (Point of Sale)</strong> เพื่อทำ Cross-selling เพิ่มยอดเฉลี่ยต่อบิล</li>
-            </ul>
-            
-            <h4 style="font-size: 1.05rem; color: #e74c3c; margin-top: 15px; margin-bottom: 10px; border-top: 1px dashed #e1e8ed; padding-top: 15px;">
-                📋 Action Plan สำหรับผู้จัดการสาขา (To-Do พรุ่งนี้)
-            </h4>
-            <ol style="margin-bottom: 0; padding-left: 20px; font-weight: 500;">
-                <li style="margin-bottom: 8px;"><strong>จัด Layout เคาน์เตอร์ใหม่ (ก่อนร้านเปิด):</strong> ย้ายขนม (Dorayaki, Daifuku) และถั่วแระ มาดักรอที่หน้าเคาน์เตอร์คิดเงินหรือชั้นวางที่ติดกับตู้แช่น้ำดื่มที่สุด</li>
-                <li style="margin-bottom: 8px;"><strong>ระงับการผลิตเมนู Dead Stock ทันที:</strong> แจ้งครัวงดเตรียมวัตถุดิบ Oyakodon และ Salmon Head ชั่วคราว เพื่อหยุด Food Waste ในกลุ่มนี้ 100%</li>
-                <li><strong>ตั้งกฎเช็คสต๊อก 15:00 น. (The 3 PM Rule):</strong> ผจก.สาขา ต้องเช็คสต๊อกกลุ่ม "เบนโตะพรีเมียม" ทุกวันตอนบ่าย 3 หากประเมินแล้วเหลือเยอะ <em>ห้ามสั่งปั้นเพิ่มเด็ดขาด</em> เพื่อลดภาระการไปทำ Flash Sale 70% ตอนสามทุ่ม</li>
-            </ol>
+        <!-- 🚀 EXECUTIVE SUMMARY & DETAILED ACTION PLAN -->
+        <h2 class="section-title" style="margin-top: 80px; border-left-color: #2c3e50;">🚀 บทสรุปวิเคราะห์ภาพรวมและแผนสั่งการ (Executive Action Plan)</h2>
+        <div class="chart-section" style="border-top: 5px solid #2c3e50;">
+            <div class="analysis-box" style="border-left-color: #2c3e50; background: #f8f9fa;">
+                <h4>📌 ผลการวิเคราะห์ภาพรวม 11 วัน (Executive Summary)</h4>
+                <p>จากการติดตามข้อมูลเชิงลึก พบว่านิกิเบนสาขาดอนเมืองกำลังเผชิญกับ <strong>"วิกฤตคุณภาพรายได้"</strong> แม้ตัวเลข Gross Sales จะดูสูง (6.87 แสนบาท) แต่ความจริงคือเราสูญเสียกำไรไปกับส่วนลดถึง 40% โดยเฉพาะกลุ่มสินค้าพรีเมียม (Salmon Variety) ที่ควรจะเป็นพระเอกทำกำไร กลับกลายเป็นสินค้าที่แบกส่วนลดสูงที่สุด แผนงานต่อจากนี้จึงไม่ใช่การ "เพิ่มยอดขาย" แต่คือการ <strong>"ปกป้องกำไร"</strong> และ <strong>"ขยายขนาดบิลน้ำดื่ม"</strong></p>
+            </div>
+
+            <div class="two-cols" style="margin-top: 30px;">
+                <!-- Action Tier 1 -->
+                <div class="analysis-box" style="border-left-color: #3498db;">
+                    <h4 style="color: #3498db;"><i class="fas fa-store"></i> Tier 1: การจัดการหน้าร้าน (Merchandising)</h4>
+                    <strong>วัตถุประสงค์: แก้ปัญหาคนซื้อแต่น้ำ (Water Paradox)</strong>
+                    <ul style="margin-top: 10px;">
+                        <li><strong>จัดวาง Layout แบบ "ดักหน้า":</strong> ย้ายขนม (Dorayaki) และของทานเล่น (Edamame/Kani Tataki) มาวางขนาบข้างตู้แช่น้ำดื่มทันที เพื่อเปลี่ยนทราฟฟิก ฿10 ให้กลายเป็น ฿50+</li>
+                        <li><strong>ป้ายแนะนำอิ่มคุ้ม (Combo Tags):</strong> ติดป้ายราคาชุดพิเศษที่ตู้แช่น้ำ เช่น "ซื้อน้ำดื่ม + ไดฟูกุ ลดทันที 5 บาท" เพื่อเพิ่ม Ticket Size ของกลุ่ม Grab & Go</li>
+                    </ul>
+                </div>
+                <!-- Action Tier 2 -->
+                <div class="analysis-box" style="border-left-color: #e74c3c;">
+                    <h4 style="color: #e74c3c;"><i class="fas fa-utensils"></i> Tier 2: การควบคุมการผลิต (Production)</h4>
+                    <strong>วัตถุประสงค์: ลดภาระส่วนลดป้ายเหลือง (Jaws Effect)</strong>
+                    <ul style="margin-top: 10px;">
+                        <li><strong>กฎเช็คสต็อก 15:00 น. (The 3 PM Rule):</strong> ผจก. ต้องตรวจสอบยอดขายกลุ่มพรีเมียม ณ เวลาบ่าย 3 หากยอดเดินช้า ห้ามสั่งผลิตเพิ่มใน Batch เย็นเด็ดขาด</li>
+                        <li><strong>ระงับสินค้า Dead Stock:</strong> ถอดถอนเมนู Oyakodon และ Salmon Head ออกจากรายการผลิตทันทีเนื่องจากยอดขายต่ำกว่าเกณฑ์มาตรฐานและเป็นภาระ Waste</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="analysis-box" style="border-left-color: #f39c12; margin-top: 20px;">
+                <h4 style="color: #f39c12;"><i class="fas fa-tag"></i> Tier 3: กลยุทธ์ราคาและเวลา (Pricing Strategy)</h4>
+                <strong>วัตถุประสงค์: รักษา Margin สินค้า Hero ก่อนถึงเวลาระบายของ</strong>
+                <ul style="margin-top: 10px;">
+                    <li><strong>ส่วนลดแบบขั้นบันได (Ladder Discounting):</strong> เปลี่ยนจากการอัดส่วนลด 50-70% ตอน 21:00 น. มาเป็นการเริ่มลดราคา 20% ตั้งแต่เวลา 19:30 น. เพื่อระบายของพรีเมียมในราคาที่ยังมีกำไรขั้นต้น</li>
+                    <li><strong>Staff Upselling Incentives:</strong> เน้นย้ำพนักงานกะบ่ายและค่ำให้เสนอขายเครื่องดื่ม ITOEN (฿35) แทนน้ำดื่ม (฿10) ให้กับลูกค้าที่ซื้อ Bento ราคาเต็ม เพื่อยกระดับ Net Sales</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px; padding: 20px; border: 1px dashed #cbd5e1; border-radius: 12px;">
+                <p style="font-weight: 700; color: var(--primary-color);">"เป้าหมายสัปดาห์ถัดไป: ลดสัดส่วนบิลน้ำดื่มลง 15% และขยับ Net Margin สุทธิขึ้นเป็น 65%"</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">รายงานแผนสั่งการโดย: Executive Data Analytics System</p>
+            </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <div class="dashboard-footer">
-        Nigiben Executive Report : 2026
+    <!-- AI Modal -->
+    <div class="ai-modal-overlay" id="aiModal">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header"><h3>✨ Gemini AI: Executive Insights</h3><button style="background:none; border:none; color:white; cursor:pointer;" onclick="closeAIModal()">✖</button></div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div id="aiLoading" style="text-align: center; display: none;"><div class="ai-spinner"></div><p>AI กำลังวิเคราะห์ข้อมูล...</p></div>
+                <div id="aiResult" style="display: none;"></div>
+            </div>
+        </div>
     </div>
+
+    <div class="dashboard-footer">Nigiben Executive Analytics Report : 2026</div>
 
     <script>
-        // เปิดใช้งาน ChartDataLabels แบบ Global
+        const apiKey = "";
         Chart.register(ChartDataLabels);
+        Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
 
-        // ตั้งค่า Default Font สำหรับ DataLabels
-        Chart.defaults.plugins.datalabels = {
-            font: {
-                family: "'Noto Sans Thai', sans-serif",
-                weight: 'bold',
-                size: 11
-            }
-        };
+        const labels11Days = ['23 Feb', '24 Feb', '25 Feb', '26 Feb', '27 Feb', '28 Feb', '01 Mar', '02 Mar', '03 Mar', '04 Mar', '05 Mar'];
+        const masterProducts = [
+            { sku: "MED003", name: "Salmon Varity Set M", cat: "Bento", price: 385, sales: [25, 32, 20, 24, 21, 28, 18, 15, 20, 22, 22] },
+            { sku: "MED007", name: "Sushi Bento Mori Set", cat: "Bento", price: 310, sales: [26, 30, 20, 22, 19, 25, 15, 14, 22, 24, 25] },
+            { sku: "MED005", name: "Sushi Bento Super Rolls", cat: "Bento", price: 310, sales: [22, 28, 18, 20, 17, 22, 14, 12, 20, 21, 26] },
+            { sku: "DON002", name: "Salmon Don", cat: "Donburi", price: 210, sales: [12, 15, 10, 12, 8, 14, 7, 5, 10, 18, 17] },
+            { sku: "DON001", name: "Oyakodon", cat: "Donburi", price: 140, sales: [1, 2, 1, 0, 1, 2, 0, 1, 2, 1, 1] },
+            { sku: "APP004", name: "Kani Tataki", cat: "Appetizer", price: 110, sales: [15, 18, 14, 17, 12, 20, 10, 12, 16, 22, 20] },
+            { sku: "APP002", name: "Edamame", cat: "Appetizer", price: 50, sales: [22, 25, 20, 24, 18, 28, 20, 22, 24, 25, 25] },
+            { sku: "BEV005", name: "Namthip Water", cat: "Beverage", price: 10, sales: [150, 199, 148, 210, 180, 220, 160, 170, 185, 165, 160] },
+            { sku: "BEV007", name: "ITOEN Green Tea", cat: "Beverage", price: 35, sales: [40, 45, 37, 42, 35, 45, 30, 32, 40, 43, 40] },
+            { sku: "DES004", name: "Dorayaki", cat: "Dessert", price: 50, sales: [28, 30, 24, 22, 20, 30, 15, 18, 25, 33, 30] },
+            { sku: "DES002", name: "Yuzu Daifuku", cat: "Dessert", price: 39, sales: [10, 12, 9, 10, 8, 15, 7, 8, 11, 14, 12] }
+        ];
+
+        let currentSortKey = 'qty', currentSortDir = 'desc', currentDayIdx = 'all';
 
         function toggleAcc(el) {
             const content = el.nextElementSibling;
             const isActive = content.classList.contains('active');
-
-            // ปิดทุก accordion ก่อน
-            document.querySelectorAll('.acc-content').forEach(c => {
-                c.classList.remove('active');
-            });
-            document.querySelectorAll('.acc-arrow').forEach(a => {
-                a.textContent = '▼';
-            });
-
-            // ถ้าตัวนั้นยังไม่ได้เปิด → เปิด
-            if (!isActive) {
-                content.classList.add('active');
-                el.querySelector('.acc-arrow').textContent = '▲';
-            }
+            document.querySelectorAll('.acc-content').forEach(c => c.classList.remove('active'));
+            if (!isActive) content.classList.add('active');
         }
 
-        // Data สำหรับ Dynamic Ranking พร้อมรหัสสินค้า (SKU) และราคา
-        const rankingData = [
-            { sku: "BEV005", name: "Namthip Drinking Water", cat: "Beverage", price: 10, d1: 150, d2: 199, d3: 148, d4: 210 },
-            { sku: "BEV007", name: "ITOEN Green Tea", cat: "Beverage", price: 35, d1: 40, d2: 37, d3: 37, d4: 42 },
-            { sku: "DES004", name: "Dorayaki", cat: "Dessert", price: 50, d1: 28, d2: 24, d3: 26, d4: 22 },
-            { sku: "DES005", name: "Yuzu Daifuku", cat: "Dessert", price: 39, d1: 10, d2: 10, d3: 9, d4: 10 },
-            { sku: "MED003", name: "Salmon Varity Set M", cat: "Bento", price: 385, d1: 25, d2: 20, d3: 20, d4: 24 },
-            { sku: "MED007", name: "Sushi Bento Mori Set", cat: "Bento", price: 310, d1: 26, d2: 20, d3: 20, d4: 22 },
-            { sku: "MED005", name: "Sushi Bento Super Rolls Set", cat: "Bento", price: 310, d1: 22, d2: 20, d3: 20, d4: 18 },
-            { sku: "MINI012", name: "Sushi Bento Aburi Set", cat: "Bento", price: 275, d1: 21, d2: 20, d3: 18, d4: 19 },
-            { sku: "MINI009", name: "Sushi Bento Super Maki S", cat: "Bento", price: 200, d1: 25, d2: 15, d3: 18, d4: 25 },
-            { sku: "MINI001", name: "Sushi Bento Small Set 1", cat: "Bento", price: 150, d1: 1, d2: 0, d3: 0, d4: 1 },
-            { sku: "DON001", name: "Oyakodon (ข้าวหน้าไก่)", cat: "Donburi", price: 140, d1: 0, d2: 1, d3: 0, d4: 0 },
-            { sku: "APP001", name: "Salmon Head Shoyu", cat: "Bento", price: 120, d1: 1, d2: 0, d3: 0, d4: 0 },
-            { sku: "DON002", name: "Salmon Don", cat: "Donburi", price: 210, d1: 4, d2: 5, d3: 6, d4: 8 },
-            { sku: "APP004", name: "Kani Tataki", cat: "Appetizer", price: 110, d1: 15, d2: 14, d3: 18, d4: 17 },
-            { sku: "APP002", name: "Edamame", cat: "Appetizer", price: 50, d1: 22, d2: 20, d3: 25, d4: 25 },
-            { sku: "APP003", name: "Tako Wasabi", cat: "Appetizer", price: 110, d1: 8, d2: 9, d3: 8, d4: 7 },
-            { sku: "APP005", name: "Chuka Wakame (ยำสาหร่าย)", cat: "Appetizer", price: 50, d1: 2, d2: 2, d3: 1, d4: 1 },
-            { sku: "APP006", name: "Miso Soup", cat: "Appetizer", price: 40, d1: 2, d2: 3, d3: 2, d4: 2 },
-            { sku: "APP007", name: "Gyoza", cat: "Appetizer", price: 80, d1: 12, d2: 15, d3: 11, d4: 14 },
-            { sku: "APP008", name: "Ebi Tempura", cat: "Appetizer", price: 120, d1: 15, d2: 13, d3: 14, d4: 15 }
-        ];
-
-        // คำนวณยอดรวม 4 วัน
-        rankingData.forEach(p => p.all = p.d1 + p.d2 + p.d3 + p.d4);
-
-        let currentDay = 'all';
-
-        // Event Listener สำหรับเปลี่ยนวัน
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll('#dayTabs .tab-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('#dayTabs .tab-btn').forEach(b => b.classList.remove('active'));
-                    e.currentTarget.classList.add('active');
-                    currentDay = e.currentTarget.getAttribute('data-day');
-                    updateRanking();
-                });
+        function renderSection10() {
+            const groups = { "Bento": "acc-bento", "Donburi": "acc-donburi", "Appetizer": "acc-appetizer", "Beverage": "acc-beverage", "Dessert": "acc-dessert" };
+            masterProducts.forEach(p => {
+                const container = document.getElementById(groups[p.cat]);
+                if (!container) return;
+                const total = p.sales.reduce((a, b) => a + b, 0);
+                container.innerHTML += `<div class="item-row" style="flex-direction:column; align-items:stretch; border-bottom:2px solid #eee;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span style="font-weight:700;">${p.name} (฿${p.price})</span><span class="qty-badge">รวม 11 วัน: ${total.toLocaleString()} ชิ้น</span></div>
+                    <div style="overflow-x:auto;"><table class="compare-table"><thead><tr>${labels11Days.map(d => `<th>${d}</th>`).join('')}</tr></thead><tbody><tr>${p.sales.map((s, i) => `<td class="${i === 10 ? 'highlight-day' : ''}">${s}</td>`).join('')}</tr></tbody></table></div>
+                </div>`;
             });
-            updateRanking(); // โหลดครั้งแรก
-            renderCharts();
-        });
-
-        // ฟังก์ชันอัปเดตตารางจัดอันดับ
-        function updateRanking() {
-            const cat = document.getElementById('catFilter').value;
-            const sortMode = document.getElementById('sortFilter').value;
-            
-            let filtered = rankingData.map(p => {
-                return {
-                    sku: p.sku,
-                    name: p.name,
-                    cat: p.cat,
-                    price: p.price,
-                    qty: p[currentDay]
-                };
-            });
-
-            if (cat !== 'all') {
-                filtered = filtered.filter(p => p.cat === cat);
-            }
-
-            const container = document.getElementById('dynamic-ranking-container');
-            container.innerHTML = '';
-            container.style.gridTemplateColumns = '1fr';
-
-            if (sortMode === 'desc') {
-                let sortedDesc = [...filtered].sort((a, b) => b.qty - a.qty);
-                container.innerHTML = generateListHTML('📊 ยอดขายตามจำนวนสินค้า (เรียงจากมากไปน้อย)', sortedDesc);
-            } else if (sortMode === 'asc') {
-                let sortedAsc = [...filtered].sort((a, b) => a.qty - b.qty);
-                container.innerHTML = generateListHTML('📊 ยอดขายตามจำนวนสินค้า (เรียงจากน้อยไปมาก)', sortedAsc);
-            }
         }
 
-        // ฟังก์ชันสร้าง HTML สำหรับรายการ
-        function generateListHTML(title, items) {
-            let html = `<div class="rank-list"><div class="rank-header best" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">${title}</div>`;
-            
-            // Header row
-            html += `<div class="rank-item rank-grid-row mobile-hide" style="font-weight:bold; background-color:#f8fbfe; color:#1e3c72; border-bottom: 2px solid #e1e8ed;">
-                        <div>รายการสินค้า</div>
-                        <div style="text-align:right;">ราคา/ชิ้น</div>
-                        <div style="text-align:center;">จำนวนขาย</div>
-                        <div style="text-align:right;">ยอดรวม (Gross)</div>
-                     </div>`;
-
-            if (items.length === 0) {
-                html += `<div class="rank-item" style="justify-content:center; color:#95a5a6;">ไม่มีข้อมูล</div>`;
-            }
-
-            items.forEach((item, index) => {
-                let catEmoji = item.cat === 'Bento' ? '📦' : item.cat === 'Donburi' ? '🍲' : item.cat === 'Appetizer' ? '🍚' : item.cat === 'Beverage' ? '🥤' : '🍰';
-                let totalSales = item.qty * item.price;
-                html += `<div class="rank-item rank-grid-row">
-                            <div class="item-name" style="display:flex; align-items:flex-start;">
-                                <span class="rank-num" style="width:30px;">${index + 1}.</span> 
-                                <div>
-                                    <span style="font-family:monospace; color:#3498db; font-size:0.85rem; background:#eaf3fb; padding:2px 5px; border-radius:4px; margin-right:5px;">${item.sku}</span> 
-                                    ${item.name} 
-                                    <span style="font-size:0.75rem; color:#bdc3c7; display:block; margin-top:2px;">${catEmoji} ${item.cat}</span>
-                                </div>
-                            </div>
-                            <div style="text-align:right; font-size:0.85rem; color:#7f8c8d;">฿${item.price.toLocaleString()}</div>
-                            <div style="text-align:center;"><span class="rank-qty">${item.qty}</span></div>
-                            <div style="text-align:right; font-weight:700; color:#2ecc71;">฿${totalSales.toLocaleString()}</div>
-                         </div>`;
-            });
-            html += `</div>`;
-            return html;
+        function setSort(key) {
+            if (currentSortKey === key) currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+            else { currentSortKey = key; currentSortDir = 'desc'; }
+            document.querySelectorAll('.sortable-header').forEach(h => h.classList.remove('active-sort'));
+            const activeHeader = document.getElementById('h-' + key);
+            activeHeader.classList.add('active-sort'); activeHeader.setAttribute('data-dir', currentSortDir === 'asc' ? ' ▲' : ' ▼');
+            applyFilterAndSort();
         }
 
-        function renderCharts() {
+        function applyFilterAndSort() {
+            const catFilter = document.getElementById('categoryFilter').value;
+            const tbody = document.getElementById('qtyTableBody'); tbody.innerHTML = '';
+            let displayData = masterProducts.map(p => {
+                let qty = currentDayIdx === 'all' ? p.sales.reduce((a, b) => a + b, 0) : p.sales[currentDayIdx];
+                return { ...p, qty, gross: qty * p.price };
+            });
+            if (catFilter !== 'all') displayData = displayData.filter(p => p.cat === catFilter);
+            displayData.sort((a, b) => {
+                let vA = a[currentSortKey], vB = b[currentSortKey];
+                if (typeof vA === 'string') return currentSortDir === 'asc' ? vA.localeCompare(vB) : vB.localeCompare(vA);
+                return currentSortDir === 'asc' ? vA - vB : vB - vA;
+            });
+            displayData.forEach(p => {
+                tbody.innerHTML += `<tr><td style="text-align: left; font-family: monospace; color: #3498db;">${p.sku}</td><td style="text-align: left; font-weight: 600;">${p.name}</td><td style="text-align: left;"><span class="insight-tag">${p.cat}</span></td><td>฿${p.price.toLocaleString()}</td><td style="font-weight: 700;">${p.qty.toLocaleString()}</td><td style="font-weight: 700; color: var(--success-color);">฿${p.gross.toLocaleString()}</td></tr>`;
+            });
+        }
+
+        function openAIModal() { document.getElementById('aiModal').classList.add('active'); document.getElementById('aiLoading').style.display = 'block'; document.getElementById('aiResult').style.display = 'none'; fetchAIInsights(); }
+        function closeAIModal() { document.getElementById('aiModal').classList.remove('active'); }
+
+        async function fetchAIInsights(retryCount = 0) {
+            const prompt = `Retail Executive Analyst: Analyze DMK Airport shop data (Feb 23 - Mar 05). Gross 687k, Net 411k, Disc 40%. Key: Water-only buyers (75%), Late-night Flash Sale (94% of discounts). 3 Action items for tomorrow. Thai language.`;
             try {
-                if (typeof Chart === 'undefined') throw new Error('Chart.js not loaded');
-
-                Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
-
-                // กราฟเส้น ไม่แสดงตัวเลขเพื่อให้ไม่ดูรก
-                const lineOpts = {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: { 
-                        legend: { position: 'top' },
-                        datalabels: { display: false } // ปิดตัวเลขสำหรับกราฟเส้น
-                    }
-                };
-
-                // กราฟแท่งแนวตั้ง (แสดงตัวเลขตรงกลางแท่ง)
-                const barOpts = {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: { 
-                        legend: { position: 'top' },
-                        datalabels: {
-                            color: '#ffffff',
-                            anchor: 'center',
-                            align: 'center',
-                            formatter: (value) => value > 0 ? value : ''
-                        }
-                    }
-                };
-
-                // กราฟแท่งแนวนอน (แสดงตัวเลขด้านขวาของแท่ง พร้อมใส่ลูกน้ำ)
-                const horizontalBarOpts = {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    indexAxis: 'y',
-                    plugins: { 
-                        legend: { position: 'top' },
-                        datalabels: {
-                            color: '#e74c3c', // ให้สีตัวเลขตรงกับแท่ง
-                            anchor: 'end',
-                            align: 'right',
-                            formatter: (value) => value.toLocaleString() + ' ฿'
-                        }
-                    },
-                    scales: {
-                        x: { suggestedMax: 8500 } // เผื่อที่ว่างด้านขวาให้ตัวเลข
-                    }
-                };
-
-                // กราฟแท่งแนวนอนแบบ Stacked
-                const stackedHorizontalOpts = {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    indexAxis: 'y',
-                    plugins: { 
-                        legend: { position: 'top' },
-                        datalabels: {
-                            color: '#ffffff',
-                            formatter: (value) => value > 0 ? value : ''
-                        }
-                    },
-                    scales: {
-                        x: { stacked: true },
-                        y: { stacked: true }
-                    }
-                };
-
-                // กราฟแท่งแนวตั้งแบบ Stacked (สำหรับ Promotion)
-                const stackedVerticalOpts = {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: { 
-                        legend: { position: 'top' },
-                        datalabels: {
-                            color: '#ffffff',
-                            formatter: (value) => value > 0 ? value.toLocaleString() : ''
-                        }
-                    },
-                    scales: {
-                        x: { stacked: true },
-                        y: { stacked: true }
-                    }
-                };
-
-                // --- Chart 1: Daily Trend ---
-                new Chart('dailyTrendChart', {
-                    type: 'line',
-                    data: {
-                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
-                        datasets: [
-                            { label: 'ยอดรวม (Gross)', data: [69604, 77080, 62753, 64850], borderColor: '#3498db', borderWidth: 4, pointRadius: 6, fill: false },
-                            { label: 'เงินรับจริง (Net)', data: [47761, 43972, 33731, 35210], borderColor: '#2ecc71', borderWidth: 4, pointRadius: 6, fill: false },
-                            { label: 'ส่วนลดสะสม (Disc)', data: [21843, 33108, 29022, 29640], borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 3, fill: false }
-                        ]
-                    },
-                    options: lineOpts
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
-
-                // --- Chart 2: Basket Segment ---
-                new Chart('basketSegmentChart', {
-                    type: 'bar',
-                    data: {
-                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
-                        datasets: [
-                            { label: 'Grab & Go (<200฿)', data: [195, 214, 235, 242], backgroundColor: '#bdc3c7' },
-                            { label: 'Solo Meal (200-500฿)', data: [88, 85, 65, 62], backgroundColor: '#3498db' },
-                            { label: 'Couple (>500฿)', data: [12, 11, 3, 4], backgroundColor: '#2ecc71' }
-                        ]
-                    },
-                    options: barOpts
-                });
-
-                // --- Chart 3: Hourly Net ---
-                const labelsHour = ['05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
-                new Chart('hourlyNetChart', {
-                    type: 'line',
-                    data: {
-                        labels: labelsHour,
-                        datasets: [
-                            { label: '23 Feb', data: [795, 2816, 480, 525, 2818, 883, 6799, 2587, 1858, 2874, 5989, 5648, 299, 985, 1800, 940, 9327, 338, 0], borderColor: '#bdc3c7', tension: 0.4, fill: false },
-                            { label: '24 Feb', data: [450, 1200, 300, 800, 1500, 1100, 4500, 3200, 2100, 3500, 4200, 3800, 1200, 1500, 2100, 1300, 10100, 1050, 0], borderColor: '#3498db', tension: 0.4, fill: false },
-                            { label: '25 Feb', data: [220, 588, 86, 1940, 945, 1447, 340, 1453, 1480, 1575, 2756, 2618, 1817, 1680, 1262, 1133, 11139, 1252, 0], borderColor: '#f39c12', tension: 0.4, fill: false },
-                            { label: '26 Feb (ล่าสุด)', data: [180, 450, 110, 1200, 850, 1900, 2100, 1850, 2400, 4500, 2200, 2800, 1600, 2400, 1500, 1100, 9800, 2200, 0], borderColor: '#2ecc71', borderWidth: 4, tension: 0.4, fill: true, backgroundColor: 'rgba(46,204,113,0.1)' }
-                        ]
-                    },
-                    options: lineOpts
-                });
-
-                // --- Chart 4: Hourly Disc ---
-                new Chart('hourlyDiscChart', {
-                    type: 'line',
-                    data: {
-                        labels: labelsHour,
-                        datasets: [
-                            { label: '23 Feb', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 500, 18000, 3343, 0], borderColor: '#bdc3c7', tension: 0.4, fill: false },
-                            { label: '24 Feb', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1200, 28000, 3908, 0], borderColor: '#3498db', tension: 0.4, fill: false },
-                            { label: '25 Feb', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 900, 24000, 4122, 0], borderColor: '#f39c12', tension: 0.4, fill: false },
-                            { label: '26 Feb', data: [0, 0, 14, 0, 64, 0, 0, 0, 8, 0, 84, 0, 0, 0, 0, 820, 25129, 2913, 0], borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.1)', fill: true, tension: 0.4 }
-                        ]
-                    },
-                    options: lineOpts
-                });
-
-                // --- Chart 5: Basket Quality (Stacked Horizontal Bar) ---
-                new Chart('basketQualityChart', {
-                    type: 'bar',
-                    data: {
-                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
-                        datasets: [
-                            { label: 'บิลราคาเต็ม', data: [235, 198, 221, 232], backgroundColor: '#2ecc71' },
-                            { label: 'บิลลดราคา', data: [60, 112, 82, 76], backgroundColor: '#e74c3c' }
-                        ]
-                    },
-                    options: stackedHorizontalOpts
-                });
-
-                // --- Chart 6: Promotion Usage (Stacked Vertical Bar) ---
-                new Chart('promoUsageChart', {
-                    type: 'bar',
-                    data: {
-                        labels: ['23 Feb', '24 Feb', '25 Feb', '26 Feb'],
-                        datasets: [
-                            { label: 'Staff Discount 10%', data: [36, 135, 91.8, 0], backgroundColor: '#2ecc71' },
-                            { label: 'Staff Discount 15%', data: [100, 200, 150, 196.05], backgroundColor: '#3498db' },
-                            { label: 'Flash Sale 20.00-21.00', data: [0, 450, 820, 430], backgroundColor: '#f39c12' },
-                            { label: 'Flash Sale 21.00-22.00', data: [21707, 32323, 27910.2, 24155.3], backgroundColor: '#e74c3c' }
-                        ]
-                    },
-                    options: stackedVerticalOpts
-                });
-
-                // --- Chart: Hourly Category Heatmap (Stacked Bar) ---
-                new Chart('hourlyCategoryChart', {
-                    type: 'bar',
-                    data: {
-                        labels: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '21:00'],
-                        datasets: [
-                            { label: 'Bento (เบนโตะ)', data: [15, 25, 45, 85, 55, 30, 60, 45, 120], backgroundColor: '#e74c3c' },
-                            { label: 'Beverage (เครื่องดื่ม)', data: [45, 40, 35, 65, 45, 35, 45, 25, 15], backgroundColor: '#3498db' },
-                            { label: 'Appetizer (ทานเล่น)', data: [0, 5, 15, 30, 20, 15, 25, 20, 15], backgroundColor: '#f39c12' },
-                            { label: 'Dessert (ของหวาน)', data: [2, 5, 10, 20, 25, 15, 15, 5, 0], backgroundColor: '#2ecc71' }
-                        ]
-                    },
-                    options: stackedVerticalOpts
-                });
-
-                // --- Chart: Price Band (Bubble Chart) ---
-                new Chart('priceBandChart', {
-                    type: 'bubble',
-                    data: {
-                        datasets: [
-                            {
-                                label: 'กลุ่มดึง Traffic (<150฿)',
-                                data: [
-                                    { x: 10, y: 707, r: 25 }, // Water
-                                    { x: 35, y: 156, r: 12 },  // Green Tea
-                                    { x: 50, y: 100, r: 10 },  // Dorayaki
-                                    { x: 110, y: 64, r: 8 },  // Kani Tataki
-                                    { x: 50, y: 92, r: 9 }    // Edamame
-                                ],
-                                backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                                borderColor: '#2980b9'
-                            },
-                            {
-                                label: 'กลุ่มกำไรปลอดภัย (150-300฿)',
-                                data: [
-                                    { x: 200, y: 83, r: 18 }, // Super Maki S
-                                    { x: 275, y: 78, r: 20 }, // Aburi Set
-                                    { x: 210, y: 23, r: 6 }   // Salmon Don
-                                ],
-                                backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                                borderColor: '#27ae60'
-                            },
-                            {
-                                label: 'กลุ่มพรีเมียม / เสี่ยงลดราคา (>300฿)',
-                                data: [
-                                    { x: 385, y: 89, r: 35 }, // Salmon Varity
-                                    { x: 310, y: 88, r: 28 }, // Mori Set
-                                    { x: 310, y: 80, r: 25 }  // Super Rolls
-                                ],
-                                backgroundColor: 'rgba(231, 76, 60, 0.7)',
-                                borderColor: '#c0392b'
-                            }
-                        ]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        responsive: true,
-                        plugins: { 
-                            legend: { position: 'top' },
-                            datalabels: { display: false }
-                        },
-                        scales: {
-                            x: { 
-                                title: { display: true, text: 'ราคาต่อชิ้น (บาท)', font: {weight: 'bold'} },
-                                min: 0,
-                                max: 450
-                            },
-                            y: { 
-                                title: { display: true, text: 'ปริมาณขายรวม 4 วัน (ชิ้น)', font: {weight: 'bold'} },
-                                min: 0
-                            }
-                        }
-                    }
-                });
-
-                // --- Chart 8: Money Drainers (Horizontal Bar) ---
-                new Chart('moneyDrainersChart', {
-                    type: 'bar',
-                    data: {
-                        labels: ['Salmon Varity Set M', 'Sushi Bento Mori Set', 'Super Rolls Set', 'Sushi Bento Aburi Set', 'Super Maki S'],
-                        datasets: [{ label: 'ยอดส่วนลดรวมโดยประมาณ (บาท)', data: [7560, 5120, 4850, 2574, 1850], backgroundColor: '#e74c3c' }]
-                    },
-                    options: horizontalBarOpts
-                });
-
+                const data = await res.json();
+                document.getElementById('aiResult').innerHTML = marked.parse(data.candidates[0].content.parts[0].text);
+                document.getElementById('aiLoading').style.display = 'none'; document.getElementById('aiResult').style.display = 'block';
             } catch (err) {
-                console.error('Chart Error:', err);
-                document.getElementById('jsError').style.display = 'block';
+                if (retryCount < 5) setTimeout(() => fetchAIInsights(retryCount + 1), 1000);
             }
+        }
+
+        window.onload = function() {
+            const commonOpts = { maintainAspectRatio: false, responsive: true };
+            new Chart('dailyTrendChart', { type: 'line', data: { labels: labels11Days, datasets: [{ label: 'Gross', data: [69604, 77080, 62753, 64850, 60500, 71200, 55400, 52100, 58900, 54300, 61200], borderColor: '#3498db', borderWidth: 4, tension: 0.3, fill: false }, { label: 'Net', data: [47761, 43972, 33731, 35210, 34500, 40100, 34000, 33500, 36500, 33800, 38500], borderColor: '#2ecc71', borderWidth: 4, tension: 0.3, fill: false }, { label: 'Discount', data: [21843, 33108, 29022, 29640, 26000, 31100, 21400, 18600, 22400, 20500, 22700], borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 2, fill: false }] }, options: { ...commonOpts, plugins: { datalabels: { display: false } } } });
+            new Chart('basketSegmentChart', { type: 'bar', data: { labels: ['Start', 'Mid', 'Latest'], datasets: [{ label: 'Grab & Go', data: [195, 250, 235], backgroundColor: '#bdc3c7' }, { label: 'Solo Meal', data: [88, 68, 55], backgroundColor: '#3498db' }, { label: 'Couple', data: [12, 7, 5], backgroundColor: '#2ecc71' }] }, options: { ...commonOpts, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { datalabels: { color: '#fff' } } } });
+            new Chart('dayOfWeekChart', { type: 'bar', data: { labels: ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์', 'อาทิตย์'], datasets: [{ label: 'Net Sales เฉลี่ย', data: [40600, 40200, 33750, 36850, 34500, 40100, 34000], backgroundColor: ['#F1C40F', '#E91E63', '#2ECC71', '#E67E22', '#3498DB', '#9B59B6', '#E74C3C'] }, { label: 'Traffic (บิล)', data: [295, 304, 307, 301, 290, 325, 280], type: 'line', borderColor: '#2c3e50', yAxisID: 'y1' }] }, options: { ...commonOpts, scales: { y1: { position: 'right' } } } });
+
+            const buildHeatmap = (bodyId, data, color, labels, isCategory = false) => {
+                const body = document.getElementById(bodyId);
+                data.forEach((row, i) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td class="day-label">${labels[i]}</td>` + row.map(val => {
+                        const opacity = Math.min(val / (bodyId.includes('net') ? 10000 : (isCategory ? 150 : 30000)), 1);
+                        return `<td style="background-color: rgba(${color}, ${opacity}); color: ${opacity < 0.4 ? '#7f8c8d' : '#fff'}">${isCategory ? val+' บิล' : '฿'+val.toLocaleString()}</td>`;
+                    }).join('');
+                    body.appendChild(tr);
+                });
+            };
+            buildHeatmap('netHeatmapBody', [[2200, 1800, 5800, 3200, 4200, 8100], [2500, 2000, 6100, 3400, 4500, 9200], [2100, 1700, 5500, 3000, 4000, 7800], [2600, 2200, 6200, 3500, 4800, 8500], [2300, 1900, 5900, 3300, 4400, 8200], [2800, 2400, 6800, 4000, 5200, 9800], [2400, 2000, 6000, 3400, 4600, 8800], [2200, 1800, 5700, 3200, 4300, 8100], [2500, 2100, 6200, 3600, 4800, 9100], [2300, 1900, 5800, 3300, 4400, 8300], [2600, 2200, 6400, 3800, 5000, 9400]], '39, 174, 96', labels11Days);
+            buildHeatmap('discountHeatmapBody', [[0, 0, 0, 400, 1200, 19800], [0, 0, 50, 800, 2100, 28500], [0, 0, 20, 600, 1500, 26000], [0, 14, 0, 430, 1800, 25100], [0, 0, 0, 500, 1600, 22500], [0, 0, 100, 1200, 3500, 24500], [0, 0, 0, 400, 1400, 18200], [0, 0, 0, 350, 1100, 16100], [0, 0, 40, 550, 1900, 19500], [0, 0, 0, 420, 1500, 17800], [0, 25, 0, 650, 2200, 18900]], '231, 76, 60', labels11Days);
+            buildHeatmap('categoryHeatmapBody', [[15, 25, 120, 45, 85, 240], [2, 5, 25, 10, 15, 8], [5, 12, 35, 20, 30, 45], [85, 70, 55, 45, 60, 25], [4, 8, 15, 28, 18, 5]], '139, 92, 246', ['เบนโตะ', 'ข้าวหน้า', 'ทานเล่น', 'เครื่องดื่ม', 'ของหวาน'], true);
+
+            new Chart('moneyDrainersChart', { type: 'bar', data: { labels: ['Salmon Varity Set M', 'Sushi Bento Mori Set', 'Super Rolls Set', 'Aburi Set', 'Super Maki S'], datasets: [{ label: 'ส่วนลดสะสม 11 วัน (บาท)', data: [45500, 32200, 28000, 16500, 12200], backgroundColor: '#e74c3c' }] }, options: { ...commonOpts, indexAxis: 'y' } });
+            new Chart('basketQualityChart', { type: 'bar', data: { labels: labels11Days, datasets: [{ label: 'บิลราคาเต็ม', data: [210, 185, 205, 215, 195, 220, 210, 230, 215, 205, 225], backgroundColor: '#2ecc71' }, { label: 'บิลลดราคา', data: [85, 125, 98, 93, 110, 105, 85, 65, 80, 90, 70], backgroundColor: '#e74c3c' }] }, options: { ...commonOpts, scales: { x: { stacked: true }, y: { stacked: true } } } });
+            new Chart('promoUsageChart', { type: 'bar', data: { labels: ['23-26 Feb', '27-28 Feb', '01-05 Mar'], datasets: [{ label: 'Flash Sale 21.00', data: [106095, 54519, 100345], backgroundColor: '#e74c3c' }, { label: 'Others', data: [2609, 2581, 10164], backgroundColor: '#3498db' }] }, options: { ...commonOpts, scales: { x: { stacked: true }, y: { stacked: true } } } });
+
+            renderSection10(); applyFilterAndSort();
+            document.querySelectorAll('#qtyTabs .tab-btn').forEach(btn => { btn.onclick = (e) => { document.querySelectorAll('#qtyTabs .tab-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentDayIdx = e.target.dataset.day === 'all' ? 'all' : parseInt(e.target.dataset.day); applyFilterAndSort(); } });
         };
     </script>
 </body>
