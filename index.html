@@ -480,9 +480,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   <div class="g4" id="quality-kpis"></div>
   <div class="card mb">
     <div class="ct">สัดส่วนรายได้: Full Price vs Promotional</div>
-    <div style="display:flex;align-items:center;gap:24px;height:240px">
-      <div style="flex:1"><canvas id="ch-quality-pie"></canvas></div>
-      <div class="leg" id="quality-leg"></div>
+    <div style="display:flex;align-items:center;gap:16px;min-height:200px;flex-wrap:wrap">
+      <div style="flex:0 0 200px;height:200px;max-width:200px"><canvas id="ch-quality-pie"></canvas></div>
+      <div class="leg" id="quality-leg" style="flex:1;min-width:160px"></div>
     </div>
     <div class="cs">📌 รายได้ที่มาจากยอดโปรโมชั่น (หลังหักส่วนลด) คิดเป็นเพียง ~28% ของยอดรวม แต่โปรโมชั่นเหล่านี้สูญเสียรายได้ไปถึง ฿171,343 · ควรวิเคราะห์ว่า Traffic พิเศษที่ได้มาคุ้มกับส่วนลดที่สูญเสียไปหรือไม่</div>
   </div>
@@ -1381,7 +1381,7 @@ function buildDiscHM(){
   document.getElementById('hm-disc').innerHTML=html;
 
   document.getElementById('disc-overview-kpis').innerHTML=`
-    <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Discount</div><div class="kpi-val rc">${f(171343)}</div><div class="kpi-sub">ส่วนลดทั้งหมด</div></div>
+    <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Discount</div><div class="kpi-val rc">171343</div><div class="kpi-sub">ส่วนลดทั้งหมด</div></div>
     <div class="kpi"><div class="kpi-ico">🔢</div><div class="kpi-lbl">Total Uses</div><div class="kpi-val">446</div><div class="kpi-sub">ครั้งทั้งหมด</div></div>
     <div class="kpi"><div class="kpi-ico">📊</div><div class="kpi-lbl">Avg per Use</div><div class="kpi-val">${f(171343/446)}</div><div class="kpi-sub">ส่วนลดเฉลี่ยต่อครั้ง</div></div>`;
 
@@ -1434,18 +1434,20 @@ function buildPromo(){
 function buildQuality(){
   const promoNet=PROMO_DATA.reduce((s,p)=>s+p.net,0);
   const fullPrice=TOTAL_NET-promoNet;
-  document.getElementById('quality-kpis').innerHTML=`
-    <div class="kpi g"><div class="kpi-lbl">Full Price Revenue</div><div class="kpi-val gc">${f(fullPrice)}</div><div class="kpi-sub">${(fullPrice/TOTAL_NET*100).toFixed(1)}% ของยอดรวม</div></div>
-    <div class="kpi r"><div class="kpi-lbl">Promo Net Revenue</div><div class="kpi-val rc">${f(promoNet)}</div><div class="kpi-sub">${(promoNet/TOTAL_NET*100).toFixed(1)}% ของยอดรวม</div></div>
-    <div class="kpi"><div class="kpi-lbl">Discount Leaked</div><div class="kpi-val" style="color:var(--cyan)">${f(171343)}</div><div class="kpi-sub">รายได้ที่สูญเสียจากโปรโมชั่น</div></div>
-    <div class="kpi p"><div class="kpi-lbl">Recovery Rate</div><div class="kpi-val pc">${(promoNet/270119*100).toFixed(1)}%</div><div class="kpi-sub">ของยอดก่อนส่วนลดโปรโมชั่น</div></div>`;
+  const totalDiscLeaked=DAILY.reduce((s,d)=>s+(d.discount||0),0);
+  const totalGrossQ=DAILY.reduce((s,d)=>s+(d.gross||d.net),0);
+  document.getElementById('quality-kpis').innerHTML=
+    '<div class="kpi g"><div class="kpi-lbl">Full Price Revenue</div><div class="kpi-val gc">'+f(fullPrice)+'</div><div class="kpi-sub">'+(fullPrice/TOTAL_NET*100).toFixed(1)+'% ของยอดรวม</div></div>'
+   +'<div class="kpi r"><div class="kpi-lbl">Promo Net Revenue</div><div class="kpi-val rc">'+f(promoNet)+'</div><div class="kpi-sub">'+(promoNet/TOTAL_NET*100).toFixed(1)+'% ของยอดรวม</div></div>'
+   +'<div class="kpi"><div class="kpi-lbl">Discount Leaked</div><div class="kpi-val" style="color:var(--cyan)">'+f(totalDiscLeaked)+'</div><div class="kpi-sub">รายได้ที่สูญเสียจากโปรโมชั่น</div></div>'
+   +'<div class="kpi p"><div class="kpi-lbl">Recovery Rate</div><div class="kpi-val pc">'+(totalGrossQ>0?(promoNet/totalGrossQ*100).toFixed(1):0)+'%</div><div class="kpi-sub">ของยอดก่อนส่วนลดโปรโมชั่น</div></div>';
   mkChart('ch-quality-pie',{type:'doughnut',
     data:{labels:['Full Price','Promotional'],datasets:[{data:[fullPrice,promoNet],backgroundColor:['#22d47a','#f04545'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)+' ('+(ctx.raw/TOTAL_NET*100).toFixed(1)+'%)'}}}}
   });
-  document.getElementById('quality-leg').innerHTML=`
-    <div class="leg-item"><div class="leg-dot" style="background:#22d47a"></div>Full Price<span class="leg-pct">${(fullPrice/TOTAL_NET*100).toFixed(1)}%</span></div>
-    <div class="leg-item"><div class="leg-dot" style="background:#f04545"></div>Promotional<span class="leg-pct">${(promoNet/TOTAL_NET*100).toFixed(1)}%</span></div>`;
+  document.getElementById('quality-leg').innerHTML=
+    '<div class="leg-item"><div class="leg-dot" style="background:#22d47a"></div>Full Price<span class="leg-pct">'+(fullPrice/TOTAL_NET*100).toFixed(1)+'%</span></div>'
+   +'<div class="leg-item"><div class="leg-dot" style="background:#f04545"></div>Promotional<span class="leg-pct">'+(promoNet/TOTAL_NET*100).toFixed(1)+'%</span></div>';
   const promoByDate={};
   PROMO_DATA.forEach(p=>{
     if(!p.date)return;
