@@ -204,7 +204,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 <body>
 <nav id="sb">
   <div class="sb-logo">
-    <div class="brand">NIGIBEN</div>
+    <div class="brand">NIGIBEN</div><div style="font-size:9px;color:var(--text3);text-align:center;margin-top:2px">build 1773114687</div>
     <div class="sub">Sales Intelligence Dashboard</div>
     <div class="loc">✈️ สนามบินดอนเมือง · Grab&amp;Go</div>
   </div>
@@ -240,7 +240,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   <div class="sb-foot">
     <div class="period-box">
       <div class="pl">Data Period</div>
-      <div class="pv">01–09 Mar 2026</div>
+      <div id="sidebar-period" class="pv">01–09 Mar 2026</div>
     </div>
     <button class="upbtn" onclick="nav('upload')">⬆ Update Data</button>
   </div>
@@ -256,17 +256,17 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
 <!-- ══════════ OVERVIEW ══════════ -->
 <div id="page-overview" class="page active">
-  <div class="ph"><h1>📊 Performance Overview</h1><p>สรุปภาพรวมยอดขาย · Nigiben Grab&amp;Go · สนามบินดอนเมือง · 01–09 มีนาคม 2569</p></div>
+  <div class="ph"><h1>📊 Performance Overview</h1><p>สรุปภาพรวมยอดขาย · Nigiben Grab&amp;Go · สนามบินดอนเมือง · <span id="ov-period">01–09 มีนาคม 2569</span></p></div>
   <div class="sec-title">🏆 Key Performance Indicators</div>
   <div class="g4">
-    <div class="kpi ac"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Net Revenue</div><div class="kpi-val ac">฿428,079</div><div class="kpi-sub">รายได้สุทธิรวม 9 วัน</div></div>
-    <div class="kpi g"><div class="kpi-ico">🧾</div><div class="kpi-lbl">Total Bills</div><div class="kpi-val gc">2,639</div><div class="kpi-sub">เฉลี่ย 293 บิล/วัน</div></div>
-    <div class="kpi b"><div class="kpi-ico">📦</div><div class="kpi-lbl">Total Items Sold</div><div class="kpi-val bc">4,322</div><div class="kpi-sub">เฉลี่ย 480 ชิ้น/วัน</div></div>
-    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div class="kpi-val pc">฿162</div><div class="kpi-sub">มูลค่าเฉลี่ยต่อบิล</div></div>
+    <div class="kpi ac"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Net Revenue</div><div id="kpi-net" class="kpi-val ac">฿428,079</div><div id="kpi-net-sub" class="kpi-sub">รายได้สุทธิรวม 9 วัน</div></div>
+    <div class="kpi g"><div class="kpi-ico">🧾</div><div class="kpi-lbl">Total Bills</div><div id="kpi-bills" class="kpi-val gc">2,639</div><div id="kpi-bills-sub" class="kpi-sub">เฉลี่ย 293 บิล/วัน</div></div>
+    <div class="kpi b"><div class="kpi-ico">📦</div><div class="kpi-lbl">Total Items Sold</div><div id="kpi-items" class="kpi-val bc">4,322</div><div id="kpi-items-sub" class="kpi-sub">เฉลี่ย 480 ชิ้น/วัน</div></div>
+    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div id="kpi-abv" class="kpi-val pc">฿162</div><div class="kpi-sub">มูลค่าเฉลี่ยต่อบิล</div></div>
   </div>
   <div class="g4 mb">
-    <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Promo Discount</div><div class="kpi-val rc">฿171,343</div><div class="kpi-sub">ส่วนลดจากโปรโมชั่นทั้งหมด</div></div>
-    <div class="kpi"><div class="kpi-ico">📉</div><div class="kpi-lbl">Gross Revenue (Pre-discount)</div><div class="kpi-val" style="color:var(--cyan)">฿599,422</div><div class="kpi-sub">ยอดก่อนหักส่วนลดโปรโมชั่น</div></div>
+    <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Promo Discount</div><div id="kpi-disc" class="kpi-val rc">฿171,343</div><div class="kpi-sub">ส่วนลดจากโปรโมชั่นทั้งหมด</div></div>
+    <div class="kpi"><div class="kpi-ico">📉</div><div class="kpi-lbl">Gross Revenue (Pre-discount)</div><div id="kpi-gross" class="kpi-val" style="color:var(--cyan)">฿599,422</div><div class="kpi-sub">ยอดก่อนหักส่วนลดโปรโมชั่น</div></div>
     <div class="kpi"><div class="kpi-ico">⏰</div><div class="kpi-lbl">Peak Hour</div><div class="kpi-val">21:00</div><div class="kpi-sub">฿192,811 · 45% ของยอดรวม</div></div>
     <div class="kpi g"><div class="kpi-ico">👑</div><div class="kpi-lbl">Top Category</div><div class="kpi-val gc" style="font-size:16px">Sushi Bento</div><div class="kpi-sub">฿272,950 · 63.8% ของยอดรวม</div></div>
   </div>
@@ -297,7 +297,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
 <!-- ══════════ DOW ══════════ -->
 <div id="page-dow" class="page">
-  <div class="ph"><h1>📅 Day-of-Week Analysis</h1><p>วิเคราะห์ผลงานตามวันในสัปดาห์ · 01–09 มีนาคม 2569</p></div>
+  <div class="ph"><h1>📅 Day-of-Week Analysis</h1><p>วิเคราะห์ผลงานตามวันในสัปดาห์ · <span id="dow-period">01–09 มีนาคม 2569</span></p></div>
   <div class="g4" id="dow-kpis"></div>
   <div class="card mb">
     <div class="ct">ยอดขายสุทธิและจำนวนบิลตามวัน</div>
@@ -491,7 +491,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   <div class="g4 mb">
     <div class="kpi"><div class="kpi-lbl">Multi-Category Bills</div><div class="kpi-val" style="color:var(--cyan)">332</div><div class="kpi-sub">12.6% ของบิลทั้งหมด</div></div>
     <div class="kpi g"><div class="kpi-lbl">Single-Category Bills</div><div class="kpi-val gc">2,307</div><div class="kpi-sub">87.4% ของบิลทั้งหมด</div></div>
-    <div class="kpi ac"><div class="kpi-lbl">Top Combo Revenue</div><div class="kpi-val ac">฿115,115</div><div class="kpi-sub">Donburi + Sushi Bento</div></div>
+    <div class="kpi ac"><div class="kpi-lbl">Top Combo Revenue</div><div id="kpi-peak-rev" class="kpi-val ac">฿115,115</div><div class="kpi-sub">Donburi + Sushi Bento</div></div>
     <div class="kpi p"><div class="kpi-lbl">Avg Items per Bill</div><div class="kpi-val pc">1.64</div><div class="kpi-sub">ชิ้นเฉลี่ยต่อบิล</div></div>
   </div>
 
@@ -616,44 +616,46 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 <!-- ══════════ UPLOAD ══════════ -->
 <div id="page-upload" class="page">
   <div style="max-width:640px;margin:30px auto">
-    <div class="ph"><h1>📤 Upload Data Files</h1><p>อัพโหลดไฟล์ Excel เพื่ออัพเดทข้อมูล Dashboard</p></div>
+    <div class="ph"><h1>📤 Upload Data Files</h1><p>อัพโหลดไฟล์ Excel — ข้อมูลจะอัพเดทใน Dashboard ทันที · <span style="color:var(--accent);font-size:11px">v3.0 — fixed column detection</span></p></div>
     <div class="upcard">
       <h3>📋 ไฟล์ที่ 1 — รายงานยอดขายแยกตามสินค้า</h3>
-      <p>ชื่อไฟล์: <code style="background:var(--surface3);padding:2px 6px;border-radius:4px;font-family:var(--font-m);font-size:10px">รายงานยอดขาย___รายงานยอดขายแยกตามส_นค_า.xlsx</code></p>
-      <div class="drop" id="d1" onclick="document.getElementById('f1').click()">
-        <input type="file" id="f1" accept=".xlsx" onchange="handleF(event,1)">
+      <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า</p>
+      <label class="drop" id="d1" for="f1" style="cursor:pointer;display:block">
+        <input type="file" id="f1" accept=".xlsx" style="display:none">
         <div class="drop-ico">📁</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
-      </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
+      </label>
       <div id="st1"></div>
     </div>
     <div class="upcard">
       <h3>🎟️ ไฟล์ที่ 2 — รายงานสรุปการใช้โปรโมชั่นแยกตามวันที่</h3>
-      <p>ชื่อไฟล์: <code style="background:var(--surface3);padding:2px 6px;border-radius:4px;font-family:var(--font-m);font-size:10px">รายงานสร_ปการใช_โปรโมช__นแยกตามว_นท__.xlsx</code></p>
-      <div class="drop" id="d2" onclick="document.getElementById('f2').click()">
-        <input type="file" id="f2" accept=".xlsx" onchange="handleF(event,2)">
-        <div class="drop-ico">📁</div>
+      <p>รองรับไฟล์ Excel (.xlsx) รายงานสรุปการใช้โปรโมชั่น</p>
+      <label class="drop" id="d2" for="f2" style="cursor:pointer;display:block">
+        <input type="file" id="f2" accept=".xlsx" style="display:none">
+        <div class="drop-ico">🎟️</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
-      </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
+      </label>
       <div id="st2"></div>
     </div>
-    <button class="proc-btn" id="proc-btn" disabled onclick="processFiles()">⚡ ประมวลผลและอัพเดท Dashboard</button>
+    <button class="proc-btn" id="proc-btn" disabled>⚡ ประมวลผลและอัพเดท Dashboard</button>
     <div id="up-result" style="margin-top:10px"></div>
   </div>
 </div>
 
   </div><!-- /content -->
 </div><!-- /main -->
-<script>
+<script id="main-script" data-ver="1773114702">
 // ══════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════
 const DAILY=[
-  {date:"01/03/2026",net:51040,qty:455,bills:272,gross:71645,discount:20605},
-  {date:"02/03/2026",net:54472,qty:467,bills:277,gross:78303,discount:23831},
+  {date:"01/03/2026",net:51040,qty:455,bills:272,gross:71644,discount:20604},
+  {date:"02/03/2026",net:54472,qty:467,bills:277,gross:78302,discount:23830},
   {date:"03/03/2026",net:37968,qty:404,bills:232,gross:51552,discount:13584},
   {date:"04/03/2026",net:48943,qty:509,bills:310,gross:68845,discount:19902},
-  {date:"05/03/2026",net:49974,qty:444,bills:258,gross:75272,discount:25298},
+  {date:"05/03/2026",net:49974,qty:444,bills:258,gross:75271,discount:25297},
   {date:"06/03/2026",net:48061,qty:581,bills:358,gross:66843,discount:18782},
   {date:"07/03/2026",net:41495,qty:410,bills:272,gross:59532,discount:18037},
   {date:"08/03/2026",net:46934,qty:508,bills:298,gross:62519,discount:15585},
@@ -667,16 +669,29 @@ const CATS=[
   {cat:"Appetizer",net:4545,qty:66,color:"#f0a500"}
 ];
 const HOURS=[
-  {h:5,net:3854,qty:92},{h:6,net:7883,qty:187},{h:7,net:6581,qty:164},{h:8,net:4473,qty:141},
-  {h:9,net:8030,qty:177},{h:10,net:9306,qty:193},{h:11,net:11763,qty:226},{h:12,net:15438,qty:274},
-  {h:13,net:18722,qty:284},{h:14,net:15497,qty:251},{h:15,net:15887,qty:317},{h:16,net:15725,qty:303},
-  {h:17,net:14939,qty:256},{h:18,net:14020,qty:218},{h:19,net:3058,qty:81},
-  {h:20,net:69933,qty:362},{h:21,net:192811,qty:792},{h:22,net:159,qty:4}
+  {h:5,net:3854,qty:92},
+  {h:6,net:7883,qty:187},
+  {h:7,net:6581,qty:164},
+  {h:8,net:4473,qty:141},
+  {h:9,net:8030,qty:177},
+  {h:10,net:9306,qty:193},
+  {h:11,net:11763,qty:226},
+  {h:12,net:15438,qty:274},
+  {h:13,net:18722,qty:284},
+  {h:14,net:15497,qty:251},
+  {h:15,net:15887,qty:317},
+  {h:16,net:15725,qty:303},
+  {h:17,net:14939,qty:256},
+  {h:18,net:14020,qty:218},
+  {h:19,net:3058,qty:81},
+  {h:20,net:69933,qty:362},
+  {h:21,net:192811,qty:792},
+  {h:22,net:159,qty:4}
 ];
 const HM_SALES={
-  "01/03":[ 0,1025,564,660,580,1085,1439,2325,2273,1970,1400,2400,3743,1677,448,0,29451,0],
+  "01/03":[0,1025,564,660,580,1085,1439,2325,2273,1970,1400,2400,3743,1677,448,0,29451,0],
   "02/03":[915,1638,569,360,880,370,395,1384,790,1033,2800,2607,1815,2435,234,5455,30792,0],
-  "03/03":[ 20,130,300,859,1000,1075,160,1245,3780,3798,704,1120,909,1900,78,4860,16030,0],
+  "03/03":[20,130,300,859,1000,1075,160,1245,3780,3798,704,1120,909,1900,78,4860,16030,0],
   "04/03":[158,740,345,160,435,420,1032,2690,480,1445,1868,2847,2410,475,69,14235,19134,0],
   "05/03":[369,885,670,160,579,860,1375,820,735,1576,1874,967,618,307,500,6237,31442,0],
   "06/03":[540,1225,850,625,915,1684,3465,1289,2498,1215,1224,827,900,2077,434,7283,21010,0],
@@ -686,36 +701,40 @@ const HM_SALES={
 };
 const CAT_HOUR={
   "Sushi Bento":[2075,2850,1880,1395,3950,2665,5070,6830,9030,7065,6115,7070,6690,6110,915,60205,143035,0],
-  "Donburi":    [565,3055,2480,1260,1845,3465,2840,4395,4395,4145,4135,3905,4310,2275,430,7985,47530,0],
-  "Beverage":   [880,1800,1870,1690,1730,2500,3330,3690,3610,3300,4100,3120,2800,4030,1050,1250,250,0],
-  "Dessert":    [234,178,351,128,245,351,373,423,997,657,1097,1425,1019,1125,663,323,941,39],
-  "Appetizer":  [100,0,0,0,260,325,150,100,690,330,440,205,120,480,0,170,1055,120]
+  "Donburi":[565,3055,2480,1260,1845,3465,2840,4395,4395,4145,4135,3905,4310,2275,430,7985,47530,0],
+  "Beverage":[880,1800,1870,1690,1730,2500,3330,3690,3610,3300,4100,3120,2800,4030,1050,1250,250,0],
+  "Dessert":[234,178,351,128,245,351,373,423,997,657,1097,1425,1019,1125,663,323,941,39],
+  "Appetizer":[100,0,0,0,260,325,150,100,690,330,440,205,120,480,0,170,1055,120]
 };
 const PROMO_DATA=[
-  {code:"PM2602-0001",name:"Staff Discount 10%",date:"03-02",count:1,sales:200,discount:20,net:200},
-  {code:"PM2602-0004",name:"Flash Sale 20:00-21:00",date:"03-02",count:9,sales:4515,discount:2230,net:4495},
-  {code:"PM2602-0004",name:"Flash Sale 20:00-21:00",date:"03-03",count:9,sales:4860,discount:2360,net:2630},
-  {code:"PM2602-0004",name:"Flash Sale 20:00-21:00",date:"03-04",count:23,sales:13185,discount:6175,net:10825},
-  {code:"PM2602-0004",name:"Flash Sale 20:00-21:00",date:"03-05",count:17,sales:7460,discount:3480,net:4465},
-  {code:"PM2602-0004",name:"Flash Sale 20:00-21:00",date:"03-06",count:30,sales:19580,discount:8500,net:11210},
-  {code:"PM2602-0004",name:"Flash Sale 20:00-21:00",date:"03-08",count:9,sales:5095,discount:2270,net:4660},
-  {code:"PM2602-0004",name:"Flash Sale 20:00-21:00",date:"03-09",count:9,sales:5510,discount:2500,net:4995},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-01",count:48,sales:31170,discount:24600,net:15295},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-02",count:43,sales:28125,discount:22165,net:13345},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-03",count:30,sales:18520,discount:14270,net:8895},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-04",count:45,sales:30340,discount:24620,net:14855},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-05",count:42,sales:27365,discount:21500,net:12940},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-06",count:43,sales:29500,discount:21500,net:13645},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-07",count:30,sales:19840,discount:13630,net:8330},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-08",count:22,sales:19350,discount:14320,net:8240},
-  {code:"PM2602-0005",name:"Flash Sale 21:00-22:00",date:"03-09",count:20,sales:20700,discount:14497,net:8980},
-  {code:"PM2602/0002",name:"Staff Discount 15%",date:"03-02",count:1,sales:200,discount:30,net:200},
-  {code:"PM2602/0002",name:"Staff Discount 15%",date:"03-05",count:8,sales:1820,discount:273,net:1678},
-  {code:"PM2602/0002",name:"Staff Discount 15%",date:"03-06",count:8,sales:1940,discount:291,net:1789},
-  {code:"PM2602/0002",name:"Staff Discount 15%",date:"03-07",count:8,sales:1780,discount:267,net:1640},
-  {code:"PM2602/0002",name:"Staff Discount 15%",date:"03-08",count:8,sales:1750,discount:262.5,net:1612.5},
-  {code:"PM2602/0002",name:"Staff Discount 15%",date:"03-09",count:4,sales:885,discount:132.75,net:822.75},
-  {code:"PM2602/0003",name:"Partners Discount 20%",date:"03-06",count:1,sales:440,discount:88,net:307.25}
+  {name:"Staff Discount 10%",date:"02/03/2026",count:1,sales:200.0,discount:20.0,net:200.0},
+  {name:"Flash Sale 20.00-21.00",date:"02/03/2026",count:9,sales:4515.0,discount:2230.0,net:4495.0},
+  {name:"Flash Sale 20.00-21.00",date:"03/03/2026",count:9,sales:4860.0,discount:2360.0,net:2630.0},
+  {name:"Flash Sale 20.00-21.00",date:"04/03/2026",count:23,sales:13185.0,discount:6175.0,net:10825.0},
+  {name:"Flash Sale 20.00-21.00",date:"05/03/2026",count:7,sales:3550.0,discount:1705.0,net:0.0},
+  {name:"Flash Sale 20.00-21.00",date:"06/03/2026",count:8,sales:3485.0,discount:1705.0,net:1780.0},
+  {name:"Flash Sale 20.00-21.00",date:"07/03/2026",count:5,sales:2865.0,discount:1400.0,net:1160.0},
+  {name:"Flash Sale 20.00-21.00",date:"08/03/2026",count:17,sales:8810.0,discount:4260.0,net:7410.0},
+  {name:"Flash Sale 20.00-21.00",date:"09/03/2026",count:10,sales:4800.0,discount:2310.0,net:540.0},
+  {name:"Flash Sale 21.00-22.00",date:"01/03/2026",count:43,sales:29065.0,discount:20345.5,net:26755.0},
+  {name:"Flash Sale 21.00-22.00",date:"02/03/2026",count:46,sales:30535.0,discount:21374.5,net:10189.5},
+  {name:"Flash Sale 21.00-22.00",date:"03/03/2026",count:15,sales:15515.0,discount:10860.5,net:0.0},
+  {name:"Flash Sale 21.00-22.00",date:"04/03/2026",count:29,sales:19095.0,discount:13366.5,net:8234.5},
+  {name:"Flash Sale 21.00-22.00",date:"05/03/2026",count:44,sales:33195.0,discount:23236.5,net:19828.5},
+  {name:"Flash Sale 21.00-22.00",date:"06/03/2026",count:32,sales:24100.0,discount:16870.0,net:863.5},
+  {name:"Flash Sale 21.00-22.00",date:"07/03/2026",count:41,sales:23585.0,discount:16509.5,net:6715.0},
+  {name:"Flash Sale 21.00-22.00",date:"08/03/2026",count:23,sales:16090.0,discount:11263.0,net:0.0},
+  {name:"Flash Sale 21.00-22.00",date:"09/03/2026",count:30,sales:18965.0,discount:13275.5,net:7702.0},
+  {name:"Staff Discount 15%",date:"01/03/2026",count:8,sales:1729.0,discount:259.35,net:0.0},
+  {name:"Staff Discount 15%",date:"02/03/2026",count:7,sales:1375.0,discount:206.25,net:1115.65},
+  {name:"Staff Discount 15%",date:"03/03/2026",count:7,sales:2425.0,discount:363.75,net:2218.75},
+  {name:"Staff Discount 15%",date:"04/03/2026",count:8,sales:2405.0,discount:360.75,net:2041.25},
+  {name:"Staff Discount 15%",date:"05/03/2026",count:9,sales:2385.0,discount:356.25,net:2024.25},
+  {name:"Staff Discount 15%",date:"06/03/2026",count:4,sales:795.0,discount:119.25,net:438.75},
+  {name:"Staff Discount 15%",date:"07/03/2026",count:3,sales:850.0,discount:127.5,net:730.75},
+  {name:"Staff Discount 15%",date:"08/03/2026",count:3,sales:415.0,discount:62.25,net:287.5},
+  {name:"Staff Discount 15%",date:"09/03/2026",count:4,sales:885.0,discount:132.75,net:822.75},
+  {name:"Partners Discount @NIGIBEN DIS 20%",date:"06/03/2026",count:1,sales:440.0,discount:88.0,net:307.25}
 ];
 const PRODUCTS=[
   {p:"MINI001 / Salmon Sushi 7 pcs.",c:"Sushi Bento",net:37800,qty:180,bills:127},
@@ -723,62 +742,61 @@ const PRODUCTS=[
   {p:"MINI004 / Salmon Varity Set S",c:"Sushi Bento",net:21400,qty:107,bills:93},
   {p:"MINI014 / Sushi Moriawase Set",c:"Sushi Bento",net:19580,qty:89,bills:79},
   {p:"MINI011 / Sushi Bento 2 Friends",c:"Sushi Bento",net:15190,qty:62,bills:47},
-  {p:"MINI005 / Tuna Varity Set S",c:"Sushi Bento",net:14850,qty:54,bills:40},
-  {p:"MINI002 / Salmon Aburi Sushi 7 pcs.",c:"Sushi Bento",net:14030,qty:61,bills:46},
-  {p:"BEV006 / Namthip Drinking Water 550ml",c:"Beverage",net:13540,qty:1306,bills:993},
-  {p:"DON004 / Salmon Don",c:"Donburi",net:13020,qty:62,bills:57},
-  {p:"MINI009 / Sushi Bento Super Maki S",c:"Sushi Bento",net:13000,qty:65,bills:57},
-  {p:"DON011 / Chirashi Don",c:"Donburi",net:12710,qty:41,bills:38},
-  {p:"MINI010 / Sushi Bento Salmon 2 Tone",c:"Sushi Bento",net:12100,qty:55,bills:48},
-  {p:"MINI012 / Sushi Bento Aburi Set",c:"Sushi Bento",net:11550,qty:42,bills:36},
-  {p:"MED004 / Sushi Bento Sashimi Varity",c:"Sushi Bento",net:11340,qty:27,bills:25},
-  {p:"MED003 / Salmon Varity Set M",c:"Sushi Bento",net:10395,qty:27,bills:23},
-  {p:"DON002 / Gyu Don",c:"Donburi",net:9310,qty:53,bills:50},
-  {p:"DON001 / Oyakodon",c:"Donburi",net:9235,qty:71,bills:63},
-  {p:"DON005 / Aburi Salmon Don",c:"Donburi",net:8530,qty:41,bills:37},
-  {p:"DON008 / Tori Teriyaki Don",c:"Donburi",net:7410,qty:57,bills:48},
-  {p:"MED002 / Tuna Varity Set M",c:"Sushi Bento",net:7200,qty:18,bills:17},
-  {p:"MINI003 / Tuna Sushi 7 pcs.",c:"Sushi Bento",net:7150,qty:26,bills:24},
-  {p:"DES007 / Matcha Chocolate Warabi Mochi",c:"Dessert",net:7095,qty:131,bills:97},
-  {p:"DON003 / Salmon Shoyu Don",c:"Donburi",net:6825,qty:35,bills:31},
-  {p:"DON007 / Tobiko Salmon Don",c:"Donburi",net:6720,qty:24,bills:22},
-  {p:"MED001 / Salmon Varity Set L",c:"Sushi Bento",net:6660,qty:12,bills:12},
-  {p:"DON006 / Aburi Tuna Don",c:"Donburi",net:6590,qty:31,bills:28},
-  {p:"DON009 / Pork Yakiniku Don",c:"Donburi",net:6435,qty:43,bills:38},
-  {p:"DON010 / Chicken Karaage Don",c:"Donburi",net:5960,qty:37,bills:34},
-  {p:"MINI007 / California Sushi Bento",c:"Sushi Bento",net:5915,qty:29,bills:25},
-  {p:"BEV007 / Green Tea Bottle 500ml",c:"Beverage",net:5760,qty:576,bills:485},
-  {p:"MINI008 / Sushi Bento Veggie 2",c:"Sushi Bento",net:5610,qty:34,bills:28},
-  {p:"BEV005 / Heineken Can 330ml",c:"Beverage",net:3600,qty:40,bills:38},
-  {p:"MINI006 / Salmon Varity Set S Mini",c:"Sushi Bento",net:4430,qty:19,bills:17},
-  {p:"BEV008 / Orange Juice Bottle 350ml",c:"Beverage",net:4150,qty:415,bills:360},
-  {p:"MINI015 / Tuna Sushi Bento Set",c:"Sushi Bento",net:3860,qty:16,bills:14},
-  {p:"APP003 / Chicken Karaage",c:"Appetizer",net:3520,qty:32,bills:29},
-  {p:"DON013 / Spicy Salmon Don",c:"Donburi",net:3025,qty:11,bills:10},
-  {p:"DES006 / Matcha Warabi Mochi",c:"Dessert",net:2940,qty:84,bills:72},
-  {p:"BEV001 / Singha Beer Can 320ml",c:"Beverage",net:2700,qty:30,bills:29},
-  {p:"DON012 / Tonkatsu Curry Don",c:"Donburi",net:2700,qty:15,bills:15},
-  {p:"BEV009 / ITOEN Jasmine Green Tea 500ml",c:"Beverage",net:2610,qty:26,bills:24},
-  {p:"BEV002 / Asahi Beer Can 330ml",c:"Beverage",net:2610,qty:29,bills:27},
-  {p:"BEV004 / Sapporo Beer Can 350ml",c:"Beverage",net:2880,qty:32,bills:30},
-  {p:"BEV010 / Sparkling Water 350ml",c:"Beverage",net:1500,qty:150,bills:130},
-  {p:"BEV003 / Kirin Beer Can 350ml",c:"Beverage",net:3150,qty:35,bills:34},
-  {p:"BEV004 / Pepsi Max Can 325ml",c:"Beverage",net:1170,qty:39,bills:35},
-  {p:"APP003 / Salmon Tataki",c:"Appetizer",net:1260,qty:9,bills:8},
+  {p:"MINI005 / Tuna Varity Set S",c:"Sushi Bento",net:14850,qty:54,bills:46},
+  {p:"MINI002 / Salmon Aburi Sushi 7 pcs.",c:"Sushi Bento",net:14030,qty:61,bills:44},
+  {p:"BEV006 / Namthip Drinking Water (Bottle) 550 ml.",c:"Beverage",net:13540,qty:1306,bills:1038},
+  {p:"DON004 / Salmon Don",c:"Donburi",net:13020,qty:62,bills:60},
+  {p:"MINI009 / Sushi Bento Super Maki S",c:"Sushi Bento",net:13000,qty:65,bills:52},
+  {p:"DON011 / Chirashi Don",c:"Donburi",net:12710,qty:41,bills:37},
+  {p:"MINI010 / Sushi Bento Salmon 2 Tone",c:"Sushi Bento",net:12100,qty:55,bills:43},
+  {p:"MINI012 / Sushi Bento Aburi Set",c:"Sushi Bento",net:11550,qty:42,bills:37},
+  {p:"MED004 / Sushi Bento Sashimi Varity",c:"Sushi Bento",net:11340,qty:27,bills:26},
+  {p:"MED003 / Salmon Varity Set  M",c:"Sushi Bento",net:10395,qty:27,bills:26},
+  {p:"MED006 / Sushi Bento Varity Aburi Rolls Set",c:"Sushi Bento",net:10010,qty:26,bills:25},
+  {p:"DON003 / Poke Bowl",c:"Donburi",net:9900,qty:36,bills:36},
+  {p:"MED002 / Sushi Bento Medium Set 2",c:"Sushi Bento",net:9240,qty:22,bills:19},
+  {p:"BEV005 / Sprite (Can) 325ml.",c:"Beverage",net:8930,qty:871,bills:670},
+  {p:"DON009 / Unagi Don",c:"Donburi",net:8085,qty:21,bills:21},
+  {p:"DON014 / Negi Salmon Don",c:"Donburi",net:7980,qty:38,bills:37},
+  {p:"DON005 / Aburi Salmon Don",c:"Donburi",net:7700,qty:35,bills:33},
+  {p:"DON015 / Salmon Teriyaki Don",c:"Donburi",net:7500,qty:30,bills:27},
+  {p:"MED009 / Tuna Varity Set M",c:"Sushi Bento",net:7140,qty:17,bills:17},
+  {p:"MINI006 / Sushi Bento Small Set 1",c:"Sushi Bento",net:6800,qty:34,bills:32},
+  {p:"BEV001 / Singha Beer (Can) 320 ml.",c:"Beverage",net:6660,qty:74,bills:45},
+  {p:"MED001 / Sushi Bento Medium Set 1",c:"Sushi Bento",net:6545,qty:17,bills:16},
+  {p:"MED007 / Sushi Bento Mori Set",c:"Sushi Bento",net:6200,qty:20,bills:20},
+  {p:"MINI003 / Tuna Sushi 7 pcs.",c:"Sushi Bento",net:5775,qty:21,bills:15},
+  {p:"MED008 / Sushi Bento Super Maki Set M",c:"Sushi Bento",net:5760,qty:24,bills:23},
+  {p:"MINI007 / Sushi Bento Veggie 1",c:"Sushi Bento",net:4900,qty:28,bills:27},
+  {p:"DON012 / Tonkatsu Curry Don",c:"Donburi",net:4770,qty:18,bills:18},
+  {p:"DON002 / Gyu Don",c:"Donburi",net:4620,qty:22,bills:20},
+  {p:"DON006 / Saba Teriyaki Don",c:"Donburi",net:4495,qty:29,bills:26},
+  {p:"MINI008 / Sushi Bento  Veggie 2",c:"Sushi Bento",net:4455,qty:27,bills:24},
+  {p:"DON013 / Torikatsu Curry Don",c:"Donburi",net:4320,qty:18,bills:18},
+  {p:"BEV002 / Asahi Beer (Can) 330 ml.",c:"Beverage",net:4140,qty:46,bills:30},
+  {p:"DON007 / Buta Teriyaki Don",c:"Donburi",net:4060,qty:28,bills:24},
+  {p:"DON010 / Buta Kimchi Don",c:"Donburi",net:3915,qty:27,bills:26},
+  {p:"DES003 / Matcha Red Bean Daifuku",c:"Dessert",net:3432,qty:88,bills:68},
+  {p:"DES002 / Yuzu Daifuku",c:"Dessert",net:3081,qty:79,bills:57},
+  {p:"DON001 / Oyakodon",c:"Donburi",net:3080,qty:22,bills:21},
+  {p:"DON008 / Tori Teriyaki Don",c:"Donburi",net:2860,qty:22,bills:18},
+  {p:"BEV007 / Hakutsuru Nama Sake (Bottle) 300 ml.",c:"Beverage",net:2500,qty:23,bills:19},
+  {p:"DES001 / Rare Cheese Daifuku",c:"Dessert",net:2106,qty:54,bills:49},
+  {p:"DES004 / Dorayaki",c:"Dessert",net:1950,qty:39,bills:35},
+  {p:"MED005 / Sushi Bento Super Rolls Set",c:"Sushi Bento",net:1860,qty:6,bills:4},
+  {p:"MED010 / Spicy Sushi Bento Set",c:"Sushi Bento",net:1590,qty:6,bills:5},
+  {p:"BEV003 / Pepsi (Can) 325ml.",c:"Beverage",net:1380,qty:46,bills:43},
+  {p:"BEV008 / ITOEN Unsweetened Green Tea (Bottle) 500 ml.",c:"Beverage",net:1380,qty:32,bills:30},
+  {p:"BEV009 / ITOEN Elegant Jasmine Green Tea (Bottle) 500 ml.",c:"Beverage",net:1300,qty:26,bills:23},
+  {p:"APP003 / Salmon Tataki",c:"Appetizer",net:1260,qty:9,bills:9},
+  {p:"BEV004 / Pepsi Max (Can) 325ml.",c:"Beverage",net:1170,qty:39,bills:34},
   {p:"APP001 / Chuka Wakame",c:"Appetizer",net:600,qty:15,bills:13},
-  {p:"APP007 / Kimchi",c:"Appetizer",net:540,qty:9,bills:8},
   {p:"APP005 / Tako Wasabi",c:"Appetizer",net:550,qty:5,bills:5},
-  {p:"APP004 / Kani Tataki",c:"Appetizer",net:440,qty:4,bills:4},
-  {p:"APP002 / Edamame",c:"Appetizer",net:440,qty:11,bills:10},
-  {p:"APP006 / Chuka Iidako",c:"Appetizer",net:220,qty:2,bills:2},
-  {p:"DES008 / Matcha Latte Warabi Mochi",c:"Dessert",net:2900,qty:29,bills:25},
-  {p:"DES005 / Warabi Mochi Original",c:"Dessert",net:390,qty:4,bills:4},
-  {p:"DES001 / Mochi Ice Cream Matcha",c:"Dessert",net:215,qty:5,bills:5},
-  {p:"DES002 / Mochi Ice Cream Strawberry",c:"Dessert",net:137,qty:4,bills:4},
-  {p:"DES003 / Mochi Ice Cream Mango",c:"Dessert",net:60,qty:2,bills:2},
-  {p:"DES004 / Mochi Ice Cream Blueberry",c:"Dessert",net:30,qty:1,bills:1},
-  {p:"SOU001 / Miso Soup",c:"Appetizer",net:495,qty:11,bills:10},
-  {p:"MED005 / Sashimi Varity Set M",c:"Sushi Bento",net:0,qty:0,bills:0}
+  {p:"APP007 / Kimchi",c:"Appetizer",net:540,qty:9,bills:9},
+  {p:"SOU001 / Miso Soup",c:"Appetizer",net:495,qty:11,bills:11},
+  {p:"APP002 / Edamame",c:"Appetizer",net:440,qty:11,bills:11},
+  {p:"APP004 / Kani Tataki",c:"Appetizer",net:440,qty:4,bills:3},
+  {p:"APP006 / Chuka Iidako",c:"Appetizer",net:220,qty:2,bills:2}
 ];
 // Product by date (sampled data for daily view)
 const PROD_BY_DATE = {
@@ -793,7 +811,8 @@ const PROD_BY_DATE = {
   "09/03/2026":{"MINI001 / Salmon Sushi 7 pcs.":{net:4200,qty:20,cat:"Sushi Bento"},"DON002 / Gyu Don":{net:1320,qty:8,cat:"Donburi"},"BEV006 / Namthip Drinking Water 550ml":{net:1820,qty:175,cat:"Beverage"},"MINI004 / Salmon Varity Set S":{net:2200,qty:11,cat:"Sushi Bento"},"DES007 / Matcha Chocolate Warabi Mochi":{net:432,qty:8,cat:"Dessert"}}
 };
 const DOW_MAP={"01/03/2026":"Sun","02/03/2026":"Mon","03/03/2026":"Tue","04/03/2026":"Wed","05/03/2026":"Thu","06/03/2026":"Fri","07/03/2026":"Sat","08/03/2026":"Sun","09/03/2026":"Mon"};
-const TOTAL_NET=428079,TOTAL_BILLS=2639;
+var TOTAL_NET=428079,TOTAL_BILLS=2639;
+var BASKET_DIST=[700,1031,215,130,117,181,100,165]; // bill count per range <50,50-99,100-149...
 
 // ══════════ UTILS ══════════
 const f=n=>'฿'+Math.round(n).toLocaleString();
@@ -811,19 +830,99 @@ function nav(p){
   document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll(`[data-page="${p}"]`).forEach(e=>e.classList.add('active'));
   document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
-  const pg=document.getElementById('page-'+p);if(pg)pg.classList.add('active');
+  const pg=document.getElementById('page-'+p);
+  if(pg){
+    pg.classList.add('active');
+    // Force layout recalc so canvas gets proper dimensions
+    pg.style.display='block';
+    void pg.offsetHeight; // trigger reflow
+  }
   document.getElementById('tb-title').textContent=document.querySelector(`[data-page="${p}"]`)?.textContent?.trim()||p;
+  // Resize any visible charts immediately after nav
+  setTimeout(()=>Object.values(CHARTS).forEach(c=>{try{c.resize();}catch(e){}}),30);
 }
 document.querySelectorAll('.nav-item[data-page]').forEach(e=>e.addEventListener('click',()=>nav(e.dataset.page)));
 document.getElementById('tb-date').textContent=new Date().toLocaleDateString('th-TH',{dateStyle:'long'});
 
+// ══════════ CHART REGISTRY ══════════
+// Store all Chart.js instances so we can update data in-place on reload
+
+
+// ══════════ CHART REGISTRY ══════════
+var CHARTS=CHARTS||{};
+function mkChart(id, config){
+  // Destroy existing instance
+  const existing=CHARTS[id];
+  if(existing){try{existing.destroy();}catch(e){}}
+  delete CHARTS[id];
+  // Replace canvas element entirely to wipe all Chart.js internal state
+  const oldCanvas=document.getElementById(id);
+  if(!oldCanvas){console.warn('canvas missing:',id);return null;}
+  const newCanvas=document.createElement('canvas');
+  newCanvas.id=id;
+  oldCanvas.parentNode.replaceChild(newCanvas,oldCanvas);
+  // Create fresh chart on clean canvas
+  try{
+    const c=new Chart(newCanvas,config);
+    CHARTS[id]=c;
+    return c;
+  }catch(e){
+    console.error('mkChart failed',id,e.message);
+    return null;
+  }
+}
+
 // ══════════ OVERVIEW ══════════
 function buildOverview(){
+  // Update KPI cards with current data
+  const days=DAILY.length||1;
+  const totalItems=PRODUCTS.reduce((s,p)=>s+p.qty,0);
+  const totalDisc=DAILY.reduce((s,d)=>s+(d.discount||0),0);
+  const totalGross=DAILY.reduce((s,d)=>s+(d.gross||d.net),0);
+  const set=el=>v=>{ const e=document.getElementById(el); if(e) e.textContent=v; };
+  set('kpi-net')('฿'+TOTAL_NET.toLocaleString());
+  set('kpi-net-sub')(('รายได้สุทธิรวม '+days+' วัน'));
+  set('kpi-bills')(TOTAL_BILLS.toLocaleString());
+  set('kpi-bills-sub')('เฉลี่ย '+Math.round(TOTAL_BILLS/days)+' บิล/วัน');
+  set('kpi-items')(totalItems.toLocaleString());
+  set('kpi-items-sub')('เฉลี่ย '+Math.round(totalItems/days)+' ชิ้น/วัน');
+  set('kpi-abv')('฿'+Math.round(TOTAL_NET/TOTAL_BILLS));
+  set('kpi-disc')('฿'+Math.round(totalDisc).toLocaleString());
+  set('kpi-gross')('฿'+Math.round(totalGross).toLocaleString());
+  // Update all period labels
+  if(DAILY.length>0){
+    const first=DAILY[0].date.substring(0,5);
+    const last=DAILY[DAILY.length-1].date.substring(0,5);
+    const yr=DAILY[0].date.split('/')[2];
+    const parts=DAILY[0].date.split('/');
+    const monthNames=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthTH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const monthFullTH=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+    const mm=parseInt(parts[1]);
+    const thYr=parseInt(yr)+543;
+    // Sidebar: "01–06 Feb 2026"
+    const sidebarTxt=first.substring(0,2)+'–'+last.substring(0,2)+' '+monthNames[mm]+' '+yr;
+    // Thai subtitle: "23–28 กุมภาพันธ์ 2569"
+    const thaiTxt=first.substring(0,2)+'–'+last.substring(0,2)+' '+monthFullTH[mm]+' '+thYr;
+    const setEl=id=>txt=>{ const e=document.getElementById(id); if(e) e.textContent=txt; };
+    setEl('sidebar-period')(sidebarTxt);
+    setEl('ov-period')(thaiTxt);
+    setEl('dow-period')(thaiTxt);
+  }
+  // Update peak hour KPIs
+  if(HOURS.length>0){
+    const peak=HOURS.reduce((a,b)=>b.net>a.net?b:a,HOURS[0]);
+    const peakBills=DAILY.reduce((s,d)=>s+d.bills,0);
+    set('kpi-peak-h')(String(peak.h).padStart(2,'0')+':00');
+    set('kpi-peak-bills')(peakBills.toLocaleString());
+    set('kpi-peak-rev')('฿'+peak.net.toLocaleString());
+  }
+
   // Gross vs Net comparison
-  new Chart(document.getElementById('ch-daily-compare'),{
+  mkChart('ch-daily-compare',{
     type:'bar',
     data:{
-      labels:DAILY.map(d=>d.date.substring(0,5)+'('+DOW_MAP[d.date].substring(0,2)+')'),
+      labels:DAILY.map(d=>{ const dw=DOW_MAP[d.date]||''; return (d.date||'').substring(0,5)+(dw?'('+dw.substring(0,2)+')':''); }),
       datasets:[
         {label:'Gross (ก่อนหักส่วนลด)',data:DAILY.map(d=>d.gross),backgroundColor:'rgba(240,165,0,0.75)',borderRadius:4,borderSkipped:false},
         {label:'Net (หลังหักส่วนลด)',data:DAILY.map(d=>d.net),backgroundColor:'rgba(34,212,122,0.75)',borderRadius:4,borderSkipped:false},
@@ -838,7 +937,7 @@ function buildOverview(){
   });
 
   // Cat pie
-  new Chart(document.getElementById('ch-cat-pie'),{
+  mkChart('ch-cat-pie',{
     type:'doughnut',
     data:{labels:CATS.map(c=>c.cat),datasets:[{data:CATS.map(c=>c.net),backgroundColor:CATS.map(c=>c.color),borderWidth:0,hoverOffset:5}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
@@ -860,40 +959,84 @@ function buildOverview(){
 
 // ══════════ DOW ══════════
 function buildDOW(){
-  const order=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  // weekOrder เรียงจันทร์-อาทิตย์ คงที่ตลอด ไม่ mutate
+  const weekOrder=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const th={Sun:'อาทิตย์',Mon:'จันทร์',Tue:'อังคาร',Wed:'พุธ',Thu:'พฤหัส',Fri:'ศุกร์',Sat:'เสาร์'};
-  const agg={};order.forEach(d=>agg[d]={net:0,qty:0,bills:0,days:0});
-  DAILY.forEach(r=>{const d=DOW_MAP[r.date];if(d){agg[d].net+=r.net;agg[d].qty+=r.qty;agg[d].bills+=r.bills;agg[d].days++;}});
-  const clrs=order.map(d=>d==='Sat'||d==='Sun'?'rgba(240,165,0,0.8)':'rgba(61,155,224,0.7)');
-  const lbls=order.map(d=>`${d}(${th[d]})`);
-  const kpiEl=document.getElementById('dow-kpis');
-  order.sort((a,b)=>agg[b].net-agg[a].net).slice(0,4).forEach((d,i)=>{
-    const v=agg[d];const cs=['ac','g','b','p'];
-    kpiEl.innerHTML+=`<div class="kpi ${cs[i]}"><div class="kpi-lbl">${i+1}. Best Day</div><div class="kpi-val" style="font-size:17px">${th[d]}</div><div class="kpi-sub">${f(v.net)} · ${fn(v.bills)} บิล</div></div>`;
+
+  // รวมยอดตามวัน — ใช้ weekOrder เป็น base
+  const agg={};
+  weekOrder.forEach(d=>agg[d]={net:0,qty:0,bills:0,days:0});
+  DAILY.forEach(r=>{
+    const d=DOW_MAP[r.date]||'?';
+    if(!d||d==='?')return;
+    if(!agg[d])agg[d]={net:0,qty:0,bills:0,days:0};
+    agg[d].net+=r.net; agg[d].qty+=r.qty; agg[d].bills+=r.bills; agg[d].days++;
   });
-  new Chart(document.getElementById('ch-dow-rev'),{
-    type:'bar',data:{labels:order.map(d=>lbls[order.indexOf(d)]),datasets:[
-      {label:'Net Revenue',data:order.map(d=>agg[d].net),backgroundColor:order.map(d=>d==='Sat'||d==='Sun'?'rgba(240,165,0,0.8)':'rgba(61,155,224,0.7)'),borderRadius:4},
-      {label:'Bills',data:order.map(d=>agg[d].bills),type:'line',borderColor:'#22d47a',backgroundColor:'transparent',pointBackgroundColor:'#22d47a',tension:.4,yAxisID:'y1'}
-    ]},
+
+  // KPI: เรียงตามยอดสูงสุด — ใช้ copy แยกต่างหาก ไม่แตะ weekOrder
+  const kpiEl=document.getElementById('dow-kpis');
+  const sortedByRev=[...weekOrder].sort((a,b)=>agg[b].net-agg[a].net);
+  sortedByRev.slice(0,4).forEach((d,i)=>{
+    const v=agg[d]; const cs=['ac','g','b','p'];
+    kpiEl.innerHTML+=`<div class="kpi ${cs[i]}"><div class="kpi-lbl">${i+1}. Best Day</div>
+      <div class="kpi-val" style="font-size:17px">${th[d]}</div>
+      <div class="kpi-sub">${f(v.net)} · ${fn(v.bills)} บิล</div></div>`;
+  });
+
+  // กราฟและตารางทุกอย่างใช้ weekOrder เดิม (Sun→Sat) เสมอ
+  const labels=weekOrder.map(d=>`${d}(${th[d]})`);
+  const barColors=weekOrder.map(d=>d==='Sat'||d==='Sun'?'rgba(240,165,0,0.8)':'rgba(61,155,224,0.7)');
+
+  mkChart('ch-dow-rev',{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Net Revenue',data:weekOrder.map(d=>agg[d].net),backgroundColor:barColors,borderRadius:4},
+        {label:'Bills',data:weekOrder.map(d=>agg[d].bills),type:'line',borderColor:'#22d47a',
+          backgroundColor:'transparent',pointBackgroundColor:'#22d47a',tension:.4,yAxisID:'y1'}
+      ]
+    },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?f(ctx.raw):fn(ctx.raw)+' บิล'}}},
-      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},y1:{grid:{display:false},position:'right',ticks:{color:'#22d47a'}}}
+      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:12,font:{size:11}}},
+        tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?f(ctx.raw):fn(ctx.raw)+' บิล'}}},
+      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},
+        y1:{grid:{display:false},position:'right',ticks:{color:'#22d47a'}}}
     }
   });
-  new Chart(document.getElementById('ch-dow-abv'),{
+
+  mkChart('ch-dow-abv',{
     type:'line',
-    data:{labels:order.map(d=>lbls[order.indexOf(d)]),datasets:[{data:order.map(d=>agg[d].bills>0?Math.round(agg[d].net/agg[d].bills):0),borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,0.1)',fill:true,tension:.4,pointBackgroundColor:'#f0a500'}]},
+    data:{
+      labels,
+      datasets:[{
+        data:weekOrder.map(d=>agg[d].bills>0?Math.round(agg[d].net/agg[d].bills):0),
+        borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,0.1)',fill:true,
+        tension:.4,pointBackgroundColor:'#f0a500'
+      }]
+    },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)}}},
+      plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)+' ('+weekOrder[ctx.dataIndex]+' '+th[weekOrder[ctx.dataIndex]]+')'}}},
       scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+v}}}
     }
   });
-  const maxN=Math.max(...order.map(d=>agg[d].net));
-  document.getElementById('dow-tbody').innerHTML=order.map(d=>{
-    const v=agg[d];const abv=v.bills>0?Math.round(v.net/v.bills):0;
-    return `<tr><td><strong>${d}</strong> ${th[d]}</td><td class="num" style="color:var(--accent)">${fn(v.net)}</td><td class="num">${fn(v.bills)}</td><td class="num">${fn(abv)}</td><td class="num">${fn(v.qty)}</td>
-    <td><div class="pbwrap" style="width:90px"><div class="pbfill" style="width:${v.net/maxN*100}%;background:#3d9be0"></div></div></td></tr>`;
+
+  // ตารางสรุป — ใช้ weekOrder เดิม ตรงกับกราฟ
+  const maxN=Math.max(...weekOrder.map(d=>agg[d].net),1);
+  document.getElementById('dow-tbody').innerHTML=weekOrder.map(d=>{
+    const v=agg[d]; const abv=v.bills>0?Math.round(v.net/v.bills):0;
+    const isTop=sortedByRev[0]===d;
+    return `<tr ${isTop?'style="background:rgba(240,165,0,0.06)"':''}>
+      <td><strong style="color:${d==='Sat'||d==='Sun'?'var(--accent)':'var(--text)'}">${d}</strong>
+        <span style="color:var(--text2);margin-left:4px">${th[d]}</span></td>
+      <td class="num" style="color:var(--accent)">${fn(v.net)}</td>
+      <td class="num">${fn(v.bills)}</td>
+      <td class="num">${fn(abv)}</td>
+      <td class="num">${fn(v.qty)}</td>
+      <td><div class="pbwrap" style="width:90px">
+        <div class="pbfill" style="width:${v.net/maxN*100}%;background:${d==='Sat'||d==='Sun'?'var(--accent)':'#3d9be0'}"></div>
+      </div></td>
+    </tr>`;
   }).join('');
 }
 
@@ -902,19 +1045,19 @@ function buildVisual(){
   const top10r=[...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>b.net-a.net).slice(0,10);
   const top10q=[...PRODUCTS].filter(p=>p.qty>0).sort((a,b)=>b.qty-a.qty).slice(0,10);
   const top10rpu=[...PRODUCTS].filter(p=>p.qty>0&&p.net>0).map(p=>({...p,rpu:Math.round(p.net/p.qty)})).sort((a,b)=>b.rpu-a.rpu).slice(0,10);
-  const mkChart=(id,data,labelFn,valFn,cbFn)=>new Chart(document.getElementById(id),{
+  const makeBarChart=(id,data,labelFn,valFn,cbFn)=>mkChart(id,{
     type:'bar',indexAxis:'y',
     data:{labels:data.map(p=>sn(p.p)),datasets:[{data:data.map(valFn),backgroundColor:data.map(p=>catColors[p.c]||'#888'),borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:cbFn}}},
       scales:{x:{grid:grd,ticks:{callback:labelFn}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
-  mkChart('ch-top10-rev',top10r,v=>'฿'+Math.round(v/1000)+'K',p=>p.net,ctx=>f(ctx.raw));
-  mkChart('ch-top10-qty',top10q,v=>fn(v),p=>p.qty,ctx=>fn(ctx.raw)+' ชิ้น');
-  mkChart('ch-rpu',top10rpu,v=>'฿'+v,p=>p.rpu,ctx=>f(ctx.raw)+'/ชิ้น');
+  makeBarChart('ch-top10-rev',top10r,v=>'฿'+Math.round(v/1000)+'K',p=>p.net,ctx=>f(ctx.raw));
+  makeBarChart('ch-top10-qty',top10q,v=>fn(v),p=>p.qty,ctx=>fn(ctx.raw)+' ชิ้น');
+  makeBarChart('ch-rpu',top10rpu,v=>'฿'+v,p=>p.rpu,ctx=>f(ctx.raw)+'/ชิ้น');
 
   // Hourly pct
   const total=HOURS.reduce((s,h)=>s+h.net,0);
-  new Chart(document.getElementById('ch-hour-pct'),{
+  mkChart('ch-hour-pct',{
     type:'bar',
     data:{labels:HOURS.map(h=>`${String(h.h).padStart(2,'0')}:00`),datasets:[{
       data:HOURS.map(h=>+(h.net/total*100).toFixed(1)),
@@ -930,7 +1073,7 @@ function buildVisual(){
   // Pareto
   const cum=[];let s=0;
   [...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>b.net-a.net).forEach((p,i)=>{s+=p.net;cum.push({x:i+1,y:+(s/TOTAL_NET*100).toFixed(1)});});
-  new Chart(document.getElementById('ch-pareto'),{
+  mkChart('ch-pareto',{
     type:'line',
     data:{labels:cum.map(d=>d.x),datasets:[
       {data:cum.map(d=>d.y),borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,0.1)',fill:true,tension:.3,pointRadius:1},
@@ -943,7 +1086,7 @@ function buildVisual(){
   });
 
   // Bubble
-  new Chart(document.getElementById('ch-bubble'),{
+  mkChart('ch-bubble',{
     type:'bubble',
     data:{datasets:CATS.map(c=>({label:c.cat,data:[{x:c.qty,y:c.net,r:Math.sqrt(c.qty)/3+5}],backgroundColor:c.color+'99',borderColor:c.color,borderWidth:1}))},
     options:{responsive:true,maintainAspectRatio:false,
@@ -955,12 +1098,28 @@ function buildVisual(){
 
 // ══════════ BASKET ══════════
 function buildBasket(){
-  const segs=[
-    {l:"Small (<฿100)",cnt:1731,tot:32422,c:"#3d9be0"},
-    {l:"Medium (฿100-299)",cnt:462,tot:97244,c:"#22d47a"},
-    {l:"Large (฿300-599)",cnt:281,tot:120664,c:"#f0a500"},
-    {l:"XL (฿600+)",cnt:165,tot:177749,c:"#f04545"}
+  // Compute basket segments from PRODUCTS (approximation from available data)
+  const segDefs=[
+    {l:"Small (<฿100)",lo:0,hi:100,c:"#3d9be0"},
+    {l:"Medium (฿100-299)",lo:100,hi:300,c:"#22d47a"},
+    {l:"Large (฿300-599)",lo:300,hi:600,c:"#f0a500"},
+    {l:"XL (฿600+)",lo:600,hi:Infinity,c:"#f04545"}
   ];
+  // Use BASKET_DIST (bill counts per range) to estimate segment counts
+  // Ranges: <50,50-99,100-149,150-199,200-299,300-499,500-699,700+
+  const segs=segDefs.map((def,i)=>{
+    let cnt,tot;
+    if(i===0){cnt=BASKET_DIST[0]+BASKET_DIST[1];} // <100
+    else if(i===1){cnt=BASKET_DIST[2]+BASKET_DIST[3]+BASKET_DIST[4];} // 100-299
+    else if(i===2){cnt=BASKET_DIST[5]+BASKET_DIST[6];} // 300-599
+    else{cnt=BASKET_DIST[7];} // 600+
+    const midpoints=[25,75,125,175,250,400,600,850];
+    tot=i===0?(BASKET_DIST[0]*25+BASKET_DIST[1]*75):
+        i===1?(BASKET_DIST[2]*125+BASKET_DIST[3]*175+BASKET_DIST[4]*250):
+        i===2?(BASKET_DIST[5]*400+BASKET_DIST[6]*600):
+        (BASKET_DIST[7]*850);
+    return {...def,cnt,tot};
+  });
   document.getElementById('basket-kpis').innerHTML=segs.map((s,i)=>`
     <div class="kpi" style="border-top:2px solid ${s.c}">
       <div class="kpi-lbl">${s.l}</div>
@@ -968,17 +1127,17 @@ function buildBasket(){
       <div class="kpi-sub">${(s.cnt/TOTAL_BILLS*100).toFixed(1)}% ของบิลทั้งหมด</div>
       <div class="kpi-sub" style="margin-top:3px">${f(s.tot)} (${(s.tot/TOTAL_NET*100).toFixed(1)}%)</div>
     </div>`).join('');
-  new Chart(document.getElementById('ch-bseg-bills'),{type:'doughnut',
+  mkChart('ch-bseg-bills',{type:'doughnut',
     data:{labels:segs.map(s=>s.l),datasets:[{data:segs.map(s=>s.cnt),backgroundColor:segs.map(s=>s.c),borderWidth:0,hoverOffset:5}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#7e8caa',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+fn(ctx.raw)+'('+( ctx.raw/TOTAL_BILLS*100).toFixed(1)+'%)'}}}}
   });
-  new Chart(document.getElementById('ch-bseg-rev'),{type:'bar',
+  mkChart('ch-bseg-rev',{type:'bar',
     data:{labels:segs.map(s=>s.l),datasets:[{data:segs.map(s=>s.tot),backgroundColor:segs.map(s=>s.c),borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)}}},scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}}
   });
   const ranges=['<50','50-99','100-149','150-199','200-299','300-499','500-699','700+'];
   const dist=[700,1031,215,130,117,181,100,165];
-  new Chart(document.getElementById('ch-bdist'),{type:'bar',
+  mkChart('ch-bdist',{type:'bar',
     data:{labels:ranges,datasets:[{data:dist,backgroundColor:'rgba(61,155,224,0.65)',borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:grd,title:{display:true,text:'มูลค่าบิล (฿)',color:'#445066'}},y:{grid:grd}}}
   });
@@ -1031,7 +1190,7 @@ function buildHourlySalesHM(){
     <span>Low</span>${Array.from({length:11},(_,i)=>`<div style="width:16px;height:10px;border-radius:2px;background:${hmSalesColor(i/10)}"></div>`).join('')}<span>High</span></div>`;
   document.getElementById('hm-sales').innerHTML=html;
 
-  new Chart(document.getElementById('ch-hourly-trend'),{
+  mkChart('ch-hourly-trend',{
     type:'line',
     data:{labels:HOURS.map(h=>`${String(h.h).padStart(2,'0')}:00`),datasets:[
       {label:'Revenue (฿)',data:HOURS.map(h=>h.net),borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,.1)',fill:true,tension:.4,yAxisID:'y'},
@@ -1065,7 +1224,7 @@ function buildCatHM(){
   document.getElementById('hm-cat').innerHTML=html;
 
   // Stacked area
-  new Chart(document.getElementById('ch-cat-hour-stacked'),{
+  mkChart('ch-cat-hour-stacked',{
     type:'line',
     data:{labels:hrs.map(h=>`${String(h).padStart(2,'0')}:00`),
       datasets:cats.map(cat=>({label:cat,data:CAT_HOUR[cat],backgroundColor:catColors[cat]+'55',borderColor:catColors[cat],fill:true,tension:.4,borderWidth:1.5}))},
@@ -1117,12 +1276,17 @@ function buildDiscHM(){
     <div class="kpi"><div class="kpi-ico">📊</div><div class="kpi-lbl">Avg per Use</div><div class="kpi-val">${f(171343/446)}</div><div class="kpi-sub">ส่วนลดเฉลี่ยต่อครั้ง</div></div>`;
 
   const stacked=DAILY.map(d=>{
-    const dtKey=d.date.substring(3,5)+'-'+d.date.substring(0,2);
     const byName={};
-    PROMO_DATA.filter(p=>p.date===dtKey).forEach(p=>{byName[p.name]=(byName[p.name]||0)+p.discount;});
+    PROMO_DATA.filter(p=>{
+      if(!p.date||!d.date)return false;
+      // match various date formats
+      const dd=String(d.date).replace(/\//g,'-');
+      const pd=String(p.date).replace(/\//g,'-');
+      return pd.includes(dd.substring(0,2))&&pd.includes(dd.substring(3,5));
+    }).forEach(p=>{byName[p.name]=(byName[p.name]||0)+p.discount;});
     return byName;
   });
-  new Chart(document.getElementById('ch-promo-daily-stacked'),{
+  mkChart('ch-promo-daily-stacked',{
     type:'bar',
     data:{labels:DAILY.map(d=>d.date.substring(0,5)),
       datasets:promoNames.map(n=>({label:n,data:stacked.map(d=>d[n]||0),backgroundColor:promoColors[n]||'#888',borderRadius:3}))},
@@ -1143,11 +1307,11 @@ function buildPromo(){
     <div class="kpi"><div class="kpi-lbl">ยอดใช้โปรโมชั่น</div><div class="kpi-val">${fn(tc)} ครั้ง</div><div class="kpi-sub">Net Revenue: ${f(PROMO_DATA.reduce((s,p)=>s+p.net,0))}</div></div>
     <div class="kpi g"><div class="kpi-lbl">Disc / Use</div><div class="kpi-val gc">${f(td/tc)}</div><div class="kpi-sub">เฉลี่ยต่อครั้ง</div></div>`;
   const names=Object.keys(byName);
-  new Chart(document.getElementById('ch-promo-type'),{type:'bar',indexAxis:'y',
+  mkChart('ch-promo-type',{type:'bar',indexAxis:'y',
     data:{labels:names.map(n=>n.substring(0,28)),datasets:[{data:names.map(n=>byName[n].disc),backgroundColor:names.map(n=>promoColors[n]||'#888'),borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)}}},scales:{x:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
-  new Chart(document.getElementById('ch-promo-count'),{type:'doughnut',
+  mkChart('ch-promo-count',{type:'doughnut',
     data:{labels:names,datasets:[{data:names.map(n=>byName[n].cnt),backgroundColor:names.map(n=>promoColors[n]||'#888'),borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'50%',plugins:{legend:{display:true,position:'right',labels:{color:'#7e8caa',boxWidth:10,font:{size:10}}}}}
   });
@@ -1165,7 +1329,7 @@ function buildQuality(){
     <div class="kpi r"><div class="kpi-lbl">Promo Net Revenue</div><div class="kpi-val rc">${f(promoNet)}</div><div class="kpi-sub">${(promoNet/TOTAL_NET*100).toFixed(1)}% ของยอดรวม</div></div>
     <div class="kpi"><div class="kpi-lbl">Discount Leaked</div><div class="kpi-val" style="color:var(--cyan)">${f(171343)}</div><div class="kpi-sub">รายได้ที่สูญเสียจากโปรโมชั่น</div></div>
     <div class="kpi p"><div class="kpi-lbl">Recovery Rate</div><div class="kpi-val pc">${(promoNet/270119*100).toFixed(1)}%</div><div class="kpi-sub">ของยอดก่อนส่วนลดโปรโมชั่น</div></div>`;
-  new Chart(document.getElementById('ch-quality-pie'),{type:'doughnut',
+  mkChart('ch-quality-pie',{type:'doughnut',
     data:{labels:['Full Price','Promotional'],datasets:[{data:[fullPrice,promoNet],backgroundColor:['#22d47a','#f04545'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)+' ('+(ctx.raw/TOTAL_NET*100).toFixed(1)+'%)'}}}}
   });
@@ -1173,9 +1337,17 @@ function buildQuality(){
     <div class="leg-item"><div class="leg-dot" style="background:#22d47a"></div>Full Price<span class="leg-pct">${(fullPrice/TOTAL_NET*100).toFixed(1)}%</span></div>
     <div class="leg-item"><div class="leg-dot" style="background:#f04545"></div>Promotional<span class="leg-pct">${(promoNet/TOTAL_NET*100).toFixed(1)}%</span></div>`;
   const promoByDate={};
-  PROMO_DATA.forEach(p=>{const dk='20'+p.date.replace('-','/')+'/2026';const d=p.date.substring(3,5)+'/'+p.date.substring(0,2)+'/2026';promoByDate[d]=(promoByDate[d]||0)+p.net;});
-  new Chart(document.getElementById('ch-quality-daily'),{type:'bar',
-    data:{labels:DAILY.map(d=>d.date.substring(0,5)),datasets:[
+  PROMO_DATA.forEach(p=>{
+    if(!p.date)return;
+    // Try to match date back to DD/MM/YYYY key
+    let dk='';
+    if(/^\d{4}-\d{2}-\d{2}$/.test(p.date)){dk=p.date.substring(8,10)+'/'+p.date.substring(5,7)+'/'+p.date.substring(0,4);}
+    else if(/^\d{2}-\d{2}$/.test(p.date)){dk=p.date.substring(3,5)+'/'+p.date.substring(0,2)+'/2026';}
+    else dk=p.date;
+    promoByDate[dk]=(promoByDate[dk]||0)+p.net;
+  });
+  mkChart('ch-quality-daily',{type:'bar',
+    data:{labels:DAILY.map(d=>(d.date||'').substring(0,5)),datasets:[
       {label:'Full Price',data:DAILY.map(d=>d.net-(promoByDate[d.date]||0)),backgroundColor:'rgba(34,212,122,.7)',borderRadius:3},
       {label:'Promo Net',data:DAILY.map(d=>promoByDate[d.date]||0),backgroundColor:'rgba(240,84,84,.7)',borderRadius:3}
     ]},
@@ -1198,7 +1370,7 @@ function buildQuality(){
 }
 
 function buildMarket(){
-  new Chart(document.getElementById('ch-polar'),{type:'polarArea',
+  mkChart('ch-polar',{type:'polarArea',
     data:{labels:CATS.map(c=>c.cat),datasets:[{data:CATS.map(c=>c.net),backgroundColor:CATS.map(c=>c.color+'99'),borderColor:CATS.map(c=>c.color),borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{color:'#7e8caa',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)}}}}
   });
@@ -1245,16 +1417,16 @@ function buildCombo(){
       <div class="combo-stat"><div class="combo-cnt">${fn(c.cnt)} บิล</div><div class="combo-rev">${f(c.rev)} · avg ${f(c.avgBill)}/บิล</div></div>
     </div>`).join('');
 
-  new Chart(document.getElementById('ch-combo-pie'),{type:'doughnut',
+  mkChart('ch-combo-pie',{type:'doughnut',
     data:{labels:['Single Category','Multi Category'],datasets:[{data:[2307,332],backgroundColor:['rgba(61,155,224,0.75)','rgba(240,165,0,0.85)'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#7e8caa',boxWidth:10,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+fn(ctx.raw)+'('+( ctx.raw/TOTAL_BILLS*100).toFixed(1)+'%)'}}}}
   });
-  new Chart(document.getElementById('ch-items-per-bill'),{type:'bar',
+  mkChart('ch-items-per-bill',{type:'bar',
     data:{labels:['1 ชิ้น','2 ชิ้น','3 ชิ้น','4 ชิ้น','5 ชิ้น','6+ ชิ้น'],
       datasets:[{data:[2055,402,125,33,11,13],backgroundColor:['rgba(240,84,84,.8)','rgba(240,165,0,.8)','rgba(61,155,224,.8)','rgba(34,212,122,.8)','rgba(160,126,224,.8)','rgba(46,200,200,.8)'],borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>fn(ctx.raw)+' บิล ('+( ctx.raw/TOTAL_BILLS*100).toFixed(1)+'%)'}}},scales:{x:{grid:grd},y:{grid:grd}}}
   });
-  new Chart(document.getElementById('ch-combo-bubble'),{type:'bubble',
+  mkChart('ch-combo-bubble',{type:'bubble',
     data:{datasets:combos.slice(0,6).map(c=>({
       label:`${c.a}+${c.b}`,
       data:[{x:c.cnt,y:c.avgBill,r:Math.sqrt(c.rev)/25}],
@@ -1270,13 +1442,13 @@ function buildCombo(){
 function buildTopBot(){
   const top10=[...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>b.net-a.net).slice(0,10);
   const bot10=[...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>a.net-b.net).slice(0,10);
-  const mkChart=(id,data,dir)=>new Chart(document.getElementById(id),{
+  const makeTopBotChart=(id,data,dir)=>mkChart(id,{
     type:'bar',indexAxis:'y',
     data:{labels:data.map(p=>sn(p.p)),datasets:[{data:data.map(p=>p.net),backgroundColor:data.map(p=>catColors[p.c]||'#888'),borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)}}},
       scales:{x:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
-  mkChart('ch-top10',top10,'desc');mkChart('ch-bot10',bot10,'asc');
+  makeTopBotChart('ch-top10',top10,'desc');makeTopBotChart('ch-bot10',bot10,'asc');
   const maxT=top10[0].net,maxB=bot10[bot10.length-1].net;
   document.getElementById('top10-tbody').innerHTML=top10.map((p,i)=>`<tr>
     <td><span class="rb ${i===0?'g1':i===1?'g2':i===2?'g3':''}">${i+1}</span></td>
@@ -1341,32 +1513,283 @@ function renderProd(){
 }
 
 // ══════════ UPLOAD ══════════
-const REQ={1:'รายงานยอดขาย___รายงานยอดขายแยกตามส_นค_า.xlsx',2:'รายงานสร_ปการใช_โปรโมช__นแยกตามว_นท__.xlsx'};
+// ══════════ UPLOAD & PARSE ══════════
 const upF={1:null,2:null};
+
 function handleF(ev,n){
   const file=ev.target.files[0];if(!file)return;
+  upF[n]=file;
   const el=document.getElementById('st'+n);
-  if(file.name!==REQ[n]){
-    el.innerHTML=`<div class="fstatus err">❌ ชื่อไฟล์ไม่ถูกต้อง! ต้องการ: <code style="font-family:var(--font-m);font-size:9px">${REQ[n]}</code></div>`;
-    upF[n]=null;
-  } else {
-    el.innerHTML=`<div class="fstatus ok">✅ <strong>${file.name}</strong> — ${(file.size/1024).toFixed(1)} KB</div>`;
-    upF[n]=file;
-  }
+  el.innerHTML=`<div class="fstatus ok">✅ <strong>${file.name}</strong> — ${(file.size/1024).toFixed(1)} KB · พร้อมประมวลผล</div>`;
   document.getElementById('proc-btn').disabled=!(upF[1]&&upF[2]);
 }
-['d1','d2'].forEach((id,i)=>{
-  const el=document.getElementById(id);
-  el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dv');});
-  el.addEventListener('dragleave',()=>el.classList.remove('dv'));
-  el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('dv');const f=e.dataTransfer.files[0];if(f){const inp=document.getElementById('f'+(i+1));const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;handleF({target:inp},i+1);}});
-});
-function processFiles(){
-  const btn=document.getElementById('proc-btn');btn.textContent='⏳ กำลังประมวลผล...';btn.disabled=true;
-  setTimeout(()=>{
-    document.getElementById('up-result').innerHTML=`<div class="fstatus ok" style="padding:12px">🎉 <div><strong>อัพเดทข้อมูลสำเร็จ!</strong><div style="font-size:11px;color:var(--text2);margin-top:3px">Dashboard อัพเดทแล้ว · <a href="#" onclick="nav('overview');return false;" style="color:var(--accent)">ดู Overview →</a></div></div></div>`;
-    btn.textContent='⚡ ประมวลผลและอัพเดท Dashboard';btn.disabled=false;
-  },1600);
+
+// File wiring handled in DOMContentLoaded init block below
+
+function readXlsx(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const wb=XLSX.read(e.target.result,{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        resolve(XLSX.utils.sheet_to_json(ws,{header:1,defval:''}));
+      }catch(err){reject(err);}
+    };
+    reader.onerror=reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function processFiles(){
+  const btn=document.getElementById('proc-btn');
+  const resultEl=document.getElementById('up-result');
+  btn.textContent='⏳ กำลังอ่านไฟล์...'; btn.disabled=true;
+  resultEl.innerHTML='';
+  try{
+    // ── File 1: Sales ──
+    const rows1=await readXlsx(upF[1]);
+    // Find header row containing 'เลขที่เอกสาร'
+    let hdr1=0;
+    for(let i=0;i<Math.min(10,rows1.length);i++){
+      if(rows1[i].some(v=>String(v).trim()==='เลขที่เอกสาร')){hdr1=i;break;}
+    }
+    const cols1=rows1[hdr1].map(v=>String(v).trim());
+    // Exact-match column finder with fallback
+    const ci1=(...names)=>{
+      for(const n of names){const i=cols1.indexOf(n);if(i!==-1)return i;}
+      return -1;
+    };
+    const iDoc  = ci1('เลขที่เอกสาร');
+    const iDate = ci1('วันที่');
+    const iTime = ci1('เวลาขาย','เวลา');
+    const iCat  = ci1('ชื่อกลุ่มสินค้า');
+    const iProd = ci1('ชื่อสินค้า');
+    const iQty  = ci1('จำนวน');
+    const iNet  = ci1('ราคาสุทธิ');
+    const iDisc = ci1('ส่วนลด');
+    
+    
+
+    const salesRows=[];
+    for(let i=hdr1+1;i<rows1.length;i++){
+      const r=rows1[i];
+      const doc=String(r[iDoc]||'').trim();
+      if(!doc.startsWith('ABB')) continue;
+      salesRows.push({
+        doc,
+        date: String(r[iDate]||'').trim(),
+        time: String(r[iTime]||'').trim(),
+        cat:  String(r[iCat] ||'').trim(),
+        prod: String(r[iProd]||'').trim(),
+        qty:  parseFloat(r[iQty]) ||0,
+        net:  parseFloat(r[iNet]) ||0,
+        disc: parseFloat(r[iDisc])||0
+      });
+    }
+    
+    if(salesRows.length===0) throw new Error('ไม่พบข้อมูลยอดขาย — cols: '+cols1.join(', '));
+
+    // ── File 2: Promo ──
+    const rows2=await readXlsx(upF[2]);
+    let hdr2=0;
+    for(let i=0;i<Math.min(10,rows2.length);i++){
+      const r=rows2[i].map(v=>String(v).trim());
+      if(r.includes('รหัสโปรโมชั่น')||r.includes('ชื่อโปรโมชั่น')||r.includes('โปรโมชั่น')){hdr2=i;break;}
+    }
+    const cols2=rows2[hdr2].map(v=>String(v).trim());
+    const ci2=(...names)=>{
+      for(const n of names){const i=cols2.indexOf(n);if(i!==-1)return i;}
+      return -1;
+    };
+    // รหัสโปรโมชั่น = code (col for PM check), ชื่อ/โปรโมชั่น = name
+    const iCode  = ci2('รหัสโปรโมชั่น','รหัส');
+    const iPN    = ci2('โปรโมชั่น','ชื่อโปรโมชั่น');  // exact 'โปรโมชั่น' before 'รหัสโปรโมชั่น'
+    const iPD    = ci2('วันที่ใช้บริการ','วันที่');
+    const iPC    = ci2('จำนวนครั้งที่ใช้โปรโมชั่น','จำนวนครั้ง');
+    const iPS    = ci2('ยอดขายโปรโมชั่น','ยอดขาย');
+    const iPDisc = ci2('ส่วนลดโปรโมชั่น','ส่วนลด');
+    const iPNet  = ci2('ยอดขายสุทธิ','ราคาสุทธิ');
+    
+    
+
+    const promoRows=[];
+    for(let i=hdr2+1;i<rows2.length;i++){
+      const r=rows2[i];
+      const code=String(r[iCode]||'').trim();
+      if(!code.startsWith('PM')) continue;
+      promoRows.push({
+        name:     String(r[iPN]   ||'').trim(),
+        date:     String(r[iPD]   ||'').trim(),
+        count:    parseFloat(r[iPC]   )||0,
+        sales:    parseFloat(r[iPS]   )||0,
+        discount: parseFloat(r[iPDisc])||0,
+        net:      parseFloat(r[iPNet] )||0
+      });
+    }
+    
+
+    btn.textContent='⏳ กำลังอัพเดท Dashboard...';
+    rebuildDashboard(salesRows, promoRows);
+
+    resultEl.innerHTML=`<div class="fstatus ok" style="padding:14px">
+      🎉 <div><strong>อัพเดทข้อมูลสำเร็จ!</strong>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px">
+          ยอดขาย <strong style="color:var(--accent)">${salesRows.length.toLocaleString()}</strong> รายการ ·
+          โปรโมชั่น <strong style="color:var(--accent)">${promoRows.length}</strong> รายการ ·
+          <a href="#" onclick="nav('overview');return false;" style="color:var(--accent)">ดู Overview →</a>
+        </div>
+      </div>
+    </div>`;
+    btn.textContent='⚡ ประมวลผลและอัพเดท Dashboard'; btn.disabled=false;
+
+  }catch(err){
+    console.error('processFiles error:', err);
+    resultEl.innerHTML=`<div class="fstatus err" style="padding:14px">❌ <strong>เกิดข้อผิดพลาด:</strong> ${err.message}</div>`;
+    btn.textContent='⚡ ประมวลผลและอัพเดท Dashboard'; btn.disabled=false;
+  }
+}
+
+function destroyCharts(){
+  // Only reset innerHTML containers — mkChart() handles canvas replacement itself
+  ['hm-sales','hm-cat','hm-disc','combo-list','cat-leg','cat-tbody',
+   'dow-kpis','dow-tbody','basket-kpis','disc-overview-kpis','promo-kpis',
+   'promo-tbody','quality-kpis','quality-leg','promo-eff','cat-pbars',
+   'market-tbls','top10-tbody','bot10-tbody','cat-peak-info'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.innerHTML='';
+  });
+}
+
+function normDate(raw){
+  const s=String(raw||'').trim();
+  if(!s)return '';
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(s))return s;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4);
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){
+    const [a,b,c]=s.split('/');
+    return a.padStart(2,'0')+'/'+b.padStart(2,'0')+'/'+c;
+  }
+  if(/^\d{5}$/.test(s)){
+    const d=new Date(Math.round((parseInt(s)-25569)*86400*1000));
+    return String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0')+'/'+d.getUTCFullYear();
+  }
+  return s;
+}
+
+function getDOW(dateStr){
+  if(!dateStr)return '?';
+  const [dd,mm,yyyy]=dateStr.split('/');
+  if(!dd||!mm||!yyyy)return '?';
+  const d=new Date(parseInt(yyyy),parseInt(mm)-1,parseInt(dd));
+  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]||'?';
+}
+
+function rebuildDashboard(salesRows, promoRows){
+  
+  salesRows.forEach(r=>{r.date=normDate(r.date);});
+  promoRows.forEach(p=>{p.date=normDate(p.date);});
+  
+
+  const dateMap={},catMap={},hourMap={},prodMap={},catHourMap={};
+  const dates=new Set();
+
+  salesRows.forEach(r=>{
+    if(!r.date)return;
+    const h=parseInt((r.time||'00:00').split(':')[0])||0;
+    dates.add(r.date);
+    if(!dateMap[r.date])dateMap[r.date]={net:0,qty:0,bills:new Set()};
+    dateMap[r.date].net+=r.net; dateMap[r.date].qty+=r.qty; dateMap[r.date].bills.add(r.doc);
+    if(!catMap[r.cat])catMap[r.cat]={net:0,qty:0};
+    catMap[r.cat].net+=r.net; catMap[r.cat].qty+=r.qty;
+    if(!hourMap[h])hourMap[h]={net:0,qty:0};
+    hourMap[h].net+=r.net; hourMap[h].qty+=r.qty;
+    if(!prodMap[r.prod])prodMap[r.prod]={net:0,qty:0,bills:new Set(),cat:r.cat};
+    prodMap[r.prod].net+=r.net; prodMap[r.prod].qty+=r.qty; prodMap[r.prod].bills.add(r.doc);
+    if(!catHourMap[r.cat])catHourMap[r.cat]={};
+    catHourMap[r.cat][h]=(catHourMap[r.cat][h]||0)+r.net;
+  });
+
+  const sortedDates=[...dates].sort();
+  
+
+  // Rebuild DOW_MAP
+  Object.keys(DOW_MAP).forEach(k=>delete DOW_MAP[k]);
+  sortedDates.forEach(d=>{DOW_MAP[d]=getDOW(d);});
+
+  // Promo discount per date
+  const promoByDate={};
+  promoRows.forEach(p=>{if(p.date)promoByDate[p.date]=(promoByDate[p.date]||0)+p.discount;});
+
+  const newDAILY=sortedDates.map(d=>{
+    const v=dateMap[d]||{net:0,qty:0,bills:new Set()};
+    const disc=promoByDate[d]||0;
+    return {date:d,net:v.net,qty:v.qty,bills:[...v.bills].length,gross:v.net+disc,discount:disc};
+  });
+
+  const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
+  const catColMap={"Sushi Bento":"#e07070","Donburi":"#3d9be0","Beverage":"#22d47a","Dessert":"#a07ee0","Appetizer":"#f0a500"};
+  const allCats=[...new Set([...catOrder,...Object.keys(catMap)])].filter(c=>catMap[c]);
+  const newCATS=allCats.map(c=>({cat:c,net:catMap[c].net,qty:catMap[c].qty,color:catColMap[c]||'#888'}));
+
+  const hrs=Array.from({length:18},(_,i)=>i+5);
+  const newHOURS=hrs.map(h=>({h,net:hourMap[h]?.net||0,qty:hourMap[h]?.qty||0}));
+  const newPRODS=Object.entries(prodMap).filter(([p])=>p).map(([p,v])=>({p,c:v.cat,net:v.net,qty:v.qty,bills:[...v.bills].length}));
+
+  const newCAT_HOUR={};
+  allCats.forEach(cat=>{newCAT_HOUR[cat]=hrs.map(h=>catHourMap[cat]?.[h]||0);});
+
+  const newHM={};
+  sortedDates.forEach(d=>{
+    const key=d.substring(0,5);
+    newHM[key]=hrs.map(h=>{
+      let v=0;
+      salesRows.filter(r=>r.date===d&&(parseInt((r.time||'00').split(':')[0])||0)===h).forEach(r=>v+=r.net);
+      return v;
+    });
+  });
+
+  DAILY.length=0;  newDAILY.forEach(d=>DAILY.push(d));
+  CATS.length=0;   newCATS.forEach(c=>CATS.push(c));
+  HOURS.length=0;  newHOURS.forEach(h=>HOURS.push(h));
+  PRODUCTS.length=0; newPRODS.forEach(p=>PRODUCTS.push(p));
+  Object.keys(CAT_HOUR).forEach(k=>delete CAT_HOUR[k]); Object.assign(CAT_HOUR,newCAT_HOUR);
+  Object.keys(HM_SALES).forEach(k=>delete HM_SALES[k]); Object.assign(HM_SALES,newHM);
+  PROMO_DATA.length=0; promoRows.forEach(p=>PROMO_DATA.push(p));
+
+  // Recompute totals from fresh data
+  TOTAL_NET   = salesRows.reduce((s,r)=>s+r.net,0);
+  const billMap={};
+  salesRows.forEach(r=>{ billMap[r.doc]=(billMap[r.doc]||0)+r.net; });
+  const billTotals=Object.values(billMap);
+  TOTAL_BILLS = billTotals.length;
+  // Compute basket distribution
+  const ranges=[[0,50],[50,100],[100,150],[150,200],[200,300],[300,500],[500,700],[700,Infinity]];
+  BASKET_DIST=ranges.map(([lo,hi])=>billTotals.filter(v=>v>=lo&&v<hi).length);
+  
+
+  // Update all charts in-place (no destroy/recreate needed — mkChart handles it)
+  // mkChart() destroys old instance and creates new one, works even on hidden canvases
+  // because we just replace the instance; canvas size is re-measured on next repaint
+  // Make ALL pages temporarily block+invisible so ALL canvases get real dimensions
+  const allPages=document.querySelectorAll('.page');
+  allPages.forEach(p=>{
+    p.style.cssText='display:block!important;position:absolute!important;visibility:hidden!important;pointer-events:none!important;';
+  });
+
+  const runBuilds=()=>{
+    destroyCharts();
+    const fns=[buildOverview,buildDOW,buildVisual,buildBasket,
+               buildHourlySalesHM,buildCatHM,buildDiscHM,buildPromo,
+               buildQuality,buildMarket,buildCombo,buildTopBot,renderProd];
+    for(const fn of fns){
+      try{ fn(); }
+      catch(e){ console.error('❌',fn.name,e.message); }
+    }
+    // Restore pages and navigate
+    allPages.forEach(p=>{ p.style.cssText=''; });
+    nav('overview');
+  };
+  requestAnimationFrame(()=>requestAnimationFrame(runBuilds));
 }
 
 // ══════════ INIT ══════════
@@ -1374,6 +1797,22 @@ window.addEventListener('DOMContentLoaded',()=>{
   buildOverview();buildDOW();buildVisual();buildBasket();
   buildHourlySalesHM();buildCatHM();buildDiscHM();buildPromo();
   buildQuality();buildMarket();buildCombo();buildTopBot();renderProd();
+  // Wire file inputs (defined here so DOMContentLoaded fires once)
+  const f1=document.getElementById('f1');
+  const f2=document.getElementById('f2');
+  if(f1)f1.addEventListener('change',e=>handleF(e,1));
+  if(f2)f2.addEventListener('change',e=>handleF(e,2));
+  ['d1','d2'].forEach((id,i)=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();el.classList.add('dv');});
+    el.addEventListener('dragleave',e=>{e.stopPropagation();el.classList.remove('dv');});
+    el.addEventListener('drop',e=>{
+      e.preventDefault();e.stopPropagation();el.classList.remove('dv');
+      const file=e.dataTransfer.files[0];
+      if(file){const inp=document.getElementById('f'+(i+1));const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;handleF({target:inp},i+1);}
+    });
+  });
+  document.getElementById('proc-btn').addEventListener('click',processFiles);
 });
 </script>
 </body>
