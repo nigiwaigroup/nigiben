@@ -40,6 +40,11 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 .period-box{background:var(--surface3);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;}
 .period-box .pl{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
 .period-box .pv{font-size:12px;color:var(--accent2);font-family:var(--font-m);margin-top:2px;}
+.sb-day-row{display:grid;grid-template-columns:32px 1fr 54px;align-items:center;gap:4px;font-size:10px;}
+.sb-day-lbl{color:var(--text3);font-family:var(--font-m);}
+.sb-day-bar-wrap{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;}
+.sb-day-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s;}
+.sb-day-val{color:var(--text2);text-align:right;font-family:var(--font-m);font-size:10px;}
 .upbtn{margin-top:9px;width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--rs);
   padding:8px;font-size:12px;font-weight:700;font-family:var(--font-h);cursor:pointer;letter-spacing:1px;}
 .upbtn:hover{opacity:.85;}
@@ -211,6 +216,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   <div class="nav-sec">
     <div class="nav-lbl">ภาพรวม</div>
     <div class="nav-item active" data-page="overview"><span class="ic">📊</span>Performance Overview</div>
+    <div class="nav-item" data-page="daily"><span class="ic">📈</span>Daily Net Sales</div>
     <div class="nav-item" data-page="dow"><span class="ic">📅</span>Day-of-Week Analysis</div>
   </div>
   <div class="nav-sec">
@@ -242,6 +248,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
       <div class="pl">Data Period</div>
       <div id="sidebar-period" class="pv">01–09 Mar 2026</div>
     </div>
+
     <button class="upbtn" onclick="nav('upload')">⬆ Update Data</button>
   </div>
 </nav>
@@ -259,13 +266,13 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   <div class="ph"><h1>📊 Performance Overview</h1><p>สรุปภาพรวมยอดขาย · Nigiben Grab&amp;Go · สนามบินดอนเมือง · <span id="ov-period">01–09 มีนาคม 2569</span></p></div>
   <div class="sec-title">🏆 Key Performance Indicators</div>
   <div class="g4">
-    <div class="kpi ac"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Net Revenue</div><div id="kpi-net" class="kpi-val ac">฿428,079</div><div id="kpi-net-sub" class="kpi-sub">รายได้สุทธิรวม 9 วัน</div></div>
+    <div class="kpi ac"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Net Revenue</div><div id="kpi-net" class="kpi-val ac">฿256,740</div><div id="kpi-net-sub" class="kpi-sub">รายได้สุทธิรวม 9 วัน</div></div>
     <div class="kpi g"><div class="kpi-ico">🧾</div><div class="kpi-lbl">Total Bills</div><div id="kpi-bills" class="kpi-val gc">2,639</div><div id="kpi-bills-sub" class="kpi-sub">เฉลี่ย 293 บิล/วัน</div></div>
     <div class="kpi b"><div class="kpi-ico">📦</div><div class="kpi-lbl">Total Items Sold</div><div id="kpi-items" class="kpi-val bc">4,322</div><div id="kpi-items-sub" class="kpi-sub">เฉลี่ย 480 ชิ้น/วัน</div></div>
-    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div id="kpi-abv" class="kpi-val pc">฿162</div><div class="kpi-sub">มูลค่าเฉลี่ยต่อบิล</div></div>
+    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div id="kpi-abv" class="kpi-val pc">฿88</div><div class="kpi-sub">มูลค่าเฉลี่ยต่อบิล (ไม่รวม Beverage)</div></div>
   </div>
   <div class="g4 mb">
-    <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Promo Discount</div><div id="kpi-disc" class="kpi-val rc">฿171,343</div><div class="kpi-sub">ส่วนลดจากโปรโมชั่นทั้งหมด</div></div>
+    <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Promo Discount</div><div id="kpi-disc" class="kpi-val rc">฿171,339</div><div class="kpi-sub">ส่วนลดจากโปรโมชั่นทั้งหมด</div></div>
     <div class="kpi"><div class="kpi-ico">📉</div><div class="kpi-lbl">Gross Revenue (Pre-discount)</div><div id="kpi-gross" class="kpi-val" style="color:var(--cyan)">฿599,422</div><div class="kpi-sub">ยอดก่อนหักส่วนลดโปรโมชั่น</div></div>
     <div class="kpi"><div class="kpi-ico">⏰</div><div class="kpi-lbl">Peak Hour</div><div class="kpi-val">21:00</div><div class="kpi-sub">฿192,811 · 45% ของยอดรวม</div></div>
     <div class="kpi g"><div class="kpi-ico">👑</div><div class="kpi-lbl">Top Category</div><div class="kpi-val gc" style="font-size:16px">Sushi Bento</div><div class="kpi-sub">฿272,950 · 63.8% ของยอดรวม</div></div>
@@ -296,6 +303,30 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 </div>
 
 <!-- ══════════ DOW ══════════ -->
+<!-- ══════════ DAILY NET SALES ══════════ -->
+<div id="page-daily" class="page">
+  <div class="ph"><h1>📈 Daily Net Sales</h1><p>ยอดขายสุทธิรายวัน · <span id="daily-period">01–09 มีนาคม 2569</span></p></div>
+  <div class="sec-title">📊 ยอดขายรายวัน</div>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="border-bottom:2px solid var(--accent);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px">
+          <th style="padding:10px 12px;text-align:left">วันที่</th>
+          <th style="padding:10px 12px;text-align:left">วัน</th>
+          <th style="padding:10px 8px;text-align:right">จำนวนบิล</th>
+          <th style="padding:10px 8px;text-align:right">จำนวนชิ้น</th>
+          <th style="padding:10px 8px;text-align:right">Gross Revenue</th>
+          <th style="padding:10px 8px;text-align:right">ส่วนลด</th>
+          <th style="padding:10px 8px;text-align:right">Net Revenue</th>
+          <th style="padding:10px 8px;text-align:right">Avg/Bill</th>
+          <th style="padding:10px 8px;text-align:left;width:120px">Bar</th>
+        </tr>
+      </thead>
+      <tbody id="daily-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
 <div id="page-dow" class="page">
   <div class="ph"><h1>📅 Day-of-Week Analysis</h1><p>วิเคราะห์ผลงานตามวันในสัปดาห์ · <span id="dow-period">01–09 มีนาคม 2569</span></p></div>
   <div class="g4" id="dow-kpis"></div>
@@ -651,22 +682,22 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 // DATA
 // ══════════════════════════════════════════
 const DAILY=[
-  {date:"01/03/2026",net:51040,qty:455,bills:272,gross:71644,discount:20604},
-  {date:"02/03/2026",net:54472,qty:467,bills:277,gross:78302,discount:23830},
-  {date:"03/03/2026",net:37968,qty:404,bills:232,gross:51552,discount:13584},
-  {date:"04/03/2026",net:48943,qty:509,bills:310,gross:68845,discount:19902},
-  {date:"05/03/2026",net:49974,qty:444,bills:258,gross:75271,discount:25297},
-  {date:"06/03/2026",net:48061,qty:581,bills:358,gross:66843,discount:18782},
-  {date:"07/03/2026",net:41495,qty:410,bills:272,gross:59532,discount:18037},
-  {date:"08/03/2026",net:46934,qty:508,bills:298,gross:62519,discount:15585},
-  {date:"09/03/2026",net:49192,qty:544,bills:362,gross:64910,discount:15718}
+  {date:"01/03/2026",net:30436,qty:455,bills:272,gross:51040,discount:20604},
+  {date:"02/03/2026",net:30642,qty:467,bills:277,gross:54472,discount:23830},
+  {date:"03/03/2026",net:24384,qty:404,bills:232,gross:37968,discount:13584},
+  {date:"04/03/2026",net:29041,qty:509,bills:310,gross:48943,discount:19902},
+  {date:"05/03/2026",net:24677,qty:444,bills:258,gross:49974,discount:25297},
+  {date:"06/03/2026",net:29279,qty:581,bills:358,gross:48061,discount:18782},
+  {date:"07/03/2026",net:23458,qty:410,bills:272,gross:41495,discount:18037},
+  {date:"08/03/2026",net:31349,qty:508,bills:298,gross:46934,discount:15585},
+  {date:"09/03/2026",net:33474,qty:544,bills:362,gross:49192,discount:15718}
 ];
 const CATS=[
-  {cat:"Sushi Bento",net:272950,qty:1084,color:"#e07070"},
-  {cat:"Donburi",net:99015,qty:449,color:"#3d9be0"},
-  {cat:"Beverage",net:41000,qty:2463,color:"#22d47a"},
-  {cat:"Dessert",net:10569,qty:260,color:"#a07ee0"},
-  {cat:"Appetizer",net:4545,qty:66,color:"#f0a500"}
+  {cat:"Sushi Bento",net:163702,qty:1084,color:"#e07070"},
+  {cat:"Donburi",net:59384,qty:449,color:"#3d9be0"},
+  {cat:"Beverage",net:24590,qty:2463,color:"#22d47a"},
+  {cat:"Dessert",net:6339,qty:260,color:"#a07ee0"},
+  {cat:"Appetizer",net:2726,qty:66,color:"#f0a500"}
 ];
 const HOURS=[
   {h:5,net:3854,qty:92},
@@ -811,7 +842,7 @@ const PROD_BY_DATE = {
   "09/03/2026":{"MINI001 / Salmon Sushi 7 pcs.":{net:4200,qty:20,cat:"Sushi Bento"},"DON002 / Gyu Don":{net:1320,qty:8,cat:"Donburi"},"BEV006 / Namthip Drinking Water 550ml":{net:1820,qty:175,cat:"Beverage"},"MINI004 / Salmon Varity Set S":{net:2200,qty:11,cat:"Sushi Bento"},"DES007 / Matcha Chocolate Warabi Mochi":{net:432,qty:8,cat:"Dessert"}}
 };
 const DOW_MAP={"01/03/2026":"Sun","02/03/2026":"Mon","03/03/2026":"Tue","04/03/2026":"Wed","05/03/2026":"Thu","06/03/2026":"Fri","07/03/2026":"Sat","08/03/2026":"Sun","09/03/2026":"Mon"};
-var TOTAL_NET=428079,TOTAL_BILLS=2639;
+var TOTAL_NET=256740,TOTAL_BILLS=2639;
 var BASKET_DIST=[700,1031,215,130,117,181,100,165]; // bill count per range <50,50-99,100-149...
 
 // ══════════ UTILS ══════════
@@ -833,13 +864,13 @@ function nav(p){
   const pg=document.getElementById('page-'+p);
   if(pg){
     pg.classList.add('active');
-    // Force layout recalc so canvas gets proper dimensions
-    pg.style.display='block';
-    void pg.offsetHeight; // trigger reflow
+    void pg.offsetHeight; // trigger reflow so canvases get real dimensions
+    // Resize all charts — Chart.js re-measures & re-renders at correct size
+    requestAnimationFrame(()=>{
+      Object.values(CHARTS).forEach(c=>{try{c.resize();}catch(e){}});
+    });
   }
   document.getElementById('tb-title').textContent=document.querySelector(`[data-page="${p}"]`)?.textContent?.trim()||p;
-  // Resize any visible charts immediately after nav
-  setTimeout(()=>Object.values(CHARTS).forEach(c=>{try{c.resize();}catch(e){}}),30);
 }
 document.querySelectorAll('.nav-item[data-page]').forEach(e=>e.addEventListener('click',()=>nav(e.dataset.page)));
 document.getElementById('tb-date').textContent=new Date().toLocaleDateString('th-TH',{dateStyle:'long'});
@@ -886,7 +917,9 @@ function buildOverview(){
   set('kpi-bills-sub')('เฉลี่ย '+Math.round(TOTAL_BILLS/days)+' บิล/วัน');
   set('kpi-items')(totalItems.toLocaleString());
   set('kpi-items-sub')('เฉลี่ย '+Math.round(totalItems/days)+' ชิ้น/วัน');
-  set('kpi-abv')('฿'+Math.round(TOTAL_NET/TOTAL_BILLS));
+  const bevNet=(CATS.find(c=>c.cat==='Beverage')||{net:0}).net;
+  const netExBev=TOTAL_NET-bevNet;
+  set('kpi-abv')('฿'+Math.round(netExBev/TOTAL_BILLS));
   set('kpi-disc')('฿'+Math.round(totalDisc).toLocaleString());
   set('kpi-gross')('฿'+Math.round(totalGross).toLocaleString());
   // Update all period labels
@@ -908,6 +941,22 @@ function buildOverview(){
     setEl('sidebar-period')(sidebarTxt);
     setEl('ov-period')(thaiTxt);
     setEl('dow-period')(thaiTxt);
+  }
+  // Render daily sales mini-bars in sidebar
+  const sbDaily = document.getElementById('sb-daily-sales');
+  if(sbDaily && DAILY.length > 0){
+    const maxNet = Math.max(...DAILY.map(d=>d.net));
+    const dowShort = {Sun:'อา',Mon:'จ',Tue:'อ',Wed:'พ',Thu:'พฤ',Fri:'ศ',Sat:'ส'};
+    sbDaily.innerHTML = DAILY.map(d=>{
+      const lbl = d.date.substring(0,5);
+      const pct = maxNet > 0 ? (d.net/maxNet*100).toFixed(1) : 0;
+      const val = d.net>=1000 ? (d.net/1000).toFixed(1)+'K' : d.net;
+      return '<div class="sb-day-row">'
+        +'<span class="sb-day-lbl">'+lbl+'</span>'
+        +'<div class="sb-day-bar-wrap"><div class="sb-day-bar-fill" style="width:'+pct+'%"></div></div>'
+        +'<span class="sb-day-val">฿'+val+'</span>'
+        +'</div>';
+    }).join('');
   }
   // Update peak hour KPIs
   if(HOURS.length>0){
@@ -955,6 +1004,67 @@ function buildOverview(){
     <td class="num" style="color:var(--accent)">${(c.net/TOTAL_NET*100).toFixed(1)}%</td>
     <td><div class="pbwrap" style="width:100px"><div class="pbfill" style="width:${c.net/maxN*100}%;background:${c.color}"></div></div></td>
   </tr>`).join('');
+}
+
+// ══════════ DAILY NET SALES ══════════
+function buildDaily(){
+  const thDOW={Sun:'อาทิตย์',Mon:'จันทร์',Tue:'อังคาร',Wed:'พุธ',Thu:'พฤหัสบดี',Fri:'ศุกร์',Sat:'เสาร์'};
+  const maxNet=Math.max(...DAILY.map(d=>d.net),1);
+  const totalNet=DAILY.reduce((s,d)=>s+d.net,0);
+  const totalGross=DAILY.reduce((s,d)=>s+d.gross,0);
+  const totalDisc=DAILY.reduce((s,d)=>s+d.discount,0);
+  const totalBills=DAILY.reduce((s,d)=>s+d.bills,0);
+  const totalQty=DAILY.reduce((s,d)=>s+d.qty,0);
+
+  const rows=DAILY.map((d,i)=>{
+    const dow=DOW_MAP[d.date]||'';
+    const dowTH=thDOW[dow]||dow;
+    const isWeekend=dow==='Sat'||dow==='Sun';
+    const pct=d.net/maxNet*100;
+    const abv=d.bills>0?Math.round(d.net/d.bills):0;
+    const discPct=d.gross>0?(d.discount/d.gross*100).toFixed(1):0;
+    return '<tr style="border-bottom:1px solid var(--border);'+(isWeekend?'background:rgba(240,165,0,0.04)':'')+'">'
+      +'<td style="padding:9px 12px;font-family:var(--font-m);color:var(--accent2)">'+d.date.substring(0,5)+'</td>'
+      +'<td style="padding:9px 8px;font-size:12px;color:'+(isWeekend?'var(--accent)':'var(--text2)')+'">'+dowTH+'</td>'
+      +'<td class="num" style="padding:9px 8px">'+fn(d.bills)+'</td>'
+      +'<td class="num" style="padding:9px 8px">'+fn(d.qty)+'</td>'
+      +'<td class="num" style="padding:9px 8px;color:var(--text2)">'+f(d.gross)+'</td>'
+      +'<td class="num" style="padding:9px 8px;color:var(--red,#f04545)">-'+f(d.discount)+'<span style="font-size:10px;color:var(--text3);margin-left:3px">('+discPct+'%)</span></td>'
+      +'<td class="num" style="padding:9px 8px;color:var(--accent);font-family:var(--font-m)">'+f(d.net)+'</td>'
+      +'<td class="num" style="padding:9px 8px">฿'+fn(abv)+'</td>'
+      +'<td style="padding:9px 8px"><div style="background:var(--surface3);border-radius:3px;height:8px;overflow:hidden">'
+      +'<div style="height:100%;width:'+pct.toFixed(1)+'%;background:var(--accent);border-radius:3px"></div></div></td>'
+      +'</tr>';
+  });
+
+  // Total row
+  const avgAbv=totalBills>0?Math.round(totalNet/totalBills):0;
+  const totalDiscPct=totalGross>0?(totalDisc/totalGross*100).toFixed(1):0;
+  const totalRow='<tr style="border-top:2px solid var(--accent);background:var(--surface2);font-family:var(--font-m)">'
+    +'<td style="padding:10px 12px;color:var(--accent2);font-size:12px">TOTAL</td>'
+    +'<td style="padding:10px 8px;font-size:11px;color:var(--text3)">'+DAILY.length+' วัน</td>'
+    +'<td class="num" style="padding:10px 8px;color:var(--accent2)">'+fn(totalBills)+'</td>'
+    +'<td class="num" style="padding:10px 8px;color:var(--accent2)">'+fn(totalQty)+'</td>'
+    +'<td class="num" style="padding:10px 8px">'+f(totalGross)+'</td>'
+    +'<td class="num" style="padding:10px 8px;color:var(--red,#f04545)">-'+f(totalDisc)+'<span style="font-size:10px;color:var(--text3);margin-left:3px">('+totalDiscPct+'%)</span></td>'
+    +'<td class="num" style="padding:10px 8px;color:var(--accent);font-size:15px">'+f(totalNet)+'</td>'
+    +'<td class="num" style="padding:10px 8px">฿'+fn(avgAbv)+'</td>'
+    +'<td style="padding:10px 8px"><div style="background:var(--accent);border-radius:3px;height:8px"></div></td>'
+    +'</tr>';
+
+  document.getElementById('daily-tbody').innerHTML=rows.join('')+totalRow;
+
+  // Update period label
+  if(DAILY.length>0){
+    const p=document.getElementById('daily-period');
+    if(p){
+      const first=DAILY[0].date.substring(0,5),last=DAILY[DAILY.length-1].date.substring(0,5);
+      const mm=parseInt(DAILY[0].date.split('/')[1]);
+      const yr=parseInt(DAILY[0].date.split('/')[2]);
+      const mTH=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      p.textContent=first+'–'+last+' '+mTH[mm]+' '+(yr+543);
+    }
+  }
 }
 
 // ══════════ DOW ══════════
@@ -1496,7 +1606,11 @@ function renderProd(){
   else if(sort==='rpu-d')data.sort((a,b)=>(b.qty>0?b.net/b.qty:0)-(a.qty>0?a.net/a.qty:0));
   else data.sort((a,b)=>(a.p||'').localeCompare(b.p||''));
   const maxN=Math.max(...data.map(p=>p.net),1);
-  document.getElementById('prod-tbody').innerHTML=data.map((p,i)=>{
+  const totalQty=data.reduce((s,p)=>s+p.qty,0);
+  const totalNet=data.reduce((s,p)=>s+p.net,0);
+  const totalBills=data.reduce((s,p)=>s+(p.bills||0),0);
+  const totalRpu=totalQty>0?Math.round(totalNet/totalQty):0;
+  const rows=data.map((p,i)=>{
     const rpu=p.qty>0?Math.round(p.net/p.qty):0;const c=catColors[p.c]||'#888';
     return `<tr>
       <td><span class="rb ${i===0?'g1':i===1?'g2':i===2?'g3':''}">${i+1}</span></td>
@@ -1508,7 +1622,18 @@ function renderProd(){
       <td class="num">${fn(p.bills||0)}</td>
       <td><div class="pbwrap" style="width:70px"><div class="pbfill" style="width:${p.net/maxN*100}%;background:${c}"></div></div></td>
     </tr>`;
-  }).join('');
+  });
+  const totalRow=`<tr style="border-top:2px solid var(--accent);font-family:var(--font-m);background:var(--surface2)">
+    <td style="text-align:center;color:var(--text3);font-size:10px">—</td>
+    <td style="font-size:11px;color:var(--accent2);letter-spacing:.5px">TOTAL (${data.length} รายการ)</td>
+    <td></td>
+    <td class="num" style="color:var(--accent2)">${fn(totalQty)}</td>
+    <td class="num" style="color:var(--accent)">${fn(totalNet)}</td>
+    <td class="num" style="color:var(--text2)">${fn(totalRpu)}</td>
+    <td class="num" style="color:var(--accent2)">${fn(totalBills)}</td>
+    <td><div class="pbwrap" style="width:70px"><div class="pbfill" style="width:100%;background:var(--accent)"></div></div></td>
+  </tr>`;
+  document.getElementById('prod-tbody').innerHTML=rows.join('')+totalRow;
   document.getElementById('ps-cnt').textContent=`แสดง ${data.length} รายการ${dateF?' ('+dateF+')':''}`;
 }
 
@@ -1583,8 +1708,9 @@ async function processFiles(){
         cat:  String(r[iCat] ||'').trim(),
         prod: String(r[iProd]||'').trim(),
         qty:  parseFloat(r[iQty]) ||0,
-        net:  parseFloat(r[iNet]) ||0,
-        disc: parseFloat(r[iDisc])||0
+        gross: parseFloat(r[iNet])  ||0,
+        disc:  parseFloat(r[iDisc]) ||0,
+        net:   (parseFloat(r[iNet])||0) - (parseFloat(r[iDisc])||0)
       });
     }
     
@@ -1697,8 +1823,12 @@ function rebuildDashboard(salesRows, promoRows){
     if(!r.date)return;
     const h=parseInt((r.time||'00:00').split(':')[0])||0;
     dates.add(r.date);
-    if(!dateMap[r.date])dateMap[r.date]={net:0,qty:0,bills:new Set()};
-    dateMap[r.date].net+=r.net; dateMap[r.date].qty+=r.qty; dateMap[r.date].bills.add(r.doc);
+    if(!dateMap[r.date])dateMap[r.date]={net:0,gross:0,qty:0,disc:0,bills:new Set()};
+    dateMap[r.date].net  +=r.net;
+    dateMap[r.date].gross+=r.gross;
+    dateMap[r.date].qty  +=r.qty;
+    dateMap[r.date].disc +=(r.disc||0);
+    dateMap[r.date].bills.add(r.doc);
     if(!catMap[r.cat])catMap[r.cat]={net:0,qty:0};
     catMap[r.cat].net+=r.net; catMap[r.cat].qty+=r.qty;
     if(!hourMap[h])hourMap[h]={net:0,qty:0};
@@ -1721,9 +1851,12 @@ function rebuildDashboard(salesRows, promoRows){
   promoRows.forEach(p=>{if(p.date)promoByDate[p.date]=(promoByDate[p.date]||0)+p.discount;});
 
   const newDAILY=sortedDates.map(d=>{
-    const v=dateMap[d]||{net:0,qty:0,bills:new Set()};
-    const disc=promoByDate[d]||0;
-    return {date:d,net:v.net,qty:v.qty,bills:[...v.bills].length,gross:v.net+disc,discount:disc};
+    const v=dateMap[d]||{net:0,gross:0,qty:0,disc:0,bills:new Set()};
+    // Use sales per-line discount if available, otherwise fall back to promo file discount
+    const disc = v.disc > 0 ? v.disc : (promoByDate[d]||0);
+    const gross = v.gross > 0 ? v.gross : v.net + disc;
+    const net   = gross - disc;
+    return {date:d,net:net,qty:v.qty,bills:[...v.bills].length,gross:gross,discount:disc};
   });
 
   const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
@@ -1749,6 +1882,7 @@ function rebuildDashboard(salesRows, promoRows){
   });
 
   DAILY.length=0;  newDAILY.forEach(d=>DAILY.push(d));
+  TOTAL_NET = DAILY.reduce((s,d)=>s+d.net,0);
   CATS.length=0;   newCATS.forEach(c=>CATS.push(c));
   HOURS.length=0;  newHOURS.forEach(h=>HOURS.push(h));
   PRODUCTS.length=0; newPRODS.forEach(p=>PRODUCTS.push(p));
@@ -1757,7 +1891,8 @@ function rebuildDashboard(salesRows, promoRows){
   PROMO_DATA.length=0; promoRows.forEach(p=>PROMO_DATA.push(p));
 
   // Recompute totals from fresh data
-  TOTAL_NET   = salesRows.reduce((s,r)=>s+r.net,0);
+  // Recalculate TOTAL_NET from DAILY after discount correction
+  // (done after newDAILY is built below)
   const billMap={};
   salesRows.forEach(r=>{ billMap[r.doc]=(billMap[r.doc]||0)+r.net; });
   const billTotals=Object.values(billMap);
@@ -1778,7 +1913,7 @@ function rebuildDashboard(salesRows, promoRows){
 
   const runBuilds=()=>{
     destroyCharts();
-    const fns=[buildOverview,buildDOW,buildVisual,buildBasket,
+    const fns=[buildOverview,buildDaily,buildDOW,buildVisual,buildBasket,
                buildHourlySalesHM,buildCatHM,buildDiscHM,buildPromo,
                buildQuality,buildMarket,buildCombo,buildTopBot,renderProd];
     for(const fn of fns){
@@ -1794,9 +1929,13 @@ function rebuildDashboard(salesRows, promoRows){
 
 // ══════════ INIT ══════════
 window.addEventListener('DOMContentLoaded',()=>{
-  buildOverview();buildDOW();buildVisual();buildBasket();
+  buildOverview();buildDaily();buildDOW();buildVisual();buildBasket();
   buildHourlySalesHM();buildCatHM();buildDiscHM();buildPromo();
   buildQuality();buildMarket();buildCombo();buildTopBot();renderProd();
+  // Resize all charts once on load (handles any initial sizing issues)
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    Object.values(CHARTS).forEach(c=>{try{c.resize();}catch(e){}});
+  }));
   // Wire file inputs (defined here so DOMContentLoaded fires once)
   const f1=document.getElementById('f1');
   const f2=document.getElementById('f2');
