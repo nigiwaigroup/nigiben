@@ -6,6 +6,7 @@
 <title>NIGIBEN Dashboard v2 — Don Mueang</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -224,7 +225,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     animation:modalIn .3s cubic-bezier(.34,1.56,.64,1) both;
   ">
     <div style="text-align:center;margin-bottom:28px">
-      <div style="font-family:var(--font-h);font-size:26px;font-weight:700;color:var(--accent);letter-spacing:3px">NIGIBEN</div>
+      <div style="font-family:var(--font-h);font-size:26px;font-weight:700;color:#22d47a;letter-spacing:3px">NIGIBEN</div>
       <div style="font-size:13px;color:var(--text3);margin-top:6px;letter-spacing:1px">Sales Intelligence Dashboard</div>
       <div style="width:40px;height:2px;background:var(--accent);margin:14px auto 0;border-radius:2px"></div>
     </div>
@@ -246,7 +247,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
     <!-- File 2: Promo -->
     <div style="margin-bottom:24px">
-      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น) <span style="color:var(--accent);font-size:10px;letter-spacing:0;text-transform:none;opacity:.7">— ไม่บังคับ</span></div>
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น)</div>
       <div id="modal-drop2" onclick="triggerPick(2)" style="border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
            ondragleave="this.style.borderColor='var(--border)'"
@@ -412,25 +413,25 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
   <div class="card mb">
     <div class="ct">🏆 Top 10 สินค้าขายดีที่สุด — เรียงตามยอดรายได้สุทธิ (฿)</div>
-    <div style="height:300px"><canvas id="ch-top10-rev"></canvas></div>
+    <div style="height:380px"><canvas id="ch-top10-rev"></canvas></div>
     <div class="cs">📌 Sushi Bento ครองอันดับต้น 7 ใน 10 สะท้อนว่า Core Product ของร้านคือ Sushi Bento · สินค้าอันดับ 1 <strong>Salmon Sushi 7 pcs.</strong> ทำรายได้ ฿37,800 ซึ่งมากกว่าอันดับ 2 เกือบ 2 เท่า แนะนำให้ยืนสต็อกอย่างต่อเนื่อง</div>
   </div>
 
   <div class="card mb">
     <div class="ct">📦 Top 10 สินค้าที่ขายได้จำนวนมากที่สุด — เรียงตามจำนวนชิ้น</div>
-    <div style="height:300px"><canvas id="ch-top10-qty"></canvas></div>
+    <div style="height:380px"><canvas id="ch-top10-qty"></canvas></div>
     <div class="cs">📌 <strong>น้ำดื่ม Namthip</strong> ขายได้ 1,306 ชิ้น สูงสุด แต่ยอดรายได้ไม่ติดTop10 บ่งชี้ว่าเป็น Low-margin High-volume item · Beverage มีปริมาณสูงแต่ Margin ต่ำ ควรพิจารณากลยุทธ์ Bundle กับ Sushi Bento</div>
   </div>
 
   <div class="card mb">
     <div class="ct">💎 Revenue per Unit — ราคาเฉลี่ยต่อชิ้น (Top 10 มูลค่าสูงสุด)</div>
-    <div style="height:300px"><canvas id="ch-rpu"></canvas></div>
+    <div style="height:380px"><canvas id="ch-rpu"></canvas></div>
     <div class="cs">📌 สินค้า Premium ใน Sushi Bento มีราคาต่อชิ้นสูงสุด — <strong>Sashimi Varity Set</strong> และ <strong>Salmon Varity Set L</strong> มีราคาเฉลี่ยต่อชิ้นเกิน ฿400 ซึ่งเป็นโอกาสดีในการ Upsell ให้ลูกค้าที่ชอบ Sushi</div>
   </div>
 
   <div class="card mb">
     <div class="ct">⚡ สัดส่วนรายได้ตามช่วงเวลา (Revenue by Hour) — เปอร์เซ็นต์ต่อชั่วโมง</div>
-    <div style="height:260px"><canvas id="ch-hour-pct"></canvas></div>
+    <div style="height:520px"><canvas id="ch-hour-pct"></canvas></div>
     <div class="cs">📌 ช่วง 21:00 สร้างรายได้ <strong>45%</strong> ของยอดรวมทั้งวัน ส่วนใหญ่มาจาก Flash Sale · ช่วง 12:00–17:00 เป็น Steady Hours ที่ควรรักษา Staff และ Stock ให้เพียงพอ</div>
   </div>
 
@@ -859,6 +860,9 @@ const fn=n=>Math.round(n).toLocaleString();
 Chart.defaults.color='#7e8caa';
 Chart.defaults.font.family="'Sarabun',sans-serif";
 Chart.defaults.plugins.legend.display=false;
+// Register datalabels plugin but disable globally — enable per-chart only
+Chart.register(ChartDataLabels);
+Chart.defaults.set('plugins.datalabels',{display:false});
 const grd={color:'rgba(255,255,255,0.05)',drawBorder:false};
 const catColors={"Sushi Bento":"#e07070","Donburi":"#3d9be0","Beverage":"#22d47a","Dessert":"#a07ee0","Appetizer":"#f0a500"};
 const promoColors={"Flash Sale 21:00-22:00":"#ff1f1f","Flash Sale 20:00-21:00":"#ffb347","Staff Discount 15%":"#c77dff","Partners Discount":"#39ff14","Staff Discount 10%":"#06d6a0","Flash Sale 19:00-20:00":"#f72585","Flash Sale 18:00-19:00":"#ffd60a","Staff Discount 5%":"#4cc9f0","Grab&Go Discount":"#7bed9f","Birthday Discount":"#ff6b81"};
@@ -1171,32 +1175,94 @@ function buildVisual(){
   const top10r=[...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>b.net-a.net).slice(0,10);
   const top10q=[...PRODUCTS].filter(p=>p.qty>0).sort((a,b)=>b.qty-a.qty).slice(0,10);
   const top10rpu=[...PRODUCTS].filter(p=>p.qty>0&&p.net>0).map(p=>({...p,rpu:Math.round(p.net/p.qty)})).sort((a,b)=>b.rpu-a.rpu).slice(0,10);
-  const makeBarChart=(id,data,labelFn,valFn,cbFn)=>mkChart(id,{
-    type:'bar',indexAxis:'y',
-    data:{labels:data.map(p=>sn(p.p)),datasets:[{data:data.map(valFn),backgroundColor:data.map(p=>catColors[p.c]||'#888'),borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:cbFn}}},
-      scales:{x:{grid:grd,ticks:{callback:labelFn}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
-  });
-  makeBarChart('ch-top10-rev',top10r,v=>'฿'+Math.round(v/1000)+'K',p=>p.net,ctx=>f(ctx.raw));
-  makeBarChart('ch-top10-qty',top10q,v=>fn(v),p=>p.qty,ctx=>fn(ctx.raw)+' ชิ้น');
-  makeBarChart('ch-rpu',top10rpu,v=>'฿'+v,p=>p.rpu,ctx=>f(ctx.raw)+'/ชิ้น');
 
-  // Hourly pct
-  const total=HOURS.reduce((s,h)=>s+h.net,0);
-  mkChart('ch-hour-pct',{
-    type:'bar',
-    data:{labels:HOURS.map(h=>`${String(h.h).padStart(2,'0')}:00`),datasets:[{
-      data:HOURS.map(h=>+(h.net/total*100).toFixed(1)),
-      backgroundColor:HOURS.map(h=>h.h>=20&&h.h<=21?'rgba(240,84,84,0.85)':h.h>=12&&h.h<=18?'rgba(61,155,224,0.7)':'rgba(100,120,160,0.5)'),
-      borderRadius:3
-    }]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{tooltip:{callbacks:{label:ctx=>ctx.raw+'%  '+f(HOURS[ctx.dataIndex].net)}}},
-      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>v+'%'}}}
-    }
-  });
+  // Custom HTML horizontal bar renderer — แม่นยำกว่า Chart.js สำหรับ label+stamp
+  function renderHBar(canvasId, items, valFn, labelFn, colorFn){
+    const canvas = document.getElementById(canvasId);
+    if(!canvas) return;
+    // Replace canvas with a div
+    const wrap = document.createElement('div');
+    wrap.id = canvasId;
+    wrap.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:4px 0;box-sizing:border-box;';
+    canvas.parentNode.replaceChild(wrap, canvas);
 
-  // Pareto
+    const vals = items.map(valFn);
+    const maxV = Math.max(...vals, 1);
+
+    items.forEach((item, i) => {
+      const v = vals[i];
+      const pct = (v / maxV * 100).toFixed(1);
+      const color = colorFn ? colorFn(item) : (catColors[item.c] || '#888');
+      const name = item.p ? (item.p.includes('/') ? item.p.split('/').slice(1).join('/').trim() : item.p) : (item.label||'');
+      const label = labelFn(v);
+      const shortName = name.length > 28 ? name.substring(0, 26) + '…' : name;
+
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:28px;';
+
+      // rank badge
+      const rank = document.createElement('span');
+      rank.style.cssText = `width:20px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:#445066;flex-shrink:0;`;
+      rank.textContent = i + 1;
+
+      // name label
+      const nameLbl = document.createElement('span');
+      nameLbl.style.cssText = `width:175px;font-size:11px;color:#9aa3b8;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;`;
+      nameLbl.title = name;
+      nameLbl.textContent = shortName;
+
+      // bar track
+      const track = document.createElement('div');
+      track.style.cssText = 'flex:1;height:22px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:visible;position:relative;';
+
+      // bar fill
+      const fill = document.createElement('div');
+      fill.style.cssText = `height:100%;width:${pct}%;background:${color};border-radius:4px;transition:width .5s ease;min-width:4px;`;
+      track.appendChild(fill);
+
+      // value stamp — อยู่ขวาของแท่ง ไม่ทับ
+      const stamp = document.createElement('span');
+      stamp.style.cssText = `position:absolute;left:calc(${pct}% + 8px);top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:#dde3f0;white-space:nowrap;`;
+      stamp.textContent = label;
+      track.appendChild(stamp);
+
+      row.appendChild(rank);
+      row.appendChild(nameLbl);
+      row.appendChild(track);
+      wrap.appendChild(row);
+    });
+  }
+
+  renderHBar('ch-top10-rev', top10r, p=>p.net, v=>'฿'+Math.round(v).toLocaleString());
+  renderHBar('ch-top10-qty', top10q, p=>p.qty, v=>Math.round(v).toLocaleString()+' ชิ้น');
+  renderHBar('ch-rpu', top10rpu, p=>p.rpu, v=>'฿'+Math.round(v).toLocaleString()+'/ชิ้น');
+
+  // Hourly — custom HTML เช่นกัน (18 ชั่วโมง)
+  const total = HOURS.reduce((s,h)=>s+h.net, 0);
+  const hourCanvas = document.getElementById('ch-hour-pct');
+  if(hourCanvas){
+    const wrap = document.createElement('div');
+    wrap.id = 'ch-hour-pct';
+    wrap.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:4px 0;box-sizing:border-box;';
+    hourCanvas.parentNode.replaceChild(wrap, hourCanvas);
+    const maxV = Math.max(...HOURS.map(h=>h.net), 1);
+    HOURS.forEach(h=>{
+      const pct = (h.net/maxV*100).toFixed(1);
+      const revPct = total>0 ? (h.net/total*100).toFixed(1) : '0.0';
+      const color = h.h>=20&&h.h<=21 ? 'rgba(240,84,84,0.9)' : h.h>=12&&h.h<=18 ? 'rgba(61,155,224,0.75)' : 'rgba(100,120,160,0.5)';
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:22px;';
+      row.innerHTML = `
+        <span style="width:44px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:#9aa3b8;flex-shrink:0;">${String(h.h).padStart(2,'0')}:00</span>
+        <div style="flex:1;height:18px;background:rgba(255,255,255,0.05);border-radius:3px;position:relative;">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width .5s ease;min-width:2px;"></div>
+          <span style="position:absolute;left:calc(${pct}% + 7px);top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:10px;color:#dde3f0;white-space:nowrap;">${revPct}%&nbsp;&nbsp;${f(h.net)}</span>
+        </div>`;
+      wrap.appendChild(row);
+    });
+  }
+
+  // Pareto — คงเป็น line chart
   const cum=[];let s=0;
   [...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>b.net-a.net).forEach((p,i)=>{s+=p.net;cum.push({x:i+1,y:+(s/TOTAL_NET*100).toFixed(1)});});
   mkChart('ch-pareto',{
@@ -1206,7 +1272,7 @@ function buildVisual(){
       {data:cum.map((d,i)=>i===Math.floor(cum.length*0.2)?80:null),type:'scatter',pointBackgroundColor:'#f04545',pointRadius:8,showLine:false}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},annotation:{},tooltip:{callbacks:{label:ctx=>`สินค้าลำดับ${ctx.label}: ${ctx.raw}% สะสม`}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`สินค้าลำดับ${ctx.label}: ${ctx.raw}% สะสม`}}},
       scales:{x:{grid:grd,title:{display:true,text:'ลำดับสินค้า (เรียงตามยอดขาย)',color:'#445066'}},y:{grid:grd,ticks:{callback:v=>v+'%'},max:100}}
     }
   });
@@ -1985,6 +2051,15 @@ async function processFiles(){
 }
 
 function destroyCharts(){
+  // Reset HTML-rendered visual charts back to canvas elements
+  ['ch-top10-rev','ch-top10-qty','ch-rpu','ch-hour-pct'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && el.tagName!=='CANVAS'){
+      const canvas=document.createElement('canvas');
+      canvas.id=id;
+      el.parentNode.replaceChild(canvas,el);
+    }
+  });
   // Only reset innerHTML containers — mkChart() handles canvas replacement itself
   ['hm-sales','hm-cat','hm-disc','combo-list','cat-leg','cat-tbody',
    'dow-kpis','dow-tbody','basket-kpis','disc-overview-kpis','promo-kpis',
