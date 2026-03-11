@@ -671,7 +671,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
       <option value="rpu-d">ราคา/ชิ้น (มาก→น้อย)</option>
       <option value="name">ชื่อ (A→Z)</option>
     </select>
-    <select id="ps-cat" onchange="renderProd()">
+    <select id="ps-cat" onchange="onCatFilter(this.value)">
       <option value="">ทุกหมวด</option>
       <option value="Sushi Bento">Sushi Bento</option>
       <option value="Donburi">Donburi</option>
@@ -681,16 +681,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     </select>
     <select id="ps-date" onchange="renderProd()">
       <option value="">ทุกวัน (รวม)</option>
-      <option value="01/03/2026">01 มี.ค. 2569</option>
-      <option value="02/03/2026">02 มี.ค. 2569</option>
-      <option value="03/03/2026">03 มี.ค. 2569</option>
-      <option value="04/03/2026">04 มี.ค. 2569</option>
-      <option value="05/03/2026">05 มี.ค. 2569</option>
-      <option value="06/03/2026">06 มี.ค. 2569</option>
-      <option value="07/03/2026">07 มี.ค. 2569</option>
-      <option value="08/03/2026">08 มี.ค. 2569</option>
-      <option value="09/03/2026">09 มี.ค. 2569</option>
     </select>
+    <button onclick="expandAllProdGroups()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 12px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b)">▶ เปิดทั้งหมด</button>
+    <button onclick="collapseAllProdGroups()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 12px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b)">▼ ยุบทั้งหมด</button>
     <span class="sc-cnt" id="ps-cnt"></span>
   </div>
   <div class="card"><div class="tw"><table>
@@ -1676,6 +1669,25 @@ function switchTopBot(mode){
 
 // ══════════ PRODUCTS TABLE ══════════
 function setSP(v){document.getElementById('ps-sort').value=v;renderProd();}
+
+function onCatFilter(cat){
+  // When filtering by category: auto-expand that group, collapse others
+  const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
+  catOrder.forEach(c=>{ _prodGroupOpen[c] = cat ? (c===cat) : false; });
+  renderProd();
+}
+
+function expandAllProdGroups(){
+  const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
+  PRODUCTS.forEach(p=>{ if(p.c) _prodGroupOpen[p.c]=true; });
+  catOrder.forEach(c=>{ _prodGroupOpen[c]=true; });
+  renderProd();
+}
+
+function collapseAllProdGroups(){
+  Object.keys(_prodGroupOpen).forEach(k=>{ _prodGroupOpen[k]=false; });
+  renderProd();
+}
 // Track which category groups are expanded
 const _prodGroupOpen={};
 
@@ -1684,14 +1696,53 @@ function toggleProdGroup(cat){
   renderProd();
 }
 
+function populateProdDateDropdown(){
+  const sel=document.getElementById('ps-date');
+  if(!sel) return;
+  // Keep first option "ทุกวัน"
+  sel.innerHTML='<option value="">ทุกวัน (รวม)</option>';
+  const monthTH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  DAILY.forEach(d=>{
+    const parts=d.date.split('/');
+    if(parts.length!==3) return;
+    const dd=parts[0],mm=parseInt(parts[1]),yyyy=parseInt(parts[2]);
+    const thYr=yyyy+543;
+    const lbl=dd+' '+( monthTH[mm]||mm)+' '+thYr;
+    const opt=document.createElement('option');
+    opt.value=d.date; opt.textContent=lbl;
+    sel.appendChild(opt);
+  });
+}
+
+function populateProdCatDropdown(){
+  const sel=document.getElementById('ps-cat');
+  if(!sel) return;
+  const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
+  const existing=new Set(catOrder);
+  // Add any extra cats from PRODUCTS
+  PRODUCTS.forEach(p=>{ if(p.c && !existing.has(p.c)){ existing.add(p.c); catOrder.push(p.c); }});
+  sel.innerHTML='<option value="">ทุกหมวด</option>';
+  catOrder.filter(c=>PRODUCTS.some(p=>p.c===c)).forEach(c=>{
+    const opt=document.createElement('option');
+    opt.value=c; opt.textContent=c;
+    sel.appendChild(opt);
+  });
+}
+
 function renderProd(){
   const srch=document.getElementById('ps').value.toLowerCase();
   const sort=document.getElementById('ps-sort').value;
   const catF=document.getElementById('ps-cat').value;
   const dateF=document.getElementById('ps-date').value;
+  // Auto-expand the filtered category so items are visible
+  if(catF){ _prodGroupOpen[catF]=true; }
   let data;
   if(dateF && PROD_BY_DATE[dateF]){
-    data=Object.entries(PROD_BY_DATE[dateF]).map(([p,v])=>({p,c:v.cat,net:v.net,qty:v.qty,bills:Math.ceil(v.qty)}));
+    data=Object.entries(PROD_BY_DATE[dateF]).map(([p,v])=>({p,c:v.cat,net:v.net,qty:v.qty,disc:v.disc||0,bills:Math.ceil(v.qty)}));
+    // Auto-expand all groups when a specific date is selected
+    const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
+    catOrder.forEach(c=>{ _prodGroupOpen[c]=true; });
+    data.forEach(p=>{ if(p.c) _prodGroupOpen[p.c]=true; });
   } else {
     data=[...PRODUCTS];
   }
@@ -1794,7 +1845,10 @@ function renderProd(){
   </tr>`;
 
   document.getElementById('prod-tbody').innerHTML=rows.join('')+totalRow;
-  document.getElementById('ps-cnt').textContent=`แสดง ${data.length} รายการ${dateF?' ('+dateF+')':''}`;
+  let cntTxt=`แสดง ${data.length} รายการ`;
+  if(catF) cntTxt+=` · หมวด: ${catF}`;
+  if(dateF) cntTxt+=` (${dateF.substring(0,5)})`;
+  document.getElementById('ps-cnt').textContent=cntTxt;
 }
 
 // ══════════ UPLOAD ══════════
@@ -2044,6 +2098,18 @@ function rebuildDashboard(salesRows, promoRows){
   Object.keys(HM_SALES).forEach(k=>delete HM_SALES[k]); Object.assign(HM_SALES,newHM);
   PROMO_DATA.length=0; promoRows.forEach(p=>PROMO_DATA.push(p));
 
+  // Build PROD_BY_DATE from real salesRows (all products per day, not just top 5)
+  Object.keys(PROD_BY_DATE).forEach(k=>delete PROD_BY_DATE[k]);
+  salesRows.forEach(r=>{
+    if(!r.date||!r.prod) return;
+    if(!PROD_BY_DATE[r.date]) PROD_BY_DATE[r.date]={};
+    const key=r.prod;
+    if(!PROD_BY_DATE[r.date][key]) PROD_BY_DATE[r.date][key]={net:0,qty:0,disc:0,cat:r.cat};
+    PROD_BY_DATE[r.date][key].net += r.net;
+    PROD_BY_DATE[r.date][key].qty += r.qty;
+    PROD_BY_DATE[r.date][key].disc += (r.disc||0);
+  });
+
   // Recompute totals from fresh data
   // Recalculate TOTAL_NET from DAILY after discount correction
   // (done after newDAILY is built below)
@@ -2076,6 +2142,8 @@ function rebuildDashboard(salesRows, promoRows){
     }
     // Restore pages and navigate
     allPages.forEach(p=>{ p.style.cssText=''; });
+    populateProdDateDropdown();
+    populateProdCatDropdown();
     nav('overview');
   };
   requestAnimationFrame(()=>requestAnimationFrame(runBuilds));
@@ -2134,7 +2202,6 @@ async function processModalFiles(){
   if(!modalFiles[1]){status.textContent='❌ กรุณาเลือกไฟล์ยอดขายก่อน';return;}
   btn.disabled=true;btn.textContent='⏳ กำลังประมวลผล...';status.textContent='';
   try{
-    // Sync modalFiles → upF before calling processFiles
     upF[1]=modalFiles[1];
     upF[2]=modalFiles[2]||null;
     await processFiles();
