@@ -246,7 +246,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
     <!-- File 2: Promo -->
     <div style="margin-bottom:24px">
-      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น)</div>
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น) <span style="color:var(--accent);font-size:10px;letter-spacing:0;text-transform:none;opacity:.7">— ไม่บังคับ</span></div>
       <div id="modal-drop2" onclick="triggerPick(2)" style="border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
            ondragleave="this.style.borderColor='var(--border)'"
@@ -1805,8 +1805,9 @@ function handleF(ev,n){
   const file=ev.target.files[0];if(!file)return;
   upF[n]=file;
   const el=document.getElementById('st'+n);
-  el.innerHTML=`<div class="fstatus ok">✅ <strong>${file.name}</strong> — ${(file.size/1024).toFixed(1)} KB · พร้อมประมวลผล</div>`;
-  document.getElementById('proc-btn').disabled=!(upF[1]&&upF[2]);
+  if(el) el.innerHTML=`<div class="fstatus ok">✅ <strong>${file.name}</strong> — ${(file.size/1024).toFixed(1)} KB · พร้อมประมวลผล</div>`;
+  const procBtn=document.getElementById('proc-btn');
+  if(procBtn) procBtn.disabled=!upF[1];
 }
 
 // File wiring handled in DOMContentLoaded init block below
@@ -2084,22 +2085,27 @@ function rebuildDashboard(salesRows, promoRows){
 // ══════════ MODAL UPLOAD ══════════
 const modalFiles={1:null,2:null};
 function triggerPick(n){
-  if(document.activeElement) document.activeElement.blur();
-  requestAnimationFrame(()=>{
-    const inp=document.getElementById('modal-f'+n);
-    if(inp){ inp.value=''; inp.click(); }
-  });
+  const inp=document.getElementById('modal-f'+n);
+  if(inp){ inp.value=''; inp.click(); }
 }
 
 
 function handleModalFile(input,n){
   const file=input.files[0];
   if(!file)return;
+  if(!file.name.toLowerCase().endsWith('.xlsx')){
+    const status=document.getElementById('modal-status');
+    if(status) status.textContent='❌ กรุณาเลือกไฟล์ .xlsx เท่านั้น';
+    input.value='';
+    return;
+  }
   modalFiles[n]=file;
   const el=document.getElementById('modal-f'+n+'-name');
   const drop=document.getElementById('modal-drop'+n);
   if(el) el.textContent='✅ '+file.name;
   if(drop){drop.style.borderColor='var(--accent)';drop.style.background='rgba(34,212,122,0.06)';}
+  const status=document.getElementById('modal-status');
+  if(status) status.textContent='';
   checkModalReady();
 }
 
@@ -2119,15 +2125,18 @@ function handleModalDrop(event,n){
 
 function checkModalReady(){
   const btn=document.getElementById('modal-btn');
-  if(btn){const ready=!!(modalFiles[1]&&modalFiles[2]);btn.disabled=!ready;btn.style.opacity=ready?'1':'.4';}
+  if(btn){const ready=!!(modalFiles[1]);btn.disabled=!ready;btn.style.opacity=ready?'1':'.4';}
 }
 
 async function processModalFiles(){
   const btn=document.getElementById('modal-btn');
   const status=document.getElementById('modal-status');
+  if(!modalFiles[1]){status.textContent='❌ กรุณาเลือกไฟล์ยอดขายก่อน';return;}
   btn.disabled=true;btn.textContent='⏳ กำลังประมวลผล...';status.textContent='';
   try{
-    upF[1]=modalFiles[1];upF[2]=modalFiles[2];
+    // Sync modalFiles → upF before calling processFiles
+    upF[1]=modalFiles[1];
+    upF[2]=modalFiles[2]||null;
     await processFiles();
     const modal=document.getElementById('upload-modal');
     if(modal){modal.style.animation='modalOut .25s ease forwards';setTimeout(()=>modal.remove(),260);}
