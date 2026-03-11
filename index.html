@@ -1759,10 +1759,15 @@ function renderProd(){
         rank++;
         const rpu=p.qty>0?Math.round(p.net/p.qty):0;
         const name=p.p.includes('/')?p.p.split('/').slice(1).join('/').trim():p.p;
+        const code=p.p.includes('/')?p.p.split('/')[0].trim():'';
         rows.push(`<tr style="border-bottom:1px solid var(--border)22">
           <td style="padding:8px 12px;color:var(--text3);font-size:11px;font-family:var(--font-m);padding-left:28px">${rank}</td>
-          <td style="padding:8px 8px;font-size:12px;color:var(--text);padding-left:32px">
-            <span style="color:var(--text3);margin-right:6px">└</span>${name}
+          <td style="padding:8px 8px;padding-left:32px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="color:var(--text3);margin-right:2px">└</span>
+              <span style="font-family:var(--font-m);font-size:10px;color:var(--accent2);background:var(--surface3);padding:2px 7px;border-radius:4px;white-space:nowrap">${code}</span>
+              <span style="font-size:12px;color:var(--text)">${name}</span>
+            </div>
           </td>
           <td></td>
           <td class="num" style="padding:8px">${fn(p.qty)}</td>
