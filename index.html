@@ -1531,36 +1531,55 @@ function buildPromo(){
 }
 
 function buildQuality(){
-  const promoNet=PROMO_DATA.reduce((s,p)=>s+p.net,0);
-  const fullPrice=TOTAL_NET-promoNet;
-  const totalDiscLeaked=DAILY.reduce((s,d)=>s+(d.discount||0),0);
-  const totalGrossQ=DAILY.reduce((s,d)=>s+(d.gross||d.net),0);
+  // ใช้ discount จาก DAILY ที่คำนวณแล้ว (แม่นยำกว่า PROMO_DATA.net)
+  // Full Price Revenue = ยอด Net ที่ไม่ถูก discount
+  // Promo Discount = ส่วนลดที่หายไป (d.discount)
+  // Promo Net ที่ลูกค้าจ่ายจริง = d.net (รวมอยู่ใน TOTAL_NET แล้ว)
+  const totalDiscount = DAILY.reduce((s,d)=>s+(d.discount||0),0);
+  const totalGross    = DAILY.reduce((s,d)=>s+(d.gross||d.net),0);
+  // Full Price = ยอด Net รวม (TOTAL_NET ซึ่งรวมทั้ง promo และ non-promo แล้ว)
+  // แยกเป็น: บิลที่โดน discount vs บิลที่ไม่โดน — ใช้ discount/gross ratio ต่อวัน
+  const promoNetTotal = PROMO_DATA.reduce((s,p)=>s+p.net,0);
+  const fullPriceTotal = TOTAL_NET - promoNetTotal;
+
+  const totalDiscLeaked=totalDiscount;
+  const totalGrossQ=totalGross;
   document.getElementById('quality-kpis').innerHTML=
-    '<div class="kpi g"><div class="kpi-lbl">Full Price Revenue</div><div class="kpi-val gc">'+f(fullPrice)+'</div><div class="kpi-sub">'+(fullPrice/TOTAL_NET*100).toFixed(1)+'% ของยอดรวม</div></div>'
-   +'<div class="kpi r"><div class="kpi-lbl">Promo Net Revenue</div><div class="kpi-val rc">'+f(promoNet)+'</div><div class="kpi-sub">'+(promoNet/TOTAL_NET*100).toFixed(1)+'% ของยอดรวม</div></div>'
+    '<div class="kpi g"><div class="kpi-lbl">Full Price Revenue</div><div class="kpi-val gc">'+f(fullPriceTotal)+'</div><div class="kpi-sub">'+(TOTAL_NET>0?(fullPriceTotal/TOTAL_NET*100).toFixed(1):0)+'% ของยอดรวม</div></div>'
+   +'<div class="kpi r"><div class="kpi-lbl">Promo Net Revenue</div><div class="kpi-val rc">'+f(promoNetTotal)+'</div><div class="kpi-sub">'+(TOTAL_NET>0?(promoNetTotal/TOTAL_NET*100).toFixed(1):0)+'% ของยอดรวม</div></div>'
    +'<div class="kpi"><div class="kpi-lbl">Discount Leaked</div><div class="kpi-val" style="color:var(--cyan)">'+f(totalDiscLeaked)+'</div><div class="kpi-sub">รายได้ที่สูญเสียจากโปรโมชั่น</div></div>'
-   +'<div class="kpi p"><div class="kpi-lbl">Recovery Rate</div><div class="kpi-val pc">'+(totalGrossQ>0?(promoNet/totalGrossQ*100).toFixed(1):0)+'%</div><div class="kpi-sub">ของยอดก่อนส่วนลดโปรโมชั่น</div></div>';
+   +'<div class="kpi p"><div class="kpi-lbl">Recovery Rate</div><div class="kpi-val pc">'+(totalGrossQ>0?(TOTAL_NET/totalGrossQ*100).toFixed(1):0)+'%</div><div class="kpi-sub">Net/Gross — % ที่เก็บได้จริง</div></div>';
   mkChart('ch-quality-pie',{type:'doughnut',
-    data:{labels:['Full Price','Promotional'],datasets:[{data:[fullPrice,promoNet],backgroundColor:['#22d47a','#f04545'],borderWidth:0,hoverOffset:4}]},
+    data:{labels:['Full Price','Promotional'],datasets:[{data:[Math.max(0,fullPriceTotal),Math.max(0,promoNetTotal)],backgroundColor:['#22d47a','#f04545'],borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)+' ('+(ctx.raw/TOTAL_NET*100).toFixed(1)+'%)'}}}}
   });
   document.getElementById('quality-leg').innerHTML=
-    '<div class="leg-item"><div class="leg-dot" style="background:#22d47a"></div>Full Price<span class="leg-pct">'+(fullPrice/TOTAL_NET*100).toFixed(1)+'%</span></div>'
-   +'<div class="leg-item"><div class="leg-dot" style="background:#f04545"></div>Promotional<span class="leg-pct">'+(promoNet/TOTAL_NET*100).toFixed(1)+'%</span></div>';
-  const promoByDate={};
-  PROMO_DATA.forEach(p=>{
-    if(!p.date)return;
-    // Try to match date back to DD/MM/YYYY key
-    let dk='';
-    if(/^\d{4}-\d{2}-\d{2}$/.test(p.date)){dk=p.date.substring(8,10)+'/'+p.date.substring(5,7)+'/'+p.date.substring(0,4);}
-    else if(/^\d{2}-\d{2}$/.test(p.date)){dk=p.date.substring(3,5)+'/'+p.date.substring(0,2)+'/2026';}
-    else dk=p.date;
-    promoByDate[dk]=(promoByDate[dk]||0)+p.net;
-  });
+    '<div class="leg-item"><div class="leg-dot" style="background:#22d47a"></div>Full Price<span class="leg-pct">'+(TOTAL_NET>0?(fullPriceTotal/TOTAL_NET*100).toFixed(1):0)+'%</span></div>'
+   +'<div class="leg-item"><div class="leg-dot" style="background:#f04545"></div>Promotional<span class="leg-pct">'+(TOTAL_NET>0?(promoNetTotal/TOTAL_NET*100).toFixed(1):0)+'%</span></div>';
+
+  // กราฟรายวัน — ใช้ d.discount จาก DAILY ซึ่งแม่นยำ
+  // Full Price per day = d.net - (ส่วนที่เป็น promo)
+  // ประมาณ promo ratio รายวันจาก discount/gross ratio
   mkChart('ch-quality-daily',{type:'bar',
     data:{labels:DAILY.map(d=>(d.date||'').substring(0,5)),datasets:[
-      {label:'Full Price',data:DAILY.map(d=>d.net-(promoByDate[d.date]||0)),backgroundColor:'rgba(34,212,122,.7)',borderRadius:3},
-      {label:'Promo Net',data:DAILY.map(d=>promoByDate[d.date]||0),backgroundColor:'rgba(240,84,84,.7)',borderRadius:3}
+      {label:'Full Price',
+       data:DAILY.map(d=>{
+         const disc=d.discount||0;
+         const gross=d.gross||d.net;
+         // Full Price = Net ที่ขายในราคาเต็ม = net - net portion ที่มาจาก promo transaction
+         // ใช้ gross-discount เป็น net จริง แล้วบิลที่โดน discount คิดตาม ratio
+         const discRatio = gross>0 ? disc/gross : 0;
+         return Math.max(0, Math.round(d.net * (1 - discRatio)));
+       }),
+       backgroundColor:'rgba(34,212,122,.75)',borderRadius:3},
+      {label:'Promo Portion (Net)',
+       data:DAILY.map(d=>{
+         const disc=d.discount||0;
+         const gross=d.gross||d.net;
+         const discRatio = gross>0 ? disc/gross : 0;
+         return Math.max(0, Math.round(d.net * discRatio));
+       }),
+       backgroundColor:'rgba(240,84,84,.75)',borderRadius:3}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:12}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
