@@ -1176,11 +1176,10 @@ function buildVisual(){
   const top10q=[...PRODUCTS].filter(p=>p.qty>0).sort((a,b)=>b.qty-a.qty).slice(0,10);
   const top10rpu=[...PRODUCTS].filter(p=>p.qty>0&&p.net>0).map(p=>({...p,rpu:Math.round(p.net/p.qty)})).sort((a,b)=>b.rpu-a.rpu).slice(0,10);
 
-  // Custom HTML horizontal bar renderer — แม่นยำกว่า Chart.js สำหรับ label+stamp
+  // Custom HTML horizontal bar renderer
   function renderHBar(canvasId, items, valFn, labelFn, colorFn){
     const canvas = document.getElementById(canvasId);
     if(!canvas) return;
-    // Replace canvas with a div
     const wrap = document.createElement('div');
     wrap.id = canvasId;
     wrap.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:4px 0;box-sizing:border-box;';
@@ -1191,44 +1190,30 @@ function buildVisual(){
 
     items.forEach((item, i) => {
       const v = vals[i];
-      const pct = (v / maxV * 100).toFixed(1);
+      const pct = (v / maxV * 100);
       const color = colorFn ? colorFn(item) : (catColors[item.c] || '#888');
-      const name = item.p ? (item.p.includes('/') ? item.p.split('/').slice(1).join('/').trim() : item.p) : (item.label||'');
+      const name = item.p ? (item.p.includes('/') ? item.p.split('/').slice(1).join('/').trim() : item.p) : '';
       const label = labelFn(v);
-      const shortName = name.length > 28 ? name.substring(0, 26) + '…' : name;
+      const shortName = name.length > 26 ? name.substring(0, 24) + '…' : name;
+
+      // ตัวเลขอยู่ในแท่งเสมอ — ถ้าแท่งสั้น ใช้สีขาว ถ้ายาว ใช้สีขาวด้วย
+      const stampInside = pct >= 35; // แท่งยาวพอ → stamp ชิดขวาในแท่ง
+      const stampLeft   = stampInside ? `calc(${pct}% - 8px)` : `calc(${pct}% + 6px)`;
+      const stampColor  = stampInside ? '#fff' : '#dde3f0';
+      const stampAlign  = stampInside ? 'right' : 'left';
+      const stampTransform = stampInside
+        ? 'translateX(-100%) translateY(-50%)'
+        : 'translateY(-50%)';
 
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:28px;';
-
-      // rank badge
-      const rank = document.createElement('span');
-      rank.style.cssText = `width:20px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:#445066;flex-shrink:0;`;
-      rank.textContent = i + 1;
-
-      // name label
-      const nameLbl = document.createElement('span');
-      nameLbl.style.cssText = `width:175px;font-size:11px;color:#9aa3b8;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;`;
-      nameLbl.title = name;
-      nameLbl.textContent = shortName;
-
-      // bar track
-      const track = document.createElement('div');
-      track.style.cssText = 'flex:1;height:22px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:visible;position:relative;';
-
-      // bar fill
-      const fill = document.createElement('div');
-      fill.style.cssText = `height:100%;width:${pct}%;background:${color};border-radius:4px;transition:width .5s ease;min-width:4px;`;
-      track.appendChild(fill);
-
-      // value stamp — อยู่ขวาของแท่ง ไม่ทับ
-      const stamp = document.createElement('span');
-      stamp.style.cssText = `position:absolute;left:calc(${pct}% + 8px);top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:#dde3f0;white-space:nowrap;`;
-      stamp.textContent = label;
-      track.appendChild(stamp);
-
-      row.appendChild(rank);
-      row.appendChild(nameLbl);
-      row.appendChild(track);
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:30px;';
+      row.innerHTML = `
+        <span style="width:18px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:#445066;flex-shrink:0;">${i+1}</span>
+        <span style="width:168px;font-size:11px;color:#9aa3b8;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${name}">${shortName}</span>
+        <div style="flex:1;height:24px;background:rgba(255,255,255,0.06);border-radius:5px;position:relative;overflow:visible;">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;min-width:4px;"></div>
+          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:${stampColor};white-space:nowrap;pointer-events:none;">${label}</span>
+        </div>`;
       wrap.appendChild(row);
     });
   }
@@ -1247,16 +1232,20 @@ function buildVisual(){
     hourCanvas.parentNode.replaceChild(wrap, hourCanvas);
     const maxV = Math.max(...HOURS.map(h=>h.net), 1);
     HOURS.forEach(h=>{
-      const pct = (h.net/maxV*100).toFixed(1);
+      const pct = (h.net/maxV*100);
       const revPct = total>0 ? (h.net/total*100).toFixed(1) : '0.0';
       const color = h.h>=20&&h.h<=21 ? 'rgba(240,84,84,0.9)' : h.h>=12&&h.h<=18 ? 'rgba(61,155,224,0.75)' : 'rgba(100,120,160,0.5)';
+      const stampInside = pct >= 30;
+      const stampLeft   = stampInside ? `calc(${pct}% - 8px)` : `calc(${pct}% + 6px)`;
+      const stampColor  = stampInside ? '#fff' : '#9aa3b8';
+      const stampTransform = stampInside ? 'translateX(-100%) translateY(-50%)' : 'translateY(-50%)';
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:22px;';
       row.innerHTML = `
         <span style="width:44px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:#9aa3b8;flex-shrink:0;">${String(h.h).padStart(2,'0')}:00</span>
-        <div style="flex:1;height:18px;background:rgba(255,255,255,0.05);border-radius:3px;position:relative;">
-          <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width .5s ease;min-width:2px;"></div>
-          <span style="position:absolute;left:calc(${pct}% + 7px);top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:10px;color:#dde3f0;white-space:nowrap;">${revPct}%&nbsp;&nbsp;${f(h.net)}</span>
+        <div style="flex:1;height:20px;background:rgba(255,255,255,0.05);border-radius:3px;position:relative;">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;min-width:2px;"></div>
+          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:${stampColor};white-space:nowrap;">${revPct}% &nbsp;${f(h.net)}</span>
         </div>`;
       wrap.appendChild(row);
     });
