@@ -217,16 +217,36 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
 /* ── PRINT / PDF STYLES ── */
 @media print {
-  body { background:#fff!important; margin:0!important; padding:0!important; }
-  #sb, #topbar, #content > .page:not(#page-report), .ph, button, .tb-live { display:none!important; }
-  #main { margin-left:0!important; }
-  #content { padding:0!important; }
-  #page-report { display:block!important; }
-  .ph, .rpt-controls { display:none!important; }
-  #report-preview { box-shadow:none!important; border-radius:0!important; }
-  .rpt-page { page-break-after: always; page-break-inside: avoid; }
-  .rpt-page:last-child { page-break-after: auto; }
-  @page { size: A4; margin: 0; }
+  /* ซ่อนทุกอย่างยกเว้น report */
+  #sb, #topbar, #upload-modal,
+  #content > .page:not(#page-report),
+  .ph, button, .tb-live,
+  #report-mode-controls,
+  #rpt-print-bar { display:none!important; }
+  /* reset layout */
+  body,html { margin:0!important; padding:0!important; background:#fff!important; }
+  #main { margin-left:0!important; width:100%!important; }
+  #content { padding:0!important; margin:0!important; }
+  #page-report { display:block!important; padding:0!important; margin:0!important; }
+  #report-preview { background:transparent!important; border-radius:0!important;
+    box-shadow:none!important; padding:0!important; }
+  /* แต่ละหน้า A4 */
+  .rpt-page {
+    width:210mm!important;
+    height:297mm!important;
+    overflow:hidden!important;
+    page-break-after: always;
+    page-break-inside: avoid;
+    break-after: page;
+    margin:0!important;
+    border:none!important;
+    border-bottom:none!important;
+    box-shadow:none!important;
+  }
+  .rpt-page:last-child { page-break-after:auto; break-after:auto; }
+  /* scale content ให้พอดีหน้า — ทำโดย JS ก่อน print */
+  .rpt-scale { display:block; transform-origin:top left; }
+  @page { size:A4 portrait; margin:0; }
 }
 </style>
 </head>
@@ -917,15 +937,15 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
         cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px;white-space:nowrap">
         🖨️ PRINT / SAVE PDF
       </button>
-      <div style="font-size:10px;color:var(--text3);line-height:1.6">
-        💡 กดปุ่มเพื่อเปิดหน้าต่าง Print → เลือก <strong style="color:var(--text2)">Save as PDF</strong><br>
-        ตั้งค่า: Paper = A4 · Margins = None · Background graphics = ✅
+      <div style="font-size:10px;color:var(--text3);line-height:1.8">
+        💡 Print dialog จะขึ้นทันที → เลือก <strong style="color:var(--text2)">Save as PDF</strong> หรือ Printer<br>
+        ⚙️ ตั้งค่า: <strong style="color:var(--text2)">Paper = A4 · Margins = None · Background graphics = ✅</strong>
       </div>
     </div>
   </div>
 
   <!-- Report preview -->
-  <div id="report-preview" style="background:#f1f5f9;border-radius:12px;padding:4px;">
+  <div id="report-preview" style="background:#e2e8f0;border-radius:8px;padding:24px 0;display:flex;flex-direction:column;align-items:center;">
     <!-- injected by buildReport() -->
   </div>
 </div>
@@ -2458,159 +2478,17 @@ function setReportMode(mode){
 function printReport(){
   const preview=document.getElementById('report-preview');
   if(!preview||!preview.innerHTML.trim()){
-    alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ');return;
+    alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ'); return;
   }
-  const pages=preview.querySelectorAll('.rpt-page');
-  if(!pages.length){alert('ไม่พบข้อมูล Report');return;}
-
-  const pageHTMLs=Array.from(pages).map(function(pg){
-    return '<div class="rpt-page"><div class="rpt-scale">'+pg.querySelector('.rpt-scale').innerHTML+'</div></div>';
-  }).join('');
-
-  const html='<!DOCTYPE html><html><head><meta charset="UTF-8">'
-    +'<title>NIGIBEN Report — Print Preview</title>'
-    +'<style id="font-css">/* fonts injected by JS */</style>'
-    +'<style>'
-    // ── reset ──
-    +'*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
-    +'html{margin:0;padding:0;}'
-    +'body,table,td,th,div,span,p{font-family:"Sarabun","TH Sarabun New","Garuda","Tahoma",sans-serif;}'
-    // ── toolbar (screen only) ──
-    +'#toolbar{'
-    +'  position:fixed;top:0;left:0;right:0;z-index:9999;height:52px;'
-    +'  background:#0f1923;border-bottom:2px solid #22d47a;'
-    +'  display:flex;align-items:center;justify-content:space-between;'
-    +'  padding:0 24px;font-family:"Sarabun",sans-serif;'
-    +'}'
-    +'#toolbar .brand{font-family:"Chakra Petch",sans-serif;font-size:16px;font-weight:700;color:#22d47a;letter-spacing:3px;}'
-    +'#toolbar .hint{font-size:11px;color:#64748b;margin-top:2px;}'
-    +'#toolbar .btns{display:flex;gap:10px;}'
-    +'#toolbar button{'
-    +'  padding:8px 20px;border:none;border-radius:7px;font-family:"Sarabun",sans-serif;'
-    +'  font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;'
-    +'}'
-    +'#toolbar button:hover{opacity:.82;}'
-    +'#btn-print{background:#22d47a;color:#0f1923;}'
-    +'#btn-close{background:#334155;color:#cbd5e1;}'
-    // ── screen: A4 centered, scaled to fit viewport ──
-    +'@media screen{'
-    +'  body{background:#334155;margin:0;padding:68px 0 48px;display:flex;flex-direction:column;align-items:center;}'
-    +'  .rpt-page{'
-    +'    width:210mm;'
-    +'    background:#fff;'
-    +'    margin:0 auto 24px;'
-    +'    box-shadow:0 8px 32px rgba(0,0,0,.5);'
-    +'    border-radius:1px;'
-    +'    overflow:visible;'
-    +'    flex-shrink:0;'
-    +'  }'
-    // scale ทั้ง body ถ้าหน้าจอแคบกว่า A4
-    +'  #pages-wrap{'
-    +'    transform-origin:top center;'
-    +'    display:flex;flex-direction:column;align-items:center;'
-    +'    padding:0 0 24px;'
-    +'  }'
-    +'  .rpt-scale{display:block;transform-origin:top left;}'
-    +'}'
-    // ── print: exact A4, no toolbar ──
-    +'@media print{'
-    +'  #toolbar,#pages-wrap>style{display:none!important;}'
-    +'  body{margin:0;padding:0;background:#fff;display:block;}'
-    +'  #pages-wrap{transform:none!important;padding:0;}'
-    +'  .rpt-page{'
-    +'    width:210mm;height:297mm;overflow:hidden;background:#fff;'
-    +'    page-break-after:always;page-break-inside:avoid;break-after:page;'
-    +'    margin:0;box-shadow:none;border-radius:0;'
-    +'  }'
-    +'  .rpt-page:last-child{page-break-after:auto;break-after:auto;}'
-    +'  .rpt-scale{display:block;transform-origin:top left;}'
-    +'  @page{size:A4 portrait;margin:0;}'
-    +'}'
-    +'</style>'
-    +'</head>'
-    +'<body>'
-    // ── Toolbar ──
-    +'<div id="toolbar">'
-    +'  <div><div class="brand">NIGIBEN</div><div class="hint">Print Preview · กดปุ่มด้านขวาเพื่อบันทึก PDF</div></div>'
-    +'  <div class="btns">'
-    +'    <button id="btn-print" onclick="doPrint()">🖨️ Print / Save as PDF</button>'
-    +'    <button id="btn-close" onclick="window.close()">✕ ปิด</button>'
-    +'  </div>'
-    +'</div>'
-    // ── Pages wrapped in scaler ──
-    +'<div id="pages-wrap">'+pageHTMLs+'</div>'
-    // ── Script: scale preview to fit window + fit A4 on print ──
-    +'<script>(function(){'
-    +'var MM=96/25.4;'
-    +'var A4W=Math.round(210*MM);'  // ~794px
-    +'var A4H=Math.round(297*MM);'  // ~1123px
-    // scale pages-wrap ให้พอดีจอ
-    +'function scaleWrap(){'
-    +'  var wrap=document.getElementById("pages-wrap");'
-    +'  if(!wrap)return;'
-    +'  wrap.style.transform="";'
-    +'  var vw=window.innerWidth;'
-    +'  var pad=40;'  // 20px each side
-    +'  if(vw<A4W+pad){'
-    +'    var s=(vw-pad)/A4W;'
-    +'    wrap.style.transform="scale("+s.toFixed(4)+")";'
-    +'    wrap.style.transformOrigin="top center";'
-    +'    document.body.style.minHeight=Math.round((wrap.scrollHeight||0)*s+120)+"px";'
-    +'  }'
-    +'}'
-    // fit rpt-scale สำหรับ print
-    +'function fitScales(){'
-    +'  document.querySelectorAll(".rpt-scale").forEach(function(sc){'
-    +'    sc.style.zoom="";'
-    +'    var h=sc.scrollHeight;'
-    +'    if(h>0&&h>A4H-28){sc.style.zoom=String(((A4H-28)/h).toFixed(4));}'
-    +'  });'
-    +'}'
-    +'window.doPrint=function(){'
-    +'  injectFonts();'
-    +'  fitScales();'
-    +'  var doIt=function(){window.print();};'
-    +'  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(doIt,300);});}else{setTimeout(doIt,500);}'
-    +'};'
-    +'function injectFonts(){'
-    // รวบรวม @font-face rules จาก parent window (dashboard ที่โหลด Google Fonts ไว้แล้ว)
-    +'  var css="";'
-    +'  try{'
-    +'    var sheets=window.opener?window.opener.document.styleSheets:[];'
-    +'    for(var i=0;i<sheets.length;i++){'
-    +'      try{'
-    +'        var rules=sheets[i].cssRules||[];'
-    +'        for(var j=0;j<rules.length;j++){'
-    +'          if(rules[j].type===5){css+=rules[j].cssText+" ";}' // CSSRule.FONT_FACE_RULE = 5
-    +'        }'
-    +'      }catch(e){}'
-    +'    }'
-    +'  }catch(e){}'
-    // fallback: ถ้า copy ไม่ได้ ใช้ system fonts Thai แทน
-    +'  if(!css){'
-    +'    css="@font-face{font-family:\'Sarabun\';src:local(\'Sarabun\'),local(\'Garuda\'),local(\'TH Sarabun New\');}"'
-    +'       +"@font-face{font-family:\'Chakra Petch\';src:local(\'Chakra Petch\'),local(\'Arial\');}"'
-    +'       +"@font-face{font-family:\'JetBrains Mono\';src:local(\'JetBrains Mono\'),local(\'Courier New\');}";'
-    +'  }'
-    +'  var el=document.getElementById("font-css");'
-    +'  if(el) el.textContent=css;'
-    +'}'
-    +'function init(){injectFonts();scaleWrap();}'
-    +'window.addEventListener("resize",scaleWrap);'
-    +'if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(init,250);});}else{window.addEventListener("load",function(){setTimeout(init,350);});}'
-    +'})();<\/script>'
-    +'</body></html>';
-
-  try{
-    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
-    const url=URL.createObjectURL(blob);
-    const win=window.open(url,'_blank');
-    if(win){setTimeout(function(){URL.revokeObjectURL(url);},180000);return;}
-    URL.revokeObjectURL(url);
-  }catch(e){}
-  const w=window.open('','_blank','width=1000,height=800');
-  if(!w){alert('กรุณาอนุญาต Popup ในหน้านี้ก่อนครับ');return;}
-  w.document.open();w.document.write(html);w.document.close();
+  // zoom แต่ละ rpt-scale ให้พอดี A4 ก่อน print
+  const MM=96/25.4;
+  const A4H=Math.round(297*MM); // ~1123px
+  preview.querySelectorAll('.rpt-scale').forEach(function(sc){
+    sc.style.zoom='';
+    var h=sc.scrollHeight;
+    if(h>0 && h>A4H-30){ sc.style.zoom=String(((A4H-30)/h).toFixed(4)); }
+  });
+  setTimeout(function(){ window.print(); },150);
 }
 
 function buildReport(){
@@ -2703,7 +2581,7 @@ function buildReport(){
     <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;color:${accent};letter-spacing:1.8px;text-transform:uppercase">${title}</span>
   </div>`;
   const tHead=(...cols)=>`<thead><tr style="background:${C.navy}">${cols.map(([txt,align,w])=>`<th style="padding:6px ${align==='r'?8:10}px;text-align:${align==='r'?'right':'left'};font-size:8px;color:#cbd5e1;font-weight:600;letter-spacing:.4px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
-  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="background:${C.white};font-family:'Sarabun','Noto Sans Thai',sans-serif;color:${C.navy};box-sizing:border-box;border-bottom:3px solid #e2e8f0;margin-bottom:24px;">
+  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;background:${C.white};font-family:'Sarabun','TH Sarabun New','Tahoma',sans-serif;color:${C.navy};box-sizing:border-box;margin:0 auto 24px;box-shadow:0 4px 24px rgba(0,0,0,.18);position:relative;">
     <!-- gradient top rule -->
     <div style="height:3px;background:linear-gradient(90deg,${C.green},${C.amber},${C.sky})"></div>
     <!-- header -->
