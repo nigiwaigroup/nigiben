@@ -2461,47 +2461,52 @@ function printReport(){
     alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ');
     return;
   }
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <title>NIGIBEN Investor Report</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    body{margin:0;padding:0;background:#fff;}
-    .rpt-page{page-break-after:always;page-break-inside:avoid;width:210mm;min-height:297mm;}
-    .rpt-page:last-child{page-break-after:auto;}
-    @page{size:A4;margin:0;}
-  </style>
-  </head><body>${preview.innerHTML}
-  <script>
-    // auto-print after fonts load
-    if(document.fonts && document.fonts.ready){
-      document.fonts.ready.then(function(){ setTimeout(function(){ window.print(); },400); });
-    } else {
-      window.onload=function(){ setTimeout(function(){ window.print(); },600); };
-    }
-  <\/script>
-  </body></html>`;
+  // A4 = 210 x 297mm at 96dpi
+  const MM=96/25.4;
+  const A4W=Math.round(210*MM); // px
+  const A4H=Math.round(297*MM); // px
 
-  // ── Method 1: Blob URL (most reliable, no popup blocker) ──
-  try {
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    +'<title>NIGIBEN Report</title>'
+    +'<link rel="preconnect" href="https://fonts.googleapis.com">'
+    +'<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">'
+    +'<style>'
+    +'*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+    +'html,body{margin:0;padding:0;background:#fff;}'
+    +'.rpt-page{position:relative;width:210mm;height:297mm;overflow:hidden;background:#fff;page-break-after:always;page-break-inside:avoid;}'
+    +'.rpt-page:last-child{page-break-after:auto;}'
+    +'.rpt-scale{width:210mm;transform-origin:top left;display:block;}'
+    +'@page{size:A4 portrait;margin:0;}'
+    +'</style>'
+    +'</head><body>'
+    +preview.innerHTML
+    +'<script>(function(){'
+    +'var MM=96/25.4,A4H=Math.round(297*MM);'
+    +'function run(){'
+    +'  document.querySelectorAll(".rpt-scale").forEach(function(el){'
+    +'    el.style.transform="";'
+    +'    var h=el.scrollHeight;'
+    +'    if(h>A4H){var s=A4H/h;el.style.transform="scale("+s+")";el.style.height=Math.round(h*s)+"px";}'
+    +'  });'
+    +'  setTimeout(function(){window.print();},350);'
+    +'}'
+    +'if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(run,300);});}'
+    +'else{window.addEventListener("load",function(){setTimeout(run,500);});}'
+    +'})();<\/script>'
+    +'</body></html>';
+
+  // Blob URL — ไม่โดน popup blocker
+  try{
     const blob=new Blob([html],{type:'text/html;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const win=window.open(url,'_blank');
-    if(win){
-      // revoke after enough time for print dialog
-      setTimeout(()=>URL.revokeObjectURL(url), 60000);
-      return;
-    }
+    if(win){ setTimeout(()=>URL.revokeObjectURL(url),120000); return; }
     URL.revokeObjectURL(url);
-  } catch(e){}
-
-  // ── Method 2: document.write fallback ──
-  const win2=window.open('','_blank','width=960,height=720');
-  if(!win2){ alert('กรุณาอนุญาต Popup ในหน้านี้ก่อนครับ แล้วกด Print อีกครั้ง'); return; }
-  win2.document.open();
-  win2.document.write(html);
-  win2.document.close();
+  }catch(e){}
+  // Fallback
+  const w=window.open('','_blank','width=960,height=720');
+  if(!w){alert('กรุณาอนุญาต Popup ในหน้านี้ก่อนครับ');return;}
+  w.document.open(); w.document.write(html); w.document.close();
 }
 
 function buildReport(){
@@ -2615,7 +2620,7 @@ function buildReport(){
         <div style="font-size:8px;color:${C.t3};margin-top:3px">Page ${pg} / ${total} · CONFIDENTIAL</div>
       </div>
     </div>
-    <div style="padding:20px 26px 52px">${content}</div>
+    <div class="rpt-scale" style="width:210mm;transform-origin:top left;"><div style="padding:20px 26px 52px">${content}</div></div>
     <div style="position:absolute;bottom:0;left:0;right:0;height:32px;background:${C.bg};border-top:1px solid ${C.border};display:flex;align-items:center;justify-content:space-between;padding:0 26px">
       <div style="font-size:7.5px;color:${C.t3}">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
       <div style="font-size:7.5px;color:${C.t3}">${periodTH} · ${days} วัน</div>
