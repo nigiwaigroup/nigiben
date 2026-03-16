@@ -254,7 +254,8 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     position:relative!important;
   }
   .rpt-page:last-child { page-break-after:auto; break-after:auto; }
-  .rpt-scale { display:block!important; transform-origin:top left; position:relative!important; }
+  .rpt-scale { display:block!important; transform-origin:top left; }
+  .rpt-footer { position:absolute!important; bottom:0!important; left:0!important; right:0!important; height:28px!important; display:flex!important; align-items:center!important; justify-content:space-between!important; padding:0 26px!important; z-index:10!important; }
   /* Force all colors to print exactly as on screen */
   * {
     -webkit-print-color-adjust: exact !important;
@@ -2497,16 +2498,11 @@ function printReport(){
   const AVAIL=A4H-HDR;
 
   preview.querySelectorAll('.rpt-scale').forEach(function(sc){
-    // reset ก่อน
     sc.style.zoom='';
-    sc.style.position='relative';
-
+    sc.style.position='';
+    sc.style.height='';
     var h=sc.scrollHeight;
-    var scale=1;
-    if(h>0 && h>AVAIL){ scale=(AVAIL/h); sc.style.zoom=String(scale.toFixed(4)); }
-
-    // set height ให้พอดีหลัง zoom — footer absolute bottom จะยึดตามนี้
-    sc.style.height=Math.round(AVAIL)+'px';
+    if(h>0 && h>AVAIL){ sc.style.zoom=String((AVAIL/h).toFixed(4)); }
   });
 
   requestAnimationFrame(function(){
@@ -2632,10 +2628,10 @@ function buildReport(){
     </div>
     <div class="rpt-scale">
       <div style="padding:20px 28px 52px">${content}</div>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:28px;background:#f8fafc;border-top:1px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px">
-        <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
-        <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
-      </div>
+    </div>
+    <div class="rpt-footer" style="position:absolute;bottom:0;left:0;right:0;height:28px;background:#f8fafc;border-top:1px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px;z-index:10">
+      <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
+      <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
     </div>
   </div>`;
 
