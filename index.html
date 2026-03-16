@@ -2460,42 +2460,88 @@ function printReport(){
   if(!preview||!preview.innerHTML.trim()){
     alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ');return;
   }
-
-  // Build standalone HTML with A4 auto-fit per page
   const pages=preview.querySelectorAll('.rpt-page');
   if(!pages.length){alert('ไม่พบข้อมูล Report');return;}
 
-  // สร้าง HTML ที่แต่ละ page จะ zoom ให้พอดี A4
   const pageHTMLs=Array.from(pages).map(function(pg){
-    return '<div class="rpt-page">'+pg.innerHTML+'</div>';
+    return '<div class="rpt-page"><div class="rpt-scale">'+pg.querySelector('.rpt-scale').innerHTML+'</div></div>';
   }).join('');
 
   const html='<!DOCTYPE html><html><head><meta charset="UTF-8">'
-    +'<title>NIGIBEN Report</title>'
+    +'<title>NIGIBEN Report — Print Preview</title>'
     +'<link rel="preconnect" href="https://fonts.googleapis.com">'
     +'<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">'
     +'<style>'
+    // ── reset ──
     +'*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
-    +'html,body{margin:0;padding:0;background:#fff;}'
-    +'.rpt-page{width:210mm;overflow:hidden;background:#fff;page-break-after:always;page-break-inside:avoid;break-after:page;position:relative;}'
-    +'.rpt-page:last-child{page-break-after:auto;break-after:auto;}'
-    +'.rpt-scale{display:block;transform-origin:top left;width:210mm;}'
-    +'@page{size:A4 portrait;margin:0;}'
-    +'@media screen{body{background:#e2e8f0;}.rpt-page{margin:0 auto 20px;box-shadow:0 4px 20px rgba(0,0,0,.2);}}'
+    +'html{margin:0;padding:0;}'
+    // ── toolbar (screen only) ──
+    +'#toolbar{'
+    +'  position:fixed;top:0;left:0;right:0;z-index:9999;'
+    +'  background:#0f1923;border-bottom:2px solid #22d47a;'
+    +'  display:flex;align-items:center;justify-content:space-between;'
+    +'  padding:10px 24px;font-family:"Sarabun",sans-serif;'
+    +'}'
+    +'#toolbar .brand{font-family:"Chakra Petch",sans-serif;font-size:16px;font-weight:700;color:#22d47a;letter-spacing:3px;}'
+    +'#toolbar .hint{font-size:11px;color:#64748b;}'
+    +'#toolbar .btns{display:flex;gap:10px;}'
+    +'#toolbar button{'
+    +'  padding:8px 18px;border:none;border-radius:7px;font-family:"Sarabun",sans-serif;'
+    +'  font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;'
+    +'}'
+    +'#toolbar button:hover{opacity:.85;}'
+    +'#btn-print{background:#22d47a;color:#0f1923;}'
+    +'#btn-close{background:#334155;color:#cbd5e1;}'
+    // ── screen: A4 page preview ──
+    +'@media screen{'
+    +'  body{background:#475569;margin:0;padding:72px 0 40px;}'
+    +'  .rpt-page{'
+    +'    width:210mm;background:#fff;'
+    +'    margin:0 auto 28px;'
+    +'    box-shadow:0 8px 40px rgba(0,0,0,.45);'
+    +'    border-radius:2px;overflow:hidden;'
+    +'    position:relative;'
+    +'  }'
+    +'  .rpt-scale{display:block;transform-origin:top left;}'
+    +'}'
+    // ── print: exact A4, no toolbar, zoom to fit ──
+    +'@media print{'
+    +'  #toolbar{display:none!important;}'
+    +'  body{margin:0;padding:0;background:#fff;}'
+    +'  .rpt-page{'
+    +'    width:210mm;height:297mm;overflow:hidden;background:#fff;'
+    +'    page-break-after:always;page-break-inside:avoid;break-after:page;'
+    +'    position:relative;margin:0;box-shadow:none;border-radius:0;'
+    +'  }'
+    +'  .rpt-page:last-child{page-break-after:auto;break-after:auto;}'
+    +'  .rpt-scale{display:block;transform-origin:top left;}'
+    +'  @page{size:A4 portrait;margin:0;}'
+    +'}'
     +'</style>'
-    +'</head><body>'+pageHTMLs
+    +'</head>'
+    +'<body>'
+    // ── Toolbar ──
+    +'<div id="toolbar">'
+    +'  <div><div class="brand">NIGIBEN</div><div class="hint">Print Preview · กดปุ่มด้านขวาเพื่อบันทึก PDF</div></div>'
+    +'  <div class="btns">'
+    +'    <button id="btn-print" onclick="doPrint()">🖨️ Print / Save as PDF</button>'
+    +'    <button id="btn-close" onclick="window.close()">✕ ปิด</button>'
+    +'  </div>'
+    +'</div>'
+    // ── Pages ──
+    +pageHTMLs
+    // ── Script: fit + print ──
     +'<script>(function(){'
-    +'var MM=96/25.4;'
-    +'var A4H=Math.floor(297*MM);'
+    +'var MM=96/25.4,A4H=Math.floor(297*MM);'
     +'function fitPages(){'
     +'  document.querySelectorAll(".rpt-scale").forEach(function(sc){'
     +'    sc.style.zoom="";'
     +'    var h=sc.scrollHeight;'
-    +'    if(h>0&&h>A4H-30){sc.style.zoom=String(((A4H-30)/h).toFixed(4));}'
+    +'    if(h>0&&h>A4H-28){sc.style.zoom=String(((A4H-28)/h).toFixed(4));}'
     +'  });'
     +'}'
-    +'function go(){fitPages();setTimeout(function(){window.print();},400);}'
-    +'if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(go,300);});}else{window.addEventListener("load",function(){setTimeout(go,500);});}'
+    +'window.doPrint=function(){fitPages();setTimeout(function(){window.print();},300);};'
+    +'if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(fitPages,300);});}else{window.addEventListener("load",function(){setTimeout(fitPages,400);});}'
     +'})();<\/script>'
     +'</body></html>';
 
@@ -2503,10 +2549,10 @@ function printReport(){
     const blob=new Blob([html],{type:'text/html;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const win=window.open(url,'_blank');
-    if(win){setTimeout(function(){URL.revokeObjectURL(url);},120000);return;}
+    if(win){setTimeout(function(){URL.revokeObjectURL(url);},180000);return;}
     URL.revokeObjectURL(url);
   }catch(e){}
-  const w=window.open('','_blank','width=960,height=720');
+  const w=window.open('','_blank','width=1000,height=800');
   if(!w){alert('กรุณาอนุญาต Popup ในหน้านี้ก่อนครับ');return;}
   w.document.open();w.document.write(html);w.document.close();
 }
