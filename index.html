@@ -2461,20 +2461,47 @@ function printReport(){
     alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ');
     return;
   }
-  const fonts=`<link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">`;
-  const printCSS=`<style>
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>NIGIBEN Investor Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
     *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     body{margin:0;padding:0;background:#fff;}
     .rpt-page{page-break-after:always;page-break-inside:avoid;width:210mm;min-height:297mm;}
     .rpt-page:last-child{page-break-after:auto;}
     @page{size:A4;margin:0;}
-  </style>`;
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){alert('กรุณาอนุญาต Popup สำหรับหน้านี้ก่อนครับ แล้วกด Print อีกครั้ง');return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NIGIBEN Investor Report</title>${fonts}${printCSS}</head><body>${preview.innerHTML}</body></html>`);
-  win.document.close();
-  win.addEventListener('load',()=>{ setTimeout(()=>{ win.focus(); win.print(); },800); });
+  </style>
+  </head><body>${preview.innerHTML}
+  <script>
+    // auto-print after fonts load
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(function(){ setTimeout(function(){ window.print(); },400); });
+    } else {
+      window.onload=function(){ setTimeout(function(){ window.print(); },600); };
+    }
+  <\/script>
+  </body></html>`;
+
+  // ── Method 1: Blob URL (most reliable, no popup blocker) ──
+  try {
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const win=window.open(url,'_blank');
+    if(win){
+      // revoke after enough time for print dialog
+      setTimeout(()=>URL.revokeObjectURL(url), 60000);
+      return;
+    }
+    URL.revokeObjectURL(url);
+  } catch(e){}
+
+  // ── Method 2: document.write fallback ──
+  const win2=window.open('','_blank','width=960,height=720');
+  if(!win2){ alert('กรุณาอนุญาต Popup ในหน้านี้ก่อนครับ แล้วกด Print อีกครั้ง'); return; }
+  win2.document.open();
+  win2.document.write(html);
+  win2.document.close();
 }
 
 function buildReport(){
@@ -2635,12 +2662,45 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
       ${kpi('Avg Bill Value','฿'+abv.toLocaleString(),'มูลค่าเฉลี่ยต่อบิล',C.amber,'🛒')}
     </div>
     <!-- KPI row 2 -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:${!showDisc&&months.length>1?'8':'16'}px">
       ${kpi('Total Items',totalItems.toLocaleString(),`${Math.round(totalItems/days)} ชิ้น/วัน เฉลี่ย`,C.purple,'📦')}
       ${kpi('Peak Hour',pad(peak.h)+':00 น.',`฿${peak.net.toLocaleString()} · ชั่วโมงยอดสูงสุด`,C.sky,'⏰')}
       ${kpi('Best Day',bestDay?.date.substring(0,5)||'—',`฿${(bestDay?.net||0).toLocaleString()} · ${dowTH[DOW_MAP[bestDay?.date||'']||'']||''}`,C.green,'📅')}
       ${kpi('Top Category',CATS[0]?.cat||'—',`฿${(CATS[0]?.net||0).toLocaleString()} · ${((CATS[0]?.net||0)/catTotal*100).toFixed(1)}% ของรวม`,C.green,'🏆')}
     </div>
+
+    <!-- MoM Comparison (Investor mode only, multi-month) -->
+    ${!showDisc&&months.length>1?(()=>{
+      const momRows=months.map((m,i)=>{
+        const prev=months[i-1];
+        const diff=prev?m.net-prev.net:null;
+        const diffPct=prev&&prev.net>0?((m.net-prev.net)/prev.net*100):null;
+        const isUp=diff!==null&&diff>=0;
+        const cols=[C.green,C.sky,C.amber,C.purple];
+        const col=cols[i%cols.length];
+        const avgBillM=m.bills>0?Math.round(m.net/m.bills):0;
+        return '<div style="background:'+C.white+';border:1px solid '+C.border+';border-radius:9px;padding:12px 14px;border-top:3px solid '+col+'">'
+          +'<div style="font-family:\'Chakra Petch\',sans-serif;font-size:10px;font-weight:700;color:'+col+';margin-bottom:6px">'+mTHF[m.mm]+' '+(m.yy+543)+'</div>'
+          +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:18px;font-weight:700;color:'+C.navy+';margin-bottom:4px">฿'+m.net.toLocaleString()+'</div>'
+          +(diff!==null?'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+            +'<span style="font-size:11px">'+(isUp?'▲':'▼')+'</span>'
+            +'<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+(isUp?C.green:C.red)+'">'+(isUp?'+':'')+diff.toLocaleString()+'</span>'
+            +'<span style="font-size:9px;background:'+(isUp?C.green:C.red)+'22;color:'+(isUp?C.green:C.red)+';border-radius:4px;padding:2px 6px;font-weight:700">'+(isUp?'+':'')+diffPct.toFixed(1)+'%</span>'
+            +'<span style="font-size:8px;color:'+C.t3+';margin-left:2px">vs เดือนก่อน</span>'
+            +'</div>'
+          :'<div style="font-size:8.5px;color:'+C.t3+';margin-bottom:6px">เดือนแรกในช่วงข้อมูล</div>')
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:8.5px;color:'+C.t4+';">'
+          +'<div>🧾 '+m.bills.toLocaleString()+' บิล</div><div>📦 '+m.qty.toLocaleString()+' ชิ้น</div>'
+          +'<div>฿'+avgBillM.toLocaleString()+' ABV</div><div>📋 '+m.days+' วัน</div>'
+          +'</div>'
+          +'</div>';
+      });
+      return '<div style="margin-bottom:14px">'
+        +sec('📊','Month-over-Month Revenue Comparison')
+        +'<div style="display:grid;grid-template-columns:repeat('+months.length+',1fr);gap:10px">'
+        +momRows.join('')
+        +'</div></div>';
+    })():''}
 
     <!-- 2-col: Category + Monthly side by side -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0">
@@ -2671,6 +2731,9 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
       <div>
         ${months.length>1?`
         ${sec('📆','Monthly Summary')}
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+          ${months.map((m,i)=>{const cols=[C.green,C.sky,C.amber,C.purple];const col=cols[i%cols.length];return `<div style="display:flex;align-items:center;gap:5px;font-size:8.5px;color:${C.t4}"><span style="width:10px;height:10px;border-radius:2px;background:${col};display:inline-block;flex-shrink:0"></span>${mTHF[m.mm]} ${m.yy+543}</div>`;}).join('')}
+        </div>
         ${months.map((m,i)=>{
           const cols=[C.green,C.sky,C.amber,C.purple];
           const col=cols[i%cols.length];
@@ -2681,9 +2744,9 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
               <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;color:${col}">${mTHF[m.mm]} ${m.yy+543}</span>
               <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:${C.navy};font-weight:700">฿${m.net.toLocaleString()}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">${bar(p,col,7)}<span style="font-size:8px;color:${C.t3};white-space:nowrap">${p.toFixed(0)}%</span></div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">${bar(p,col,7)}<span style="font-size:8px;color:${C.t3};white-space:nowrap">${p.toFixed(0)}% ของเดือนสูงสุด</span></div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;font-size:8px;color:${C.t4}">
-              <span>📋 ${m.days} วัน</span><span>🧾 ${m.bills.toLocaleString()} บิล</span><span>💸 Disc ${dr2}%</span>
+              <span>📋 ${m.days} วัน</span><span>🧾 ${m.bills.toLocaleString()} บิล</span>${showDisc?`<span>💸 Disc ${dr2}%</span>`:`<span>📦 ${m.qty.toLocaleString()} ชิ้น</span>`}
             </div>
           </div>`;
         }).join('')}
@@ -2705,9 +2768,10 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
       </div>
     </div>
 
-    <!-- Strategic Insights -->
+    <!-- Strategic Insights + Recovery Rate (Full mode only) — hidden in Investor mode -->
+    ${showDisc?`
     ${sec('💡','Strategic Insights & Recommendations')}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
       ${insights.map(ins=>`
       <div style="background:${C.bg};border-radius:8px;padding:10px 12px;border:1px solid ${C.border};border-left:3px solid ${ins.col}">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
@@ -2718,6 +2782,64 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
         <div style="font-size:8.5px;color:${C.t4};line-height:1.6">${ins.body}</div>
       </div>`).join('')}
     </div>
+    ${sec('📘','Recovery Rate — คำอธิบายตัวชี้วัด')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+      <!-- What is Recovery Rate -->
+      <div style="background:${C.bg};border-radius:10px;padding:14px 16px;border:1px solid ${C.border};border-left:4px solid ${C.green}">
+        <div style="font-size:9px;font-weight:700;color:${C.navy};letter-spacing:.5px;margin-bottom:8px">📗 Recovery Rate คืออะไร?</div>
+        <div style="font-size:8.5px;color:${C.t4};line-height:1.8">
+          <strong style="color:${C.navy}">Recovery Rate</strong> คือสัดส่วนของยอดขายสุทธิ (Net Revenue) ที่ร้านเก็บได้จริงเมื่อเทียบกับยอดขายรวมก่อนส่วนลด (Gross Revenue)<br><br>
+          เป็นตัวชี้วัดหลักที่แสดงว่า <strong style="color:${C.navy}">ทุก ฿100 ที่ลูกค้าสั่ง ร้านเก็บเงินได้จริงกี่บาท</strong>
+        </div>
+      </div>
+
+      <!-- Formula -->
+      <div style="background:${C.ink};border-radius:10px;padding:14px 16px;border:1px solid ${C.border}">
+        <div style="font-size:9px;font-weight:700;color:#94a3b8;letter-spacing:.5px;margin-bottom:10px">🧮 สูตรการคำนวณ</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.white};line-height:2;text-align:center">
+          <span style="color:${C.green};font-weight:700">Net Revenue</span><br>
+          <span style="color:#475569">──────────────────</span> × 100<br>
+          <span style="color:#94a3b8">Gross Revenue</span>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.06);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#94a3b8;text-align:center">
+          ฿${TOTAL_NET.toLocaleString()} ÷ ฿${totalGross.toLocaleString()} × 100
+          <div style="color:${parseFloat(netRate)>=70?C.green:C.amber};font-size:14px;font-weight:700;margin-top:4px">= ${netRate}%</div>
+        </div>
+      </div>
+
+      <!-- Current period result -->
+      <div style="background:${C.bg};border-radius:10px;padding:14px 16px;border:1px solid ${C.border};border-left:4px solid ${parseFloat(netRate)>=70?C.green:C.amber}">
+        <div style="font-size:9px;font-weight:700;color:${C.navy};letter-spacing:.5px;margin-bottom:8px">📊 ผลลัพธ์ช่วงนี้ (${periodTH})</div>
+        <div style="font-size:8.5px;color:${C.t4};line-height:1.9">
+          • Gross Revenue: <strong style="color:${C.navy};font-family:'JetBrains Mono',monospace">฿${totalGross.toLocaleString()}</strong><br>
+          • Net Revenue: <strong style="color:${C.green};font-family:'JetBrains Mono',monospace">฿${TOTAL_NET.toLocaleString()}</strong><br>
+          • <strong style="color:${C.navy}">Recovery Rate = ${netRate}%</strong><br>
+          <span style="color:${C.t3}">ทุก ฿100 ที่ขายได้ ร้านเก็บเงินจริง ฿${netRate}</span>
+        </div>
+      </div>
+
+      <!-- Benchmark -->
+      <div style="background:${C.bg};border-radius:10px;padding:14px 16px;border:1px solid ${C.border};border-left:4px solid ${C.sky}">
+        <div style="font-size:9px;font-weight:700;color:${C.navy};letter-spacing:.5px;margin-bottom:8px">🎯 เกณฑ์มาตรฐาน F&B Airport</div>
+        <div style="font-size:8.5px;color:${C.t4};line-height:1.9">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid ${C.border}">
+            <span>🟢 ดีเยี่ยม</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${C.green}">≥ 75%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid ${C.border}">
+            <span>🟡 อยู่ในเกณฑ์</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${C.amber}">65–74%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">
+            <span>🔴 ต้องปรับปรุง</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${C.red}">< 65%</span>
+          </div>
+          <div style="margin-top:6px;padding:5px 8px;background:${parseFloat(netRate)>=75?C.green:parseFloat(netRate)>=65?C.amber:C.red}22;border-radius:5px;font-size:8px;font-weight:700;color:${parseFloat(netRate)>=75?C.green:parseFloat(netRate)>=65?C.amber:C.red};text-align:center">
+            ร้านนี้อยู่ในระดับ: ${parseFloat(netRate)>=75?'🟢 ดีเยี่ยม':parseFloat(netRate)>=65?'🟡 อยู่ในเกณฑ์':'🔴 ต้องปรับปรุง'}
+          </div>
+        </div>
+      </div>
+
+    </div>
+    `:''}
 
   `,1,months.length>1?months.length+2:3);
 
