@@ -2591,6 +2591,7 @@ function buildReport(){
   };
 
   /* ── micro helpers ── */
+  const fNet=n=>n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
   const bar=(p,col,h=6)=>`<div style="background:#e2e8f0;border-radius:3px;height:${h}px;overflow:hidden;flex:1;min-width:30px"><div style="height:100%;width:${Math.min(p,100).toFixed(1)}%;background:${col};border-radius:3px"></div></div>`;
   const badge=(txt,col)=>`<span style="background:${col}22;color:${col};border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;white-space:nowrap">${txt}</span>`;
   const kpi=(lbl,val,sub,col,icon='')=>`<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:9px 12px;border-top:3px solid ${col}">
@@ -2656,7 +2657,7 @@ function buildReport(){
     <div style="background:linear-gradient(135deg,#0f1923 0%,#162537 60%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:10px;padding:14px 20px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center">
       <div>
         <div style="font-size:8.5px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">NET REVENUE · ${periodTH}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:#f0a500;line-height:1">฿${TOTAL_NET.toLocaleString()}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:#f0a500;line-height:1">฿${fNet(TOTAL_NET)}</div>
         <div style="font-size:9px;color:#475569;margin-top:5px">เฉลี่ย ฿${avgDailyNet.toLocaleString()} / วัน · ${days} วัน · ${totalBills.toLocaleString()} บิล</div>
       </div>
       <div style="text-align:center;padding:0 8px">
@@ -2755,7 +2756,7 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
           return `<div style="background:#f8fafc;border-radius:7px;padding:10px 12px;margin-bottom:7px;border:1px solid #e2e8f0;border-left:3px solid ${col}">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
               <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;color:${col}">${mTHF[m.mm]} ${m.yy+543}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#162537;font-weight:700">฿${m.net.toLocaleString()}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#162537;font-weight:700">฿${fNet(m.net)}</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">${bar(p,col,7)}<span style="font-size:8px;color:#64748b;white-space:nowrap">${p.toFixed(0)}% ของเดือนสูงสุด</span></div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;font-size:8px;color:#334155">
@@ -2772,9 +2773,9 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
           const dr2=d.gross>0?(d.discount/d.gross*100).toFixed(0):0;
           return `<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:9px">
             <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#162537;width:32px;flex-shrink:0">${d.date.substring(0,5)}</span>
-            <span style="color:${isWE?C.amber:C.t3};width:28px;flex-shrink:0;font-size:8px">${dowTH[dw]||''}</span>
+            <span style="color:${isWE?C.amber:'#94a3b8'};flex-shrink:0;font-size:8px;white-space:nowrap;min-width:52px">${dowTH[dw]||''}</span>
             ${bar(p,isWE?C.amber:C.green,8)}
-            <span style="font-family:'JetBrains Mono',monospace;color:#22d47a;font-weight:700;white-space:nowrap;width:${showDisc?62:72}px;text-align:right">฿${d.net.toLocaleString()}</span>
+            <span style="font-family:'JetBrains Mono',monospace;color:#22d47a;font-weight:700;white-space:nowrap;width:${showDisc?62:72}px;text-align:right">฿${fNet(d.net)}</span>
             ${showDisc?`<span style="color:#f04545;font-size:8px;white-space:nowrap;width:28px;text-align:right">-${dr2}%</span>`:''} 
           </div>`;
         }).join('')}`}
@@ -2816,7 +2817,7 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
           <span style="color:#94a3b8">Gross Revenue</span>
         </div>
         <div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.06);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#94a3b8;text-align:center">
-          ฿${TOTAL_NET.toLocaleString()} ÷ ฿${totalGross.toLocaleString()} × 100
+          ฿${fNet(TOTAL_NET)} ÷ ฿${totalGross.toLocaleString()} × 100
           <div style="color:${parseFloat(netRate)>=70?C.green:C.amber};font-size:14px;font-weight:700;margin-top:4px">= ${netRate}%</div>
         </div>
       </div>
@@ -2826,7 +2827,7 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
         <div style="font-size:9px;font-weight:700;color:#162537;letter-spacing:.5px;margin-bottom:8px">📊 ผลลัพธ์ช่วงนี้ (${periodTH})</div>
         <div style="font-size:8.5px;color:#334155;line-height:1.9">
           • Gross Revenue: <strong style="color:#162537;font-family:'JetBrains Mono',monospace">฿${totalGross.toLocaleString()}</strong><br>
-          • Net Revenue: <strong style="color:#22d47a;font-family:'JetBrains Mono',monospace">฿${TOTAL_NET.toLocaleString()}</strong><br>
+          • Net Revenue: <strong style="color:#22d47a;font-family:'JetBrains Mono',monospace">฿${fNet(TOTAL_NET)}</strong><br>
           • <strong style="color:#162537">Recovery Rate = ${netRate}%</strong><br>
           <span style="color:#64748b">ทุก ฿100 ที่ขายได้ ร้านเก็บเงินจริง ฿${netRate}</span>
         </div>
@@ -2874,12 +2875,12 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
           const col=isWE?C.amber:C.green;
           return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
             <td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;font-weight:700;color:#162537">${d.date.substring(0,5)}</td>
-            <td style="padding:5px 8px;color:${isWE?C.amber:C.t4};font-size:8.5px">${dowTH[dw]||''}</td>
+            <td style="padding:5px 8px;color:${isWE?C.amber:'#94a3b8'};font-size:9px;white-space:nowrap">${dowTH[dw]||''}</td>
             <td style="padding:5px 8px;text-align:right">${d.bills.toLocaleString()}</td>
             <td style="padding:5px 8px;text-align:right">${d.qty.toLocaleString()}</td>
             ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#334155">${d.gross.toLocaleString()}</td>`:''}
             ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#f04545">-${d.discount.toLocaleString()}</td>`:''}
-            <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${d.net.toLocaleString()}</td>
+            <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${fNet(d.net)}</td>
             <td style="padding:5px 8px;text-align:right">฿${abvD.toLocaleString()}</td>
             ${showDisc?`<td style="padding:5px 8px;text-align:right;color:${parseFloat(dr2)>30?C.red:C.t4}">${dr2}%</td>`:''} 
             <td style="padding:5px 10px"><div style="display:flex;align-items:center;gap:4px">${bar(p,col,8)}<span style="font-size:7.5px;color:#64748b;white-space:nowrap">${p.toFixed(0)}%</span></div></td>
@@ -2891,7 +2892,7 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
           <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${totalItems.toLocaleString()}</td>
           ${showDisc?`<td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">฿${totalGross.toLocaleString()}</td>`:''}
           ${showDisc?`<td style="padding:6px 8px;text-align:right;color:${C.pink};font-family:'JetBrains Mono',monospace">-฿${totalDisc.toLocaleString()}</td>`:''}
-          <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:'JetBrains Mono',monospace;font-size:11px">฿${TOTAL_NET.toLocaleString()}</td>
+          <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:'JetBrains Mono',monospace;font-size:11px">฿${fNet(TOTAL_NET)}</td>
           <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">฿${abv.toLocaleString()}</td>
           ${showDisc?`<td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${discRate}%</td>`:''}
           <td style="padding:6px 10px;font-size:8px;color:#94a3b8">${showDisc?'Recovery: '+netRate+'%':''}</td>
@@ -2916,7 +2917,7 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
             <td style="padding:6px 8px;text-align:right">${m.qty.toLocaleString()}</td>
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:#334155">${m.gross.toLocaleString()}</td>`:''}
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:#f04545">-${m.discount.toLocaleString()}</td>`:''}
-            <td style="padding:6px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${m.net.toLocaleString()}</td>
+            <td style="padding:6px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${fNet(m.net)}</td>
             <td style="padding:6px 8px;text-align:right">฿${avbM.toLocaleString()}</td>
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:${parseFloat(drM)>30?C.red:C.t4}">${drM}%</td>`:''} 
           </tr>`;
@@ -3005,7 +3006,7 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
           </div>`;
         }).join('')}`:''}
 
-        `:(showDisc?`<div style="background:#f8fafc;border-radius:8px;padding:20px;text-align:center;color:#64748b;font-size:11px;border:1px dashed ${C.border}">⚠️ ไม่พบข้อมูลโปรโมชั่น</div>`:`<div style="background:#f8fafc;border-radius:8px;padding:16px;color:#334155;font-size:10px;border:1px solid #e2e8f0;line-height:1.8"><strong style="color:#162537">สรุป Revenue สำหรับ Investor</strong><br>Net Revenue รวม: <strong style="color:#22d47a">฿${TOTAL_NET.toLocaleString()}</strong><br>จำนวนบิล: <strong>${totalBills.toLocaleString()}</strong> บิล · เฉลี่ย ${avgDailyB} บิล/วัน<br>Avg Bill Value: <strong>฿${abv.toLocaleString()}</strong> ต่อบิล</div>`)}
+        `:(showDisc?`<div style="background:#f8fafc;border-radius:8px;padding:20px;text-align:center;color:#64748b;font-size:11px;border:1px dashed ${C.border}">⚠️ ไม่พบข้อมูลโปรโมชั่น</div>`:`<div style="background:#f8fafc;border-radius:8px;padding:16px;color:#334155;font-size:10px;border:1px solid #e2e8f0;line-height:1.8"><strong style="color:#162537">สรุป Revenue สำหรับ Investor</strong><br>Net Revenue รวม: <strong style="color:#22d47a">฿${fNet(TOTAL_NET)}</strong><br>จำนวนบิล: <strong>${totalBills.toLocaleString()}</strong> บิล · เฉลี่ย ${avgDailyB} บิล/วัน<br>Avg Bill Value: <strong>฿${abv.toLocaleString()}</strong> ต่อบิล</div>`)}
       </div>
     </div>
 
@@ -3085,12 +3086,12 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
             const mAbv=d.bills>0?Math.round(d.net/d.bills):0;
             return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
               <td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;font-weight:700;color:#162537">${d.date.substring(0,5)}</td>
-              <td style="padding:5px 8px;color:${isWE?C.amber:C.t4};font-size:8.5px">${dowTH[dw]||''}</td>
+              <td style="padding:5px 8px;color:${isWE?C.amber:'#94a3b8'};font-size:9px;white-space:nowrap">${dowTH[dw]||''}</td>
               <td style="padding:5px 8px;text-align:right">${d.bills.toLocaleString()}</td>
               <td style="padding:5px 8px;text-align:right">${d.qty.toLocaleString()}</td>
               ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#334155">${d.gross.toLocaleString()}</td>`:''}
               ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#f04545">-${d.discount.toLocaleString()}</td>`:''}
-              <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${d.net.toLocaleString()}</td>
+              <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${fNet(d.net)}</td>
               <td style="padding:5px 8px;text-align:right">฿${mAbv.toLocaleString()}</td>
               <td style="padding:5px 10px"><div style="display:flex;align-items:center;gap:4px">${bar(p2,isWE?C.amber:col,8)}<span style="font-size:7.5px;color:#64748b">${p2.toFixed(0)}%</span></div></td>
             </tr>`;
@@ -3101,7 +3102,7 @@ ${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-
             <td style="padding:6px 8px;text-align:right">${m.qty.toLocaleString()}</td>
             ${showDisc?`<td style="padding:6px 8px;text-align:right">฿${m.gross.toLocaleString()}</td>`:''}
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:${C.pink}">-฿${m.discount.toLocaleString()}</td>`:''}
-            <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:'JetBrains Mono',monospace">฿${m.net.toLocaleString()}</td>
+            <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:'JetBrains Mono',monospace">฿${fNet(m.net)}</td>
             <td style="padding:6px 8px;text-align:right">฿${mAvgB.toLocaleString()}</td>
             <td style="padding:6px 10px;font-size:8px;color:#94a3b8">${showDisc?'Disc: '+mDR+'%':''}</td>
           </tr>
