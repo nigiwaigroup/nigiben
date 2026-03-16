@@ -255,6 +255,12 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   }
   .rpt-page:last-child { page-break-after:auto; break-after:auto; }
   .rpt-scale { display:block!important; transform-origin:top left; }
+  /* Force all colors to print exactly as on screen */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
   @page { size:A4 portrait; margin:0; }
 }
 </style>
@@ -2485,15 +2491,20 @@ function printReport(){
   if(!preview||!preview.innerHTML.trim()){
     alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ'); return;
   }
-  // zoom แต่ละ rpt-scale ให้พอดี A4 ก่อน print
+  // zoom แต่ละ rpt-scale ให้พอดี A4
   const MM=96/25.4;
-  const A4H=Math.round(297*MM); // ~1123px
+  const A4H=Math.round(297*MM);
   preview.querySelectorAll('.rpt-scale').forEach(function(sc){
     sc.style.zoom='';
     var h=sc.scrollHeight;
     if(h>0 && h>A4H-30){ sc.style.zoom=String(((A4H-30)/h).toFixed(4)); }
   });
-  setTimeout(function(){ window.print(); },150);
+  // รอ browser repaint layout ก่อน print
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      window.print();
+    });
+  });
 }
 
 function buildReport(){
@@ -2586,14 +2597,14 @@ function buildReport(){
     <span style="font-size:14px">${icon}</span>
     <span style="font-family:'Chakra Petch',sans-serif;font-size:11px;font-weight:700;color:#0f1923;letter-spacing:2px;text-transform:uppercase">${title}</span>
   </div>`;
-  const tHead=(...cols)=>`<thead><tr style="background:#162537">${cols.map(([txt,align,w])=>`<th style="padding:8px ${align==='r'?10:12}px;text-align:${align==='r'?'right':'left'};font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.5px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
-  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;background:#fff;font-family:'Sarabun','TH Sarabun New',sans-serif;color:#0f1923;box-sizing:border-box;width:210mm;margin:0 auto 28px;border-radius:4px;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.35);">
+  const tHead=(...cols)=>`<thead><tr style="background:#162537;-webkit-print-color-adjust:exact;print-color-adjust:exact">${cols.map(([txt,align,w])=>`<th style="padding:8px ${align==='r'?10:12}px;text-align:${align==='r'?'right':'left'};font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.5px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
+  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;background:#fff;font-family:'Sarabun','TH Sarabun New',sans-serif;color:#0f1923;box-sizing:border-box;margin:0 auto 28px;border-radius:4px;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.35);-webkit-print-color-adjust:exact;print-color-adjust:exact;">
     <!-- gradient top rule -->
-    <div style="height:5px;background:linear-gradient(90deg,#f0a500 0%,#22d47a 35%,#3d9be0 65%,#a07ee0 100%)"></div>
+    <div style="height:5px;background:linear-gradient(90deg,#f0a500 0%,#22d47a 35%,#3d9be0 65%,#a07ee0 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>
     <!-- gradient spine -->
     <div style="height:5px;background:linear-gradient(90deg,#f0a500 0%,#22d47a 40%,#3d9be0 70%,#a07ee0 100%)"></div>
     <!-- header -->
-    <div style="background:#0f1923;padding:14px 26px;display:flex;align-items:center;justify-content:space-between">
+    <div style="background:#0f1923;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact">
       <div style="display:flex;align-items:center;gap:18px">
         <div>
           <div style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:4px">NIGIBEN</div>
@@ -2611,7 +2622,7 @@ function buildReport(){
       </div>
     </div>
     <div class="rpt-scale"><div style="padding:20px 28px 40px">${content}</div></div>
-    <div style="height:28px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;padding:0 26px;margin-top:4px">
+    <div style="height:28px;background:#f8fafc;border-top:1px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px;margin-top:4px">
       <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
       <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
     </div>
@@ -2635,7 +2646,7 @@ function buildReport(){
   const p1=pageWrap(`
 
     <!-- Hero Revenue Banner -->
-    <div style="background:linear-gradient(135deg,#0f1923 0%,#162537 60%,#1d3248 100%);border-radius:10px;padding:14px 20px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center">
+    <div style="background:linear-gradient(135deg,#0f1923 0%,#162537 60%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:10px;padding:14px 20px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center">
       <div>
         <div style="font-size:8.5px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">NET REVENUE · ${periodTH}</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:#f0a500;line-height:1">฿${TOTAL_NET.toLocaleString()}</div>
