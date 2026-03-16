@@ -254,7 +254,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     position:relative!important;
   }
   .rpt-page:last-child { page-break-after:auto; break-after:auto; }
-  .rpt-scale { display:block!important; transform-origin:top left; }
+  .rpt-scale { display:block!important; transform-origin:top left; position:relative!important; }
   /* Force all colors to print exactly as on screen */
   * {
     -webkit-print-color-adjust: exact !important;
@@ -2491,15 +2491,24 @@ function printReport(){
   if(!preview||!preview.innerHTML.trim()){
     alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ'); return;
   }
-  // zoom แต่ละ rpt-scale ให้พอดี A4
   const MM=96/25.4;
-  const A4H=Math.round(297*MM);
+  const A4H=Math.round(297*MM); // ~1123px
+  const HDR=55; // header height approx px
+  const AVAIL=A4H-HDR;
+
   preview.querySelectorAll('.rpt-scale').forEach(function(sc){
+    // reset ก่อน
     sc.style.zoom='';
+    sc.style.position='relative';
+
     var h=sc.scrollHeight;
-    if(h>0 && h>A4H-30){ sc.style.zoom=String(((A4H-30)/h).toFixed(4)); }
+    var scale=1;
+    if(h>0 && h>AVAIL){ scale=(AVAIL/h); sc.style.zoom=String(scale.toFixed(4)); }
+
+    // set height ให้พอดีหลัง zoom — footer absolute bottom จะยึดตามนี้
+    sc.style.height=Math.round(AVAIL)+'px';
   });
-  // รอ browser repaint layout ก่อน print
+
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
       window.print();
@@ -2621,10 +2630,12 @@ function buildReport(){
         <div style="font-size:8px;color:#64748b;margin-top:3px">Page ${pg} / ${total} · CONFIDENTIAL</div>
       </div>
     </div>
-    <div class="rpt-scale"><div style="padding:20px 28px 40px">${content}</div></div>
-    <div style="height:28px;background:#f8fafc;border-top:1px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px;margin-top:4px">
-      <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
-      <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
+    <div class="rpt-scale">
+      <div style="padding:20px 28px 52px">${content}</div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:28px;background:#f8fafc;border-top:1px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px">
+        <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
+        <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
+      </div>
     </div>
   </div>`;
 
