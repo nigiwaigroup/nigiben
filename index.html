@@ -2473,24 +2473,17 @@ function printReport(){
     +'<style>'
     +'*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
     +'html,body{margin:0;padding:0;background:#fff;}'
-    +'.rpt-page{position:relative;width:210mm;height:297mm;overflow:hidden;background:#fff;page-break-after:always;page-break-inside:avoid;}'
+    +'.rpt-page{width:210mm;background:#fff;page-break-after:always;page-break-inside:avoid;break-after:page;}'
     +'.rpt-page:last-child{page-break-after:auto;}'
-    +'.rpt-scale{width:210mm;transform-origin:top left;display:block;}'
+    +'.rpt-scale{display:block;width:210mm;}'
     +'@page{size:A4 portrait;margin:0;}'
     +'</style>'
     +'</head><body>'
     +preview.innerHTML
     +'<script>(function(){'
     +'var MM=96/25.4,A4H=Math.round(297*MM);'
-    +'function run(){'
-    +'  document.querySelectorAll(".rpt-scale").forEach(function(el){'
-    +'    el.style.transform="";'
-    +'    var h=el.scrollHeight;'
-    +'    if(h>A4H){var s=A4H/h;el.style.transform="scale("+s+")";el.style.height=Math.round(h*s)+"px";}'
-    +'  });'
-    +'  setTimeout(function(){window.print();},350);'
-    +'}'
-    +'if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(run,300);});}'
+    +'function run(){document.querySelectorAll(\'.rpt-scale\').forEach(function(el){el.style.zoom=\'1\';var h=el.scrollHeight,av=A4H-36;if(h>av&&av>0){el.style.zoom=String((av/h).toFixed(4));}});setTimeout(function(){window.print();},350);}'
+        +'if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(run,300);});}'
     +'else{window.addEventListener("load",function(){setTimeout(run,500);});}'
     +'})();<\/script>'
     +'</body></html>';
@@ -2589,21 +2582,21 @@ function buildReport(){
   /* ── micro helpers ── */
   const bar=(p,col,h=6)=>`<div style="background:#dde7f0;border-radius:3px;height:${h}px;overflow:hidden;flex:1;min-width:30px"><div style="height:100%;width:${Math.min(p,100).toFixed(1)}%;background:${col};border-radius:3px"></div></div>`;
   const badge=(txt,col)=>`<span style="background:${col}22;color:${col};border-radius:4px;padding:2px 7px;font-size:8px;font-weight:700;white-space:nowrap">${txt}</span>`;
-  const kpi=(lbl,val,sub,col,icon='')=>`<div style="background:${C.white};border:1px solid ${C.border};border-radius:9px;padding:13px 15px;border-top:3px solid ${col}">
+  const kpi=(lbl,val,sub,col,icon='')=>`<div style="background:${C.white};border:1px solid ${C.border};border-radius:8px;padding:9px 12px;border-top:3px solid ${col}">
     <div style="font-size:7.5px;color:${C.t3};letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:5px">${icon} ${lbl}</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;color:${col};line-height:1.1;margin-bottom:3px">${val}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:${col};line-height:1.1;margin-bottom:2px">${val}</div>
     <div style="font-size:8.5px;color:${C.t4};line-height:1.4">${sub}</div>
   </div>`;
-  const sec=(icon,title,accent=C.navy)=>`<div style="display:flex;align-items:center;gap:7px;margin:16px 0 9px;padding-bottom:6px;border-bottom:2px solid ${C.border}">
+  const sec=(icon,title,accent=C.navy)=>`<div style="display:flex;align-items:center;gap:7px;margin:10px 0 7px;padding-bottom:5px;border-bottom:2px solid ${C.border}">
     <span style="font-size:13px">${icon}</span>
     <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;color:${accent};letter-spacing:1.8px;text-transform:uppercase">${title}</span>
   </div>`;
   const tHead=(...cols)=>`<thead><tr style="background:${C.navy}">${cols.map(([txt,align,w])=>`<th style="padding:6px ${align==='r'?8:10}px;text-align:${align==='r'?'right':'left'};font-size:8px;color:#cbd5e1;font-weight:600;letter-spacing:.4px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
-  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;min-height:297mm;background:${C.white};font-family:'Sarabun','Noto Sans Thai',sans-serif;color:${C.navy};box-sizing:border-box;position:relative;overflow:hidden;">
+  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;background:${C.white};font-family:'Sarabun','Noto Sans Thai',sans-serif;color:${C.navy};box-sizing:border-box;">
     <!-- gradient top rule -->
     <div style="height:3px;background:linear-gradient(90deg,${C.green},${C.amber},${C.sky})"></div>
     <!-- header -->
-    <div style="background:${C.ink};padding:16px 26px;display:flex;align-items:center;justify-content:space-between">
+    <div style="background:${C.ink};padding:11px 22px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:18px">
         <div>
           <div style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;color:${C.white};letter-spacing:4px">NIGIBEN</div>
@@ -2620,8 +2613,8 @@ function buildReport(){
         <div style="font-size:8px;color:${C.t3};margin-top:3px">Page ${pg} / ${total} · CONFIDENTIAL</div>
       </div>
     </div>
-    <div class="rpt-scale" style="width:210mm;transform-origin:top left;"><div style="padding:20px 26px 52px">${content}</div></div>
-    <div style="position:absolute;bottom:0;left:0;right:0;height:32px;background:${C.bg};border-top:1px solid ${C.border};display:flex;align-items:center;justify-content:space-between;padding:0 26px">
+    <div class="rpt-scale"><div style="padding:14px 22px 44px">${content}</div></div>
+    <div style="height:28px;background:${C.bg};border-top:1px solid ${C.border};display:flex;align-items:center;justify-content:space-between;padding:0 22px;margin-top:4px">
       <div style="font-size:7.5px;color:${C.t3}">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
       <div style="font-size:7.5px;color:${C.t3}">${periodTH} · ${days} วัน</div>
     </div>
@@ -2645,29 +2638,29 @@ function buildReport(){
   const p1=pageWrap(`
 
     <!-- Hero Revenue Banner -->
-    <div style="background:linear-gradient(135deg,${C.ink} 0%,${C.steel} 100%);border-radius:12px;padding:20px 24px;margin-bottom:16px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center">
+    <div style="background:linear-gradient(135deg,${C.ink} 0%,${C.steel} 100%);border-radius:10px;padding:14px 20px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center">
       <div>
         <div style="font-size:8.5px;color:${C.t2};letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">NET REVENUE · ${periodTH}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:${C.white};line-height:1">฿${TOTAL_NET.toLocaleString()}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:${C.white};line-height:1">฿${TOTAL_NET.toLocaleString()}</div>
         <div style="font-size:9px;color:${C.t2};margin-top:5px">เฉลี่ย ฿${avgDailyNet.toLocaleString()} / วัน · ${days} วัน · ${totalBills.toLocaleString()} บิล</div>
       </div>
       <div style="text-align:center;padding:0 8px">
         <div style="font-size:8px;color:${C.t3};letter-spacing:1px;margin-bottom:4px">RECOVERY RATE</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:${parseFloat(netRate)>=70?C.green:C.amber};line-height:1">${netRate}%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:${parseFloat(netRate)>=70?C.green:C.amber};line-height:1">${netRate}%</div>
         <div style="font-size:8px;color:${C.t3};margin-top:3px">Net / Gross</div>
       </div>
-${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-size:8px;color:${C.t3};letter-spacing:1px;margin-bottom:4px">DISCOUNT RATE</div><div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:${parseFloat(discRate)>30?C.red:C.amber};line-height:1">${discRate}%</div><div style="font-size:8px;color:${C.t3};margin-top:3px">ของ Gross Revenue</div></div>`:''}
+${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-size:8px;color:${C.t3};letter-spacing:1px;margin-bottom:4px">DISCOUNT RATE</div><div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:${parseFloat(discRate)>30?C.red:C.amber};line-height:1">${discRate}%</div><div style="font-size:8px;color:${C.t3};margin-top:3px">ของ Gross Revenue</div></div>`:''}
     </div>
 
     <!-- KPI row 1 -->
-    <div style="display:grid;grid-template-columns:repeat(${showDisc?4:2},1fr);gap:8px;margin-bottom:8px">
+    <div style="display:grid;grid-template-columns:repeat(${showDisc?4:2},1fr);gap:6px;margin-bottom:6px">
       ${showDisc?kpi('Gross Revenue','฿'+totalGross.toLocaleString(),`ก่อนหักส่วนลด · ${days} วัน`,C.sky,'💰'):''}
       ${showDisc?kpi('Total Discount','-฿'+totalDisc.toLocaleString(),`${discRate}% ของ Gross · ${promoCnt.toLocaleString()} ครั้ง`,C.red,'💸'):''}
       ${kpi('Total Bills',totalBills.toLocaleString(),`เฉลี่ย ${avgDailyB} บิล/วัน`,C.blue,'🧾')}
       ${kpi('Avg Bill Value','฿'+abv.toLocaleString(),'มูลค่าเฉลี่ยต่อบิล',C.amber,'🛒')}
     </div>
     <!-- KPI row 2 -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:${!showDisc&&months.length>1?'8':'16'}px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:${!showDisc&&months.length>1?'6':'10'}px">
       ${kpi('Total Items',totalItems.toLocaleString(),`${Math.round(totalItems/days)} ชิ้น/วัน เฉลี่ย`,C.purple,'📦')}
       ${kpi('Peak Hour',pad(peak.h)+':00 น.',`฿${peak.net.toLocaleString()} · ชั่วโมงยอดสูงสุด`,C.sky,'⏰')}
       ${kpi('Best Day',bestDay?.date.substring(0,5)||'—',`฿${(bestDay?.net||0).toLocaleString()} · ${dowTH[DOW_MAP[bestDay?.date||'']||'']||''}`,C.green,'📅')}
