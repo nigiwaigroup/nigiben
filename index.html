@@ -996,7 +996,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
       <h3>📋 ไฟล์ที่ 1 — รายงานยอดขายแยกตามสินค้า</h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า</p>
       <input type="file" id="f1" accept=".xlsx"
-             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
+             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
+             onchange="handleF(event,1);this.value=''"
+      >
       <label class="drop" id="d1" for="f1" style="cursor:pointer;display:block" onmousedown="if(document.activeElement)document.activeElement.blur()">
         <div class="drop-ico">📁</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
@@ -1008,7 +1010,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
       <h3>🎟️ ไฟล์ที่ 2 — รายงานสรุปการใช้โปรโมชั่น <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานสรุปการใช้โปรโมชั่น</p>
       <input type="file" id="f2" accept=".xlsx"
-             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
+             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
+             onchange="handleF(event,2);this.value=''"
+      >
       <label class="drop" id="d2" for="f2" style="cursor:pointer;display:block" onmousedown="if(document.activeElement)document.activeElement.blur()">
         <div class="drop-ico">🎟️</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
@@ -3981,10 +3985,7 @@ function buildTrialItemTable(prodEntries, totalNet, totalGross, totalDisc, total
 
 // ══════════ INIT ══════════
 window.addEventListener('DOMContentLoaded',()=>{
-  const f1=document.getElementById('f1');
-  const f2=document.getElementById('f2');
-  if(f1) f1.addEventListener('change',function(e){ handleF(e,1); this.value=''; });
-  if(f2) f2.addEventListener('change',function(e){ handleF(e,2); this.value=''; });
+  // f1, f2 ใช้ onchange inline แล้ว ไม่ต้อง addEventListener ซ้ำ
   // drag/drop สำหรับ page-upload
   ['d1','d2'].forEach((id,i)=>{
     const el=document.getElementById(id);if(!el)return;
