@@ -292,12 +292,15 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <!-- File 1: Sales -->
     <div style="margin-bottom:16px">
       <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 ไฟล์ยอดขาย (รายงานยอดขายแยกตามสินค้า)</div>
-      <label id="modal-drop1" style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
-           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-           ondragleave="this.style.borderColor='var(--border)'"
-           ondrop="handleModalDrop(event,1)">
-        <input type="file" id="modal-f1" accept=".xlsx" style="display:none" onchange="handleModalFile(this,1)">
-        <div style="font-size:24px;margin-bottom:6px;pointer-events:none">📁</div>
+      <input type="file" id="modal-f1" accept=".xlsx" tabindex="-1"
+             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
+             onchange="handleModalFile(this,1);this.value=''">
+      <label for="modal-f1" id="modal-drop1"
+             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
+             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+             ondragleave="this.style.borderColor='var(--border)'"
+             ondrop="handleModalDrop(event,1)">
+        <div style="font-size:24px;margin-bottom:6px">📁</div>
         <div id="modal-f1-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </label>
     </div>
@@ -305,12 +308,15 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <!-- File 2: Promo -->
     <div style="margin-bottom:24px">
       <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น)</div>
-      <label id="modal-drop2" style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
-           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-           ondragleave="this.style.borderColor='var(--border)'"
-           ondrop="handleModalDrop(event,2)">
-        <input type="file" id="modal-f2" accept=".xlsx" style="display:none" onchange="handleModalFile(this,2)">
-        <div style="font-size:24px;margin-bottom:6px;pointer-events:none">🎟️</div>
+      <input type="file" id="modal-f2" accept=".xlsx" tabindex="-1"
+             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
+             onchange="handleModalFile(this,2);this.value=''">
+      <label for="modal-f2" id="modal-drop2"
+             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
+             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+             ondragleave="this.style.borderColor='var(--border)'"
+             ondrop="handleModalDrop(event,2)">
+        <div style="font-size:24px;margin-bottom:6px">🎟️</div>
         <div id="modal-f2-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </label>
     </div>
@@ -978,8 +984,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="upcard">
       <h3>📋 ไฟล์ที่ 1 — รายงานยอดขายแยกตามสินค้า</h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า</p>
+      <input type="file" id="f1" accept=".xlsx" tabindex="-1"
+             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
       <label class="drop" id="d1" for="f1" style="cursor:pointer;display:block">
-        <input type="file" id="f1" accept=".xlsx">
         <div class="drop-ico">📁</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
@@ -989,8 +996,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="upcard">
       <h3>🎟️ ไฟล์ที่ 2 — รายงานสรุปการใช้โปรโมชั่น <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานสรุปการใช้โปรโมชั่น</p>
+      <input type="file" id="f2" accept=".xlsx" tabindex="-1"
+             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
       <label class="drop" id="d2" for="f2" style="cursor:pointer;display:block">
-        <input type="file" id="f2" accept=".xlsx">
         <div class="drop-ico">🎟️</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
@@ -3518,13 +3526,6 @@ function rebuildDashboard(salesRows, promoRows){
 
 // ══════════ MODAL UPLOAD ══════════
 const modalFiles={1:null,2:null};
-function triggerPick(n){
-  // ไม่ใช้แล้ว — label ครอบ input โดยตรงแทน
-  const inp=document.getElementById('modal-f'+n);
-  if(inp){ inp.value=''; inp.click(); }
-}
-
-
 function handleModalFile(input,n){
   const file=input.files[0];
   if(!file)return;
@@ -3541,8 +3542,6 @@ function handleModalFile(input,n){
   if(drop){drop.style.borderColor='var(--accent)';drop.style.background='rgba(34,212,122,0.06)';}
   const status=document.getElementById('modal-status');
   if(status) status.textContent='';
-  // reset value เพื่อให้เลือกไฟล์เดิมซ้ำได้อีกครั้ง
-  input.value='';
   checkModalReady();
 }
 
