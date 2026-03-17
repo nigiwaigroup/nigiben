@@ -292,14 +292,12 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <!-- File 1: Sales -->
     <div style="margin-bottom:16px">
       <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 ไฟล์ยอดขาย (รายงานยอดขายแยกตามสินค้า)</div>
-      <input type="file" id="modal-f1" accept=".xlsx" tabindex="-1"
+      <input type="file" id="modal-f1" accept=".xlsx"
              style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
              onchange="handleModalFile(this,1);this.value=''">
       <label for="modal-f1" id="modal-drop1"
-             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
-             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-             ondragleave="this.style.borderColor='var(--border)'"
-             ondrop="handleModalDrop(event,1)">
+             onmousedown="if(document.activeElement)document.activeElement.blur()"
+             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
         <div style="font-size:24px;margin-bottom:6px">📁</div>
         <div id="modal-f1-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </label>
@@ -308,14 +306,12 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <!-- File 2: Promo -->
     <div style="margin-bottom:24px">
       <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น)</div>
-      <input type="file" id="modal-f2" accept=".xlsx" tabindex="-1"
+      <input type="file" id="modal-f2" accept=".xlsx"
              style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
              onchange="handleModalFile(this,2);this.value=''">
       <label for="modal-f2" id="modal-drop2"
-             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)"
-             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-             ondragleave="this.style.borderColor='var(--border)'"
-             ondrop="handleModalDrop(event,2)">
+             onmousedown="if(document.activeElement)document.activeElement.blur()"
+             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
         <div style="font-size:24px;margin-bottom:6px">🎟️</div>
         <div id="modal-f2-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </label>
@@ -323,7 +319,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
     <div id="modal-status" style="min-height:20px;font-size:12px;color:var(--accent);text-align:center;margin-bottom:14px"></div>
 
-    <button id="modal-btn" onclick="processModalFiles()" disabled style="
+    <button id="modal-btn" onclick="processModalFiles()" disabled tabindex="-1" style="
       width:100%;padding:14px;border:none;border-radius:10px;
       background:var(--accent);color:#000;font-family:var(--font-h);
       font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;
@@ -806,8 +802,8 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
 <!-- ══════════ PRODUCTS ══════════ -->
 <div id="page-products" class="page">
-  <div class="ph"><h1>📦 Sales by Quantity</h1><p>ยอดขายตามจำนวนสินค้า · เลือกดูรายวัน เรียงลำดับ และกรองข้อมูลได้</p></div>
-  <div class="sc">
+  <div class="ph"><h1>📦 Sales by Quantity</h1><p>ยอดขายตามจำนวนสินค้า · แยกช่วงเวลาปกติ vs Flash Sale</p></div>
+  <div class="sc" style="flex-wrap:wrap;gap:8px">
     <input type="text" id="ps" placeholder="🔍 ค้นหาสินค้า..." oninput="renderProd()">
     <select id="ps-sort" onchange="renderProd()">
       <option value="net-d">ยอดรายได้ (มาก→น้อย)</option>
@@ -815,6 +811,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
       <option value="qty-d">จำนวน (มาก→น้อย)</option>
       <option value="qty-a">จำนวน (น้อย→มาก)</option>
       <option value="rpu-d">ราคา/ชิ้น (มาก→น้อย)</option>
+      <option value="flash-d">Flash Sale (มาก→น้อย)</option>
       <option value="name">ชื่อ (A→Z)</option>
     </select>
     <select id="ps-cat" onchange="onCatFilter(this.value)">
@@ -825,22 +822,36 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
       <option value="Dessert">Dessert</option>
       <option value="Appetizer">Appetizer</option>
     </select>
-    <select id="ps-date" onchange="renderProd()">
-      <option value="">ทุกวัน (รวม)</option>
+    <!-- Date range -->
+    <span style="font-size:11px;color:var(--text3);align-self:center">📅 ช่วง:</span>
+    <select id="ps-date-from" onchange="renderProd()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none">
+      <option value="">ต้น</option>
     </select>
+    <span style="color:var(--text3);align-self:center">—</span>
+    <select id="ps-date-to" onchange="renderProd()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none">
+      <option value="">ปลาย</option>
+    </select>
+    <button onclick="document.getElementById('ps-date-from').value='';document.getElementById('ps-date-to').value='';renderProd()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b)">✕ ล้าง</button>
     <button onclick="expandAllProdGroups()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 12px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b)">▶ เปิดทั้งหมด</button>
     <button onclick="collapseAllProdGroups()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 12px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b)">▼ ยุบทั้งหมด</button>
     <span class="sc-cnt" id="ps-cnt"></span>
+  </div>
+  <!-- Legend -->
+  <div style="display:flex;gap:16px;margin-bottom:10px;font-size:11px;color:var(--text2)">
+    <span>☀️ <span style="color:var(--green)">ช่วงปกติ</span> 05:00–19:59</span>
+    <span>⚡ <span style="color:var(--red)">Flash Sale</span> 20:00–22:59</span>
   </div>
   <div class="card"><div class="tw"><table>
     <thead><tr>
       <th>#</th>
       <th onclick="setSP('name')">สินค้า ↕</th>
       <th>หมวด</th>
-      <th class="num" onclick="setSP('qty-d')">จำนวน ↕</th>
+      <th class="num" onclick="setSP('qty-d')">รวม ↕</th>
+      <th class="num" style="color:var(--green)">☀️ ปกติ</th>
+      <th class="num" style="color:var(--red)">⚡ Flash</th>
+      <th class="num" style="color:var(--text3)">Flash%</th>
       <th class="num" onclick="setSP('net-d')">ยอดสุทธิ ↕</th>
       <th class="num" onclick="setSP('rpu-d')">฿/ชิ้น ↕</th>
-      <th class="num">บิล</th>
       <th>Revenue</th>
     </tr></thead>
     <tbody id="prod-tbody"></tbody>
@@ -984,9 +995,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="upcard">
       <h3>📋 ไฟล์ที่ 1 — รายงานยอดขายแยกตามสินค้า</h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า</p>
-      <input type="file" id="f1" accept=".xlsx" tabindex="-1"
+      <input type="file" id="f1" accept=".xlsx"
              style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
-      <label class="drop" id="d1" for="f1" style="cursor:pointer;display:block">
+      <label class="drop" id="d1" for="f1" style="cursor:pointer;display:block" onmousedown="if(document.activeElement)document.activeElement.blur()">
         <div class="drop-ico">📁</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
@@ -996,9 +1007,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="upcard">
       <h3>🎟️ ไฟล์ที่ 2 — รายงานสรุปการใช้โปรโมชั่น <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานสรุปการใช้โปรโมชั่น</p>
-      <input type="file" id="f2" accept=".xlsx" tabindex="-1"
+      <input type="file" id="f2" accept=".xlsx"
              style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
-      <label class="drop" id="d2" for="f2" style="cursor:pointer;display:block">
+      <label class="drop" id="d2" for="f2" style="cursor:pointer;display:block" onmousedown="if(document.activeElement)document.activeElement.blur()">
         <div class="drop-ico">🎟️</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
@@ -2373,21 +2384,30 @@ function toggleProdGroup(cat){
 }
 
 function populateProdDateDropdown(){
+  // populate old ps-date if exists (backward compat)
   const sel=document.getElementById('ps-date');
-  if(!sel) return;
-  // Keep first option "ทุกวัน"
-  sel.innerHTML='<option value="">ทุกวัน (รวม)</option>';
-  const monthTH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-  DAILY.forEach(d=>{
-    const parts=d.date.split('/');
-    if(parts.length!==3) return;
-    const dd=parts[0],mm=parseInt(parts[1]),yyyy=parseInt(parts[2]);
-    const thYr=yyyy+543;
-    const lbl=dd+' '+( monthTH[mm]||mm)+' '+thYr;
-    const opt=document.createElement('option');
-    opt.value=d.date; opt.textContent=lbl;
-    sel.appendChild(opt);
-  });
+  if(sel){
+    sel.innerHTML='<option value="">ทุกวัน (รวม)</option>';
+    DAILY.forEach(d=>{
+      const [dd,mm,yyyy]=(d.date||'').split('/');
+      const lbl=dd+'/'+mm;
+      const opt=document.createElement('option');
+      opt.value=d.date; opt.textContent=lbl;
+      sel.appendChild(opt);
+    });
+  }
+  // populate date range dropdowns
+  const mTH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const fromSel=document.getElementById('ps-date-from');
+  const toSel=document.getElementById('ps-date-to');
+  if(!fromSel||!toSel) return;
+  const opts=DAILY.map(d=>{
+    const [dd,mm,yyyy]=(d.date||'').split('/');
+    const lbl=dd+' '+(mTH[parseInt(mm)]||mm);
+    return '<option value="'+d.date+'">'+lbl+'</option>';
+  }).join('');
+  fromSel.innerHTML='<option value="">ต้น</option>'+opts;
+  toSel.innerHTML='<option value="">ปลาย</option>'+opts;
 }
 
 function populateProdCatDropdown(){
@@ -2406,44 +2426,87 @@ function populateProdCatDropdown(){
 }
 
 function renderProd(){
-  const srch=document.getElementById('ps').value.toLowerCase();
-  const sort=document.getElementById('ps-sort').value;
-  const catF=document.getElementById('ps-cat').value;
-  const dateF=document.getElementById('ps-date').value;
-  // Auto-expand the filtered category so items are visible
-  if(catF){ _prodGroupOpen[catF]=true; }
+  const srch    = (document.getElementById('ps')||{value:''}).value.toLowerCase();
+  const sort    = (document.getElementById('ps-sort')||{value:'net-d'}).value;
+  const catF    = (document.getElementById('ps-cat')||{value:''}).value;
+  const fromD   = (document.getElementById('ps-date-from')||{value:''}).value;
+  const toD     = (document.getElementById('ps-date-to')||{value:''}).value;
+
+  if(catF) _prodGroupOpen[catF]=true;
+
+  // ── กำหนด date range ──
+  const toTs=s=>{const[d,m,y]=(s||'').split('/');return s?new Date(+y,+m-1,+d).getTime():0;};
+  const fromTs = fromD ? toTs(fromD) : 0;
+  const toTs2  = toD   ? toTs(toD)   : Infinity;
+  const inRange = d => { const t=toTs(d); return t>=fromTs && t<=toTs2; };
+
+  // ── คำนวณ normal / flash qty จาก salesRows ──
+  // normal: 05-19 (h>=5 && h<=19), flash: 20-22 (h>=20 && h<=22)
+  const normalMap={}, flashMap={};
+  salesRows.forEach(r=>{
+    if(!r.date) return;
+    if(!inRange(r.date)) return;
+    const h=parseInt((r.time||'00:00').split(':')[0])||0;
+    const key=(r.prod||'').trim();
+    if(!key) return;
+    if(h>=5 && h<=19){
+      normalMap[key]=(normalMap[key]||0)+r.qty;
+    } else if(h>=20 && h<=22){
+      flashMap[key]=(flashMap[key]||0)+r.qty;
+    }
+  });
+
+  // ── build product list จาก salesRows ตาม date range ──
   let data;
-  if(dateF && PROD_BY_DATE[dateF]){
-    data=Object.entries(PROD_BY_DATE[dateF]).map(([p,v])=>({p,c:v.cat,net:v.net,qty:v.qty,disc:v.disc||0,bills:v.bills instanceof Set?v.bills.size:(v.bills||0)})); // BUG8+9 fixed: use real bills from PROD_BY_DATE
-    // Auto-expand all groups when a specific date is selected
+  if(fromD||toD){
+    // คำนวณใหม่จาก salesRows
+    const prodMap2={};
+    salesRows.forEach(r=>{
+      if(!r.date||!inRange(r.date)) return;
+      const key=(r.prod||'').trim();
+      if(!key) return;
+      if(!prodMap2[key]) prodMap2[key]={p:key,c:r.cat||'',net:0,qty:0,bills:new Set()};
+      prodMap2[key].net+=r.net;
+      prodMap2[key].qty+=r.qty;
+      prodMap2[key].bills.add(r.doc);
+    });
+    data=Object.values(prodMap2).map(p=>({...p,bills:p.bills.size}));
     const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
     catOrder.forEach(c=>{ _prodGroupOpen[c]=true; });
-    data.forEach(p=>{ if(p.c) _prodGroupOpen[p.c]=true; });
   } else {
-    data=[...PRODUCTS];
+    data=[...PRODUCTS].map(p=>({...p,bills:p.bills||0}));
   }
+
+  // เพิ่ม normal/flash qty เข้า data
+  data=data.map(p=>({
+    ...p,
+    qtyNormal: normalMap[p.p]||0,
+    qtyFlash:  flashMap[p.p]||0
+  }));
+
   data=data.filter(p=>(p.p||'').toLowerCase().includes(srch)&&(!catF||p.c===catF));
-  if(sort==='net-d')data.sort((a,b)=>b.net-a.net);
-  else if(sort==='net-a')data.sort((a,b)=>a.net-b.net);
-  else if(sort==='qty-d')data.sort((a,b)=>b.qty-a.qty);
-  else if(sort==='qty-a')data.sort((a,b)=>a.qty-b.qty);
-  else if(sort==='rpu-d')data.sort((a,b)=>(b.qty>0?b.net/b.qty:0)-(a.qty>0?a.net/a.qty:0));
-  else data.sort((a,b)=>(a.p||'').localeCompare(b.p||''));
+
+  if(sort==='net-d')       data.sort((a,b)=>b.net-a.net);
+  else if(sort==='net-a')  data.sort((a,b)=>a.net-b.net);
+  else if(sort==='qty-d')  data.sort((a,b)=>b.qty-a.qty);
+  else if(sort==='qty-a')  data.sort((a,b)=>a.qty-b.qty);
+  else if(sort==='rpu-d')  data.sort((a,b)=>(b.qty>0?b.net/b.qty:0)-(a.qty>0?a.net/a.qty:0));
+  else if(sort==='flash-d')data.sort((a,b)=>b.qtyFlash-a.qtyFlash);
+  else                     data.sort((a,b)=>(a.p||'').localeCompare(b.p||''));
 
   const maxN=Math.max(...data.map(p=>p.net),1);
   const totalQty=data.reduce((s,p)=>s+p.qty,0);
   const totalNet=data.reduce((s,p)=>s+p.net,0);
+  const totalNormal=data.reduce((s,p)=>s+p.qtyNormal,0);
+  const totalFlash=data.reduce((s,p)=>s+p.qtyFlash,0);
 
-  // Group by category
   const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
   const groups={};
   data.forEach(p=>{ if(!groups[p.c])groups[p.c]=[]; groups[p.c].push(p); });
 
   const rows=[];
   let rank=0;
-
-  const catsToShow=catF ? [catF] : catOrder.filter(c=>groups[c]);
-  // Add any unknown cats
+  const catsToShow=catF?[catF]:catOrder.filter(c=>groups[c]);
   Object.keys(groups).forEach(c=>{ if(!catsToShow.includes(c)) catsToShow.push(c); });
 
   catsToShow.forEach(cat=>{
@@ -2452,13 +2515,14 @@ function renderProd(){
     const color=catColors[cat]||'#888';
     const catQty=items.reduce((s,p)=>s+p.qty,0);
     const catNet=items.reduce((s,p)=>s+p.net,0);
-    const catBills=items.reduce((s,p)=>s+(p.bills||0),0);
+    const catNormal=items.reduce((s,p)=>s+p.qtyNormal,0);
+    const catFlash=items.reduce((s,p)=>s+p.qtyFlash,0);
     const catRpu=catQty>0?Math.round(catNet/catQty):0;
     const isOpen=!!_prodGroupOpen[cat];
     const pct=(catNet/totalNet*100).toFixed(1);
+    const flashPct=catQty>0?(catFlash/catQty*100).toFixed(0):0;
 
-    // Group header row
-    rows.push(`<tr onclick="toggleProdGroup('${cat}')" style="cursor:pointer;background:var(--surface2);border-top:2px solid ${color}22;border-bottom:1px solid var(--border)">
+    rows.push(`<tr onclick="toggleProdGroup('${cat}')" style="cursor:pointer;background:var(--surface2);border-top:2px solid ${color}44;border-bottom:1px solid var(--border)">
       <td colspan="2" style="padding:10px 12px">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:13px;transition:transform .2s;display:inline-block;transform:rotate(${isOpen?90:0}deg)">▶</span>
@@ -2471,36 +2535,41 @@ function renderProd(){
         <div style="height:6px;background:var(--surface3);border-radius:3px;width:80px;overflow:hidden">
           <div style="height:100%;width:${pct}%;background:${color};border-radius:3px"></div>
         </div>
-        <div style="font-size:10px;color:var(--text3);margin-top:3px">${pct}% ของทั้งหมด</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">${pct}%</div>
       </td>
       <td class="num" style="padding:10px 8px;font-weight:700;color:var(--text)">${fn(catQty)}</td>
+      <td class="num" style="padding:10px 8px;color:var(--green)">${fn(catNormal)}</td>
+      <td class="num" style="padding:10px 8px;color:var(--red)">${fn(catFlash)}</td>
+      <td class="num" style="padding:10px 8px;color:var(--text3);font-size:11px">${flashPct}%</td>
       <td class="num" style="padding:10px 8px;font-weight:700;color:var(--accent)">${f(catNet)}</td>
       <td class="num" style="padding:10px 8px;color:var(--text2)">฿${fn(catRpu)}</td>
-      <td class="num" style="padding:10px 8px;color:var(--text2)">${fn(catBills)}</td>
       <td></td>
     </tr>`);
 
-    // Item rows (shown when group open)
     if(isOpen){
       items.forEach(p=>{
         rank++;
         const rpu=p.qty>0?Math.round(p.net/p.qty):0;
         const name=p.p.includes('/')?p.p.split('/').slice(1).join('/').trim():p.p;
         const code=p.p.includes('/')?p.p.split('/')[0].trim():'';
+        const fPct=p.qty>0?(p.qtyFlash/p.qty*100).toFixed(0):0;
+        const fColor=parseInt(fPct)>60?'var(--red)':parseInt(fPct)>30?'var(--amber)':'var(--text3)';
         rows.push(`<tr style="border-bottom:1px solid var(--border)22">
           <td style="padding:8px 12px;color:var(--text3);font-size:11px;font-family:var(--font-m);padding-left:28px">${rank}</td>
           <td style="padding:8px 8px;padding-left:32px">
             <div style="display:flex;align-items:center;gap:8px">
-              <span style="color:var(--text3);margin-right:2px">└</span>
+              <span style="color:var(--text3)">└</span>
               <span style="font-family:var(--font-m);font-size:10px;color:var(--accent2);background:var(--surface3);padding:2px 7px;border-radius:4px;white-space:nowrap">${code}</span>
               <span style="font-size:12px;color:var(--text)">${name}</span>
             </div>
           </td>
           <td></td>
-          <td class="num" style="padding:8px">${fn(p.qty)}</td>
+          <td class="num" style="padding:8px;font-weight:600">${fn(p.qty)}</td>
+          <td class="num" style="padding:8px;color:var(--green)">${fn(p.qtyNormal)}</td>
+          <td class="num" style="padding:8px;color:var(--red)">${fn(p.qtyFlash)}</td>
+          <td class="num" style="padding:8px;font-size:11px;color:${fColor}">${fPct}%</td>
           <td class="num" style="padding:8px;color:var(--accent)">${f(p.net)}</td>
           <td class="num" style="padding:8px;color:var(--text2)">฿${fn(rpu)}</td>
-          <td class="num" style="padding:8px;color:var(--text3)">${fn(p.bills||0)}</td>
           <td style="padding:8px">
             <div class="pbwrap" style="width:70px">
               <div class="pbfill" style="width:${p.net/maxN*100}%;background:${color}"></div>
@@ -2511,19 +2580,23 @@ function renderProd(){
     }
   });
 
+  const totalFlashPct=totalQty>0?(totalFlash/totalQty*100).toFixed(0):0;
   const totalRow=`<tr style="border-top:2px solid var(--accent);font-family:var(--font-m);background:var(--surface2)">
-    <td style="text-align:center;color:var(--text3);font-size:10px" colspan="2">TOTAL — ${data.length} รายการ</td>
+    <td colspan="2" style="text-align:center;color:var(--text3);font-size:10px">TOTAL — ${data.length} รายการ</td>
     <td></td>
     <td class="num" style="color:var(--accent2)">${fn(totalQty)}</td>
+    <td class="num" style="color:var(--green)">${fn(totalNormal)}</td>
+    <td class="num" style="color:var(--red)">${fn(totalFlash)}</td>
+    <td class="num" style="color:var(--text3);font-size:11px">${totalFlashPct}%</td>
     <td class="num" style="color:var(--accent)">${f(totalNet)}</td>
     <td class="num" style="color:var(--text2)">฿${totalQty>0?fn(Math.round(totalNet/totalQty)):0}</td>
-    <td></td><td></td>
+    <td></td>
   </tr>`;
 
   document.getElementById('prod-tbody').innerHTML=rows.join('')+totalRow;
   let cntTxt=`แสดง ${data.length} รายการ`;
   if(catF) cntTxt+=` · หมวด: ${catF}`;
-  if(dateF) cntTxt+=` (${dateF.substring(0,5)})`;
+  if(fromD||toD) cntTxt+=` · ${fromD?fromD.substring(0,5):'ต้น'}–${toD?toD.substring(0,5):'ปลาย'}`;
   document.getElementById('ps-cnt').textContent=cntTxt;
 }
 
@@ -3561,7 +3634,13 @@ function handleModalDrop(event,n){
 
 function checkModalReady(){
   const btn=document.getElementById('modal-btn');
-  if(btn){const ready=!!(modalFiles[1]);btn.disabled=!ready;btn.style.opacity=ready?'1':'.4';}
+  if(btn){
+    const ready=!!(modalFiles[1]);
+    btn.disabled=!ready;
+    btn.style.opacity=ready?'1':'.4';
+    // ป้องกัน browser auto-focus ไปที่ปุ่มหลัง enable
+    if(ready && document.activeElement) document.activeElement.blur();
+  }
 }
 
 async function processModalFiles(){
@@ -3852,6 +3931,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   const f2=document.getElementById('f2');
   if(f1) f1.addEventListener('change',function(e){ handleF(e,1); this.value=''; });
   if(f2) f2.addEventListener('change',function(e){ handleF(e,2); this.value=''; });
+  // drag/drop สำหรับ page-upload
   ['d1','d2'].forEach((id,i)=>{
     const el=document.getElementById(id);if(!el)return;
     el.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();el.classList.add('dv');});
@@ -3859,7 +3939,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     el.addEventListener('drop',e=>{
       e.preventDefault();e.stopPropagation();el.classList.remove('dv');
       const file=e.dataTransfer.files[0];
-      if(file){const inp=document.getElementById('f'+(i+1));const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;handleF({target:inp},i+1);}
+      if(file){const fakeEv={target:{files:[file]}};handleF(fakeEv,i+1);}
     });
   });
   document.getElementById('proc-btn').addEventListener('click',processFiles);
