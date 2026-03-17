@@ -842,17 +842,17 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <span>⚡ <span style="color:var(--red)">Flash Sale</span> 20:00–22:59</span>
   </div>
   <div class="card"><div class="tw"><table>
-    <thead><tr>
-      <th>#</th>
-      <th onclick="setSP('name')">สินค้า ↕</th>
-      <th>หมวด</th>
-      <th class="num" onclick="setSP('qty-d')">รวม ↕</th>
-      <th class="num" style="color:var(--green)">☀️ ปกติ</th>
-      <th class="num" style="color:var(--red)">⚡ Flash</th>
-      <th class="num" style="color:var(--text3)">Flash%</th>
-      <th class="num" onclick="setSP('net-d')">ยอดสุทธิ ↕</th>
-      <th class="num" onclick="setSP('rpu-d')">฿/ชิ้น ↕</th>
-      <th>Revenue</th>
+    <thead><tr id="prod-thead">
+      <th style="padding:8px 12px">#</th>
+      <th style="padding:8px 12px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('name')">สินค้า <span id="sp-name">↕</span></th>
+      <th style="padding:8px 8px;cursor:pointer;user-select:none" onclick="toggleSP('cat')">หมวด <span id="sp-cat">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('qty')">รวม <span id="sp-qty">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--green);white-space:nowrap" onclick="toggleSP('normal')">☀️ ปกติ <span id="sp-normal">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--red);white-space:nowrap" onclick="toggleSP('flash')">⚡ Flash <span id="sp-flash">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--text3);white-space:nowrap" onclick="toggleSP('flashpct')">Flash% <span id="sp-flashpct">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('net')">ยอดสุทธิ <span id="sp-net">↓</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('rpu')">฿/ชิ้น <span id="sp-rpu">↕</span></th>
+      <th style="padding:8px">Revenue</th>
     </tr></thead>
     <tbody id="prod-tbody"></tbody>
   </table></div></div>
@@ -2355,7 +2355,44 @@ function switchTopBot(mode,el){
 }
 
 // ══════════ PRODUCTS TABLE ══════════
-function setSP(v){document.getElementById('ps-sort').value=v;renderProd();}
+// sort state: col + dir
+let _prodSortCol='net', _prodSortDir=-1; // -1=desc, 1=asc
+
+function toggleSP(col){
+  if(_prodSortCol===col){
+    _prodSortDir=-_prodSortDir; // toggle
+  } else {
+    _prodSortCol=col;
+    // default dir: desc สำหรับตัวเลข, asc สำหรับ text
+    _prodSortDir=(col==='name'||col==='cat')?1:-1;
+  }
+  // sync dropdown
+  const dirStr=_prodSortDir>0?'-a':'-d';
+  const sel=document.getElementById('ps-sort');
+  if(sel){
+    const v=col==='name'?'name':col==='cat'?'name':(col+dirStr);
+    if(sel.querySelector('option[value="'+v+'"]')) sel.value=v;
+  }
+  _updateSortIndicators();
+  renderProd();
+}
+function setSP(v){
+  // backward compat
+  const m=v.match(/^(.+?)(-[ad])?$/);
+  if(m){_prodSortCol=m[1];_prodSortDir=(m[2]==='-a')?1:-1;}
+  document.getElementById('ps-sort').value=v;
+  _updateSortIndicators();
+  renderProd();
+}
+function _updateSortIndicators(){
+  const cols=['name','cat','qty','normal','flash','flashpct','net','rpu'];
+  cols.forEach(c=>{
+    const el=document.getElementById('sp-'+c);
+    if(!el) return;
+    if(c===_prodSortCol) el.textContent=_prodSortDir>0?'↑':'↓';
+    else el.textContent='↕';
+  });
+}
 
 function onCatFilter(cat){
   // When filtering by category: auto-expand that group, collapse others
@@ -2486,13 +2523,30 @@ function renderProd(){
 
   data=data.filter(p=>(p.p||'').toLowerCase().includes(srch)&&(!catF||p.c===catF));
 
-  if(sort==='net-d')       data.sort((a,b)=>b.net-a.net);
-  else if(sort==='net-a')  data.sort((a,b)=>a.net-b.net);
-  else if(sort==='qty-d')  data.sort((a,b)=>b.qty-a.qty);
-  else if(sort==='qty-a')  data.sort((a,b)=>a.qty-b.qty);
-  else if(sort==='rpu-d')  data.sort((a,b)=>(b.qty>0?b.net/b.qty:0)-(a.qty>0?a.net/a.qty:0));
-  else if(sort==='flash-d')data.sort((a,b)=>b.qtyFlash-a.qtyFlash);
-  else                     data.sort((a,b)=>(a.p||'').localeCompare(b.p||''));
+  // sort ตาม _prodSortCol / _prodSortDir
+  const _d=_prodSortDir;
+  if(_prodSortCol==='name')       data.sort((a,b)=>(a.p||'').localeCompare(b.p||'')*_d);
+  else if(_prodSortCol==='cat')   data.sort((a,b)=>(a.c||'').localeCompare(b.c||'')*_d);
+  else if(_prodSortCol==='qty')   data.sort((a,b)=>(b.qty-a.qty)*_d*-1);
+  else if(_prodSortCol==='normal')data.sort((a,b)=>(b.qtyNormal-a.qtyNormal)*_d*-1);
+  else if(_prodSortCol==='flash') data.sort((a,b)=>(b.qtyFlash-a.qtyFlash)*_d*-1);
+  else if(_prodSortCol==='flashpct') data.sort((a,b)=>{
+    const pa=a.qty>0?a.qtyFlash/a.qty:0, pb=b.qty>0?b.qtyFlash/b.qty:0;
+    return (pb-pa)*_d*-1;
+  });
+  else if(_prodSortCol==='net')   data.sort((a,b)=>(b.net-a.net)*_d*-1);
+  else if(_prodSortCol==='rpu')   data.sort((a,b)=>{
+    const ra=a.qty>0?a.net/a.qty:0, rb=b.qty>0?b.net/b.qty:0;
+    return (rb-ra)*_d*-1;
+  });
+  // fallback: sync กับ dropdown select
+  else if(sort==='net-d')       data.sort((a,b)=>b.net-a.net);
+  else if(sort==='net-a')       data.sort((a,b)=>a.net-b.net);
+  else if(sort==='qty-d')       data.sort((a,b)=>b.qty-a.qty);
+  else if(sort==='qty-a')       data.sort((a,b)=>a.qty-b.qty);
+  else if(sort==='rpu-d')       data.sort((a,b)=>(b.qty>0?b.net/b.qty:0)-(a.qty>0?a.net/a.qty:0));
+  else if(sort==='flash-d')     data.sort((a,b)=>b.qtyFlash-a.qtyFlash);
+  else                          data.sort((a,b)=>(a.p||'').localeCompare(b.p||''));
 
   const maxN=Math.max(...data.map(p=>p.net),1);
   const totalQty=data.reduce((s,p)=>s+p.qty,0);
