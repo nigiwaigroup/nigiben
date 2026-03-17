@@ -393,7 +393,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   <div class="g4 mb">
     <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Promo Discount</div><div id="kpi-disc" class="kpi-val rc">฿171,339</div><div class="kpi-sub">ส่วนลดจากโปรโมชั่นทั้งหมด</div></div>
     <div class="kpi"><div class="kpi-ico">📉</div><div class="kpi-lbl">Gross Revenue (Pre-discount)</div><div id="kpi-gross" class="kpi-val" style="color:var(--cyan)">฿599,422</div><div class="kpi-sub">ยอดก่อนหักส่วนลดโปรโมชั่น</div></div>
-    <div class="kpi"><div class="kpi-ico">⏰</div><div class="kpi-lbl">Peak Hour</div><div class="kpi-val">21:00</div><div class="kpi-sub">฿192,811 · 45% ของยอดรวม</div></div>
+    <div class="kpi g"><div class="kpi-ico">📈</div><div class="kpi-lbl">ยอดขายเฉลี่ยต่อวัน</div><div id="kpi-avg-daily" class="kpi-val gc">฿—</div><div id="kpi-avg-daily-sub" class="kpi-sub">เฉลี่ย Net Revenue ต่อวัน</div></div>
     <div class="kpi g"><div class="kpi-ico">👑</div><div class="kpi-lbl">Top Category</div><div class="kpi-val gc" style="font-size:16px">Sushi Bento</div><div class="kpi-sub">฿272,950 · 63.8% ของยอดรวม</div></div>
   </div>
 
@@ -439,6 +439,21 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
       style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;color:var(--text);font-size:12px;font-family:var(--font-b);outline:none;display:none;">
       <option value="">ทุกเดือน</option>
     </select>
+    <!-- Date range filter -->
+    <div id="daily-range-wrap" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <span style="font-size:11px;color:var(--text3);">📅 ช่วงวันที่:</span>
+      <select id="daily-date-from" onchange="renderDailyTable()"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;">
+        <option value="">ตั้งแต่วันแรก</option>
+      </select>
+      <span style="color:var(--text3);font-size:12px;">—</span>
+      <select id="daily-date-to" onchange="renderDailyTable()"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;">
+        <option value="">ถึงวันสุดท้าย</option>
+      </select>
+      <button onclick="clearDailyRange()" title="ล้าง filter"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b);">✕ ล้าง</button>
+    </div>
     <span id="daily-cnt" style="font-size:11px;color:var(--text3);margin-left:auto;"></span>
   </div>
 
@@ -1103,6 +1118,9 @@ function buildOverview(){
   set('kpi-abv')(TOTAL_BILLS>0?'฿'+Math.round(TOTAL_NET/TOTAL_BILLS):'—');
   set('kpi-disc')('฿'+Math.round(totalDisc).toLocaleString());
   set('kpi-gross')('฿'+Math.round(totalGross).toLocaleString());
+  const avgDaily=days>0?Math.round(TOTAL_NET/days):0;
+  set('kpi-avg-daily')('฿'+avgDaily.toLocaleString());
+  set('kpi-avg-daily-sub')('เฉลี่ย Net Revenue ต่อวัน · '+days+' วัน');
   // Update all period labels
   if(DAILY.length>0){
     const firstDate=DAILY[0].date, lastDate=DAILY[DAILY.length-1].date;
@@ -1419,13 +1437,40 @@ function sortDaily(col){
   renderDailyTable();
 }
 
+function clearDailyRange(){
+  const f=document.getElementById('daily-date-from');
+  const t=document.getElementById('daily-date-to');
+  if(f) f.value='';
+  if(t) t.value='';
+  renderDailyTable();
+}
+
+function populateDailyDateDropdowns(){
+  const fromSel=document.getElementById('daily-date-from');
+  const toSel=document.getElementById('daily-date-to');
+  if(!fromSel||!toSel||!DAILY.length) return;
+  const fromVal=fromSel.value, toVal=toSel.value;
+  const opts=DAILY.map(d=>`<option value="${d.date}">${d.date.substring(0,5)} ${_thDOW[DOW_MAP[d.date]]||''}</option>`).join('');
+  fromSel.innerHTML='<option value="">ตั้งแต่วันแรก</option>'+opts;
+  toSel.innerHTML='<option value="">ถึงวันสุดท้าย</option>'+opts;
+  if(fromVal) fromSel.value=fromVal;
+  if(toVal) toSel.value=toVal;
+}
+
 function renderDailyTable(){
   const mf=document.getElementById('daily-month-filter');
+  const fromSel=document.getElementById('daily-date-from');
+  const toSel=document.getElementById('daily-date-to');
   const selMonth=mf?mf.value:'';
-  const toTs=s=>{const p=(s||'').split('/');return p.length>=3?new Date(p[2],p[1]-1,p[0]).getTime():0;};
+  const fromDate=fromSel?fromSel.value:'';
+  const toDate=toSel?toSel.value:'';
+  const toTs=s=>{const p=(s||'').split('/');return p.length>=3?new Date(+p[2],+p[1]-1,+p[0]).getTime():0;};
+  const fromTs=fromDate?toTs(fromDate):0;
+  const toTs2=toDate?toTs(toDate):Infinity;
 
   let rows=[...DAILY].map(d=>({...d,abv:d.bills>0?Math.round(d.net/d.bills):0,dow:DOW_MAP[d.date]||''}));
   if(selMonth) rows=rows.filter(d=>{const p=d.date.split('/');return (p[1]||'')+'/'+( p[2]||'')===selMonth;});
+  if(fromDate||toDate) rows=rows.filter(d=>{const t=toTs(d.date);return t>=fromTs&&t<=toTs2;});
 
   const col=_dailySortCol;
   rows.sort((a,b)=>{
@@ -1463,9 +1508,10 @@ function renderDailyTable(){
   });
   const avgAbv=tot.bills>0?Math.round(tot.net/tot.bills):0;
   const totDP=tot.gross>0?(tot.discount/tot.gross*100).toFixed(1):0;
+  const avgDaily=rows.length>0?Math.round(tot.net/rows.length):0;
   html.push(`<tr style="border-top:2px solid var(--accent);background:var(--surface2);font-family:var(--font-m)">
     <td style="padding:10px 12px;color:var(--accent2)">TOTAL</td>
-    <td style="padding:10px 8px;font-size:11px;color:var(--text3)">${rows.length} วัน</td>
+    <td style="padding:10px 8px;font-size:11px;color:var(--text3)">${rows.length} วัน · เฉลี่ย ฿${avgDaily.toLocaleString()}/วัน</td>
     <td class="num" style="padding:10px 8px;color:var(--accent2)">${fn(tot.bills)}</td>
     <td class="num" style="padding:10px 8px;color:var(--accent2)">${fn(tot.qty)}</td>
     <td class="num" style="padding:10px 8px">${f(tot.gross)}</td>
@@ -1477,7 +1523,10 @@ function renderDailyTable(){
 
   document.getElementById('daily-tbody').innerHTML=html.join('');
   const cnt=document.getElementById('daily-cnt');
-  if(cnt) cnt.textContent=`แสดง ${rows.length} วัน`;
+  // แสดง summary ที่มี filter active
+  let cntTxt=`แสดง ${rows.length} วัน`;
+  if(fromDate||toDate) cntTxt+=` (filter: ${fromDate?fromDate.substring(0,5):'ต้น'}–${toDate?toDate.substring(0,5):'ปลาย'})`;
+  if(cnt) cnt.textContent=cntTxt;
 }
 
 function renderMonthlyTable(){
@@ -1574,6 +1623,7 @@ function buildDaily(){
     }
   }
   _dailySortCol='date';_dailySortDir=1;
+  populateDailyDateDropdowns();
   setDailyView('day');
 }
 
