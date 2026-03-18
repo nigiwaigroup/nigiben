@@ -292,29 +292,27 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <!-- File 1: Sales -->
     <div style="margin-bottom:16px">
       <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 ไฟล์ยอดขาย (รายงานยอดขายแยกตามสินค้า)</div>
-      <input type="file" id="modal-f1" accept=".xlsx"
-             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
-             onchange="handleModalFile(this,1);this.value=''">
-      <label for="modal-f1" id="modal-drop1"
-             onmousedown="if(document.activeElement)document.activeElement.blur()"
-             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
+      <div id="modal-drop1" onclick="pickFile(1)"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handleModalDrop(event,1)"
+           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
         <div style="font-size:24px;margin-bottom:6px">📁</div>
         <div id="modal-f1-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
-      </label>
+      </div>
     </div>
 
     <!-- File 2: Promo -->
     <div style="margin-bottom:24px">
       <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น)</div>
-      <input type="file" id="modal-f2" accept=".xlsx"
-             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
-             onchange="handleModalFile(this,2);this.value=''">
-      <label for="modal-f2" id="modal-drop2"
-             onmousedown="if(document.activeElement)document.activeElement.blur()"
-             style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
+      <div id="modal-drop2" onclick="pickFile(2)"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handleModalDrop(event,2)"
+           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
         <div style="font-size:24px;margin-bottom:6px">🎟️</div>
         <div id="modal-f2-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
-      </label>
+      </div>
     </div>
 
     <div id="modal-status" style="min-height:20px;font-size:12px;color:var(--accent);text-align:center;margin-bottom:14px"></div>
@@ -995,29 +993,27 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="upcard">
       <h3>📋 ไฟล์ที่ 1 — รายงานยอดขายแยกตามสินค้า</h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า</p>
-      <input type="file" id="f1" accept=".xlsx"
-             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
-             onchange="handleF(event,1);this.value=''"
-      >
-      <label class="drop" id="d1" for="f1" style="cursor:pointer;display:block" onmousedown="if(document.activeElement)document.activeElement.blur()">
+      <div class="drop" id="d1" onclick="pickFileUp(1)"
+           ondragover="event.preventDefault();this.classList.add('dv')"
+           ondragleave="this.classList.remove('dv')"
+           ondrop="dropFileUp(event,1)">
         <div class="drop-ico">📁</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
-      </label>
+      </div>
       <div id="st1"></div>
     </div>
     <div class="upcard">
       <h3>🎟️ ไฟล์ที่ 2 — รายงานสรุปการใช้โปรโมชั่น <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานสรุปการใช้โปรโมชั่น</p>
-      <input type="file" id="f2" accept=".xlsx"
-             style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0"
-             onchange="handleF(event,2);this.value=''"
-      >
-      <label class="drop" id="d2" for="f2" style="cursor:pointer;display:block" onmousedown="if(document.activeElement)document.activeElement.blur()">
+      <div class="drop" id="d2" onclick="pickFileUp(2)"
+           ondragover="event.preventDefault();this.classList.add('dv')"
+           ondragleave="this.classList.remove('dv')"
+           ondrop="dropFileUp(event,2)">
         <div class="drop-ico">🎟️</div>
         <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
-      </label>
+      </div>
       <div id="st2"></div>
     </div>
     <button class="proc-btn" id="proc-btn" disabled>⚡ ประมวลผลและอัพเดท Dashboard</button>
@@ -2851,18 +2847,53 @@ function buildReport(){
         <div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:#f0a500;line-height:1">฿${fNet(TOTAL_NET)}</div>
         <div style="font-size:9px;color:#475569;margin-top:5px">เฉลี่ย ฿${avgDailyNet.toLocaleString()} / วัน · ${days} วัน · ${totalBills.toLocaleString()} บิล</div>
       </div>
-      <div style="text-align:center;padding:0 8px">
-        <div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">RECOVERY RATE</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${parseFloat(netRate)>=70?'#22d47a':'#f0a500'};line-height:1">${netRate}%</div>
-        <div style="font-size:8px;color:#64748b;margin-top:3px">Net / Gross</div>
+      ${(()=>{
+        // MoM Growth — คำนวณจากเดือนล่าสุดเทียบเดือนก่อน
+        let momHtml='';
+        if(months.length>=2){
+          const last=months[months.length-1];
+          const prev=months[months.length-2];
+          const diff=last.net-prev.net;
+          const pct=prev.net>0?((diff/prev.net)*100):null;
+          const isUp=diff>=0;
+          const col=isUp?'#22d47a':'#f04545';
+          const arrow=isUp?'▲':'▼';
+          momHtml=`<div style="text-align:center;padding:0 8px;border-left:1px solid #1e3a5f">
+            <div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">MoM GROWTH</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${col};line-height:1">${arrow}${pct!==null?Math.abs(pct).toFixed(1)+'%':'—'}</div>
+            <div style="font-size:8px;color:#64748b;margin-top:3px">${mEN[last.mm]} vs ${mEN[prev.mm]}</div>
+          </div>`;
+        } else {
+          // ข้อมูลเดือนเดียว — แสดง Recovery Rate แทน
+          momHtml=`<div style="text-align:center;padding:0 8px;border-left:1px solid #1e3a5f">
+            <div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">RECOVERY RATE</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${parseFloat(netRate)>=70?'#22d47a':'#f0a500'};line-height:1">${netRate}%</div>
+            <div style="font-size:8px;color:#64748b;margin-top:3px">Net / Gross</div>
+          </div>`;
+        }
+        return momHtml;
+      })()}
+      <div style="text-align:center;padding:0 8px;border-left:1px solid #1e3a5f">
+        <div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">DAILY AVG</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:#22d47a;line-height:1">฿${Math.round(avgDailyNet).toLocaleString()}</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">รายได้เฉลี่ย / วัน</div>
       </div>
-${showDisc?`      <div style="text-align:center;padding:0 8px"><div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">DISCOUNT RATE</div><div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${parseFloat(discRate)>30?'#f04545':'#f0a500'};line-height:1">${discRate}%</div><div style="font-size:8px;color:#64748b;margin-top:3px">ของ Gross Revenue</div></div>`:''}
     </div>
 
     <!-- KPI row 1 -->
-    <div style="display:grid;grid-template-columns:repeat(${showDisc?4:2},1fr);gap:6px;margin-bottom:6px">
+    <div style="display:grid;grid-template-columns:repeat(${showDisc?4:3},1fr);gap:6px;margin-bottom:6px">
       ${showDisc?kpi('Gross Revenue','฿'+totalGross.toLocaleString(),`ก่อนหักส่วนลด · ${days} วัน`,C.sky,'💰'):''}
       ${showDisc?kpi('Total Discount','-฿'+totalDisc.toLocaleString(),`${discRate}% ของ Gross · ${promoCnt.toLocaleString()} ครั้ง`,C.red,'💸'):''}
+      ${!showDisc?(()=>{
+        if(months.length>=2){
+          const last=months[months.length-1], prev=months[months.length-2];
+          const diff=last.net-prev.net;
+          const pct=prev.net>0?((diff/prev.net)*100).toFixed(1):null;
+          const isUp=diff>=0;
+          return kpi('MoM Growth',(isUp?'▲':'▼')+(pct?Math.abs(pct)+'%':'—'),`${mEN[last.mm]} vs ${mEN[prev.mm]} · ${isUp?'+':''}฿${Math.abs(Math.round(diff)).toLocaleString()}`,isUp?C.green:C.red,'📈');
+        }
+        return kpi('Recovery Rate',netRate+'%','Net / Gross — % ที่เก็บได้จริง',parseFloat(netRate)>=70?C.green:C.amber,'📊');
+      })():''}
       ${kpi('Total Bills',totalBills.toLocaleString(),`เฉลี่ย ${avgDailyB} บิล/วัน`,C.blue,'🧾')}
       ${kpi('Avg Bill Value','฿'+abv.toLocaleString(),'มูลค่าเฉลี่ยต่อบิล',C.amber,'🛒')}
     </div>
@@ -3656,6 +3687,41 @@ function rebuildDashboard(salesRows, promoRows){
 
 
 // ══════════ MODAL UPLOAD ══════════
+// ── File picker: สร้าง input ใหม่ทุกครั้งใน direct user gesture ──
+function pickFile(n){
+  // modal uploads
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.xlsx';
+  inp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+  document.body.appendChild(inp);
+  inp.onchange = function(){
+    if(inp.files[0]) handleModalFile(inp, n);
+    document.body.removeChild(inp);
+  };
+  inp.click();
+}
+
+function pickFileUp(n){
+  // page-upload uploads
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.xlsx';
+  inp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+  document.body.appendChild(inp);
+  inp.onchange = function(){
+    if(inp.files[0]) handleF({target: inp}, n);
+    document.body.removeChild(inp);
+  };
+  inp.click();
+}
+
+function dropFileUp(e, n){
+  e.preventDefault(); e.stopPropagation();
+  const el = document.getElementById('d'+n);
+  if(el) el.classList.remove('dv');
+  const file = e.dataTransfer && e.dataTransfer.files[0];
+  if(file) handleF({target:{files:[file]}}, n);
+}
+
 const modalFiles={1:null,2:null};
 function handleModalFile(input,n){
   const file=input.files[0];
@@ -3985,18 +4051,6 @@ function buildTrialItemTable(prodEntries, totalNet, totalGross, totalDisc, total
 
 // ══════════ INIT ══════════
 window.addEventListener('DOMContentLoaded',()=>{
-  // f1, f2 ใช้ onchange inline แล้ว ไม่ต้อง addEventListener ซ้ำ
-  // drag/drop สำหรับ page-upload
-  ['d1','d2'].forEach((id,i)=>{
-    const el=document.getElementById(id);if(!el)return;
-    el.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();el.classList.add('dv');});
-    el.addEventListener('dragleave',e=>{e.stopPropagation();el.classList.remove('dv');});
-    el.addEventListener('drop',e=>{
-      e.preventDefault();e.stopPropagation();el.classList.remove('dv');
-      const file=e.dataTransfer.files[0];
-      if(file){const fakeEv={target:{files:[file]}};handleF(fakeEv,i+1);}
-    });
-  });
   document.getElementById('proc-btn').addEventListener('click',processFiles);
 });
 </script>
