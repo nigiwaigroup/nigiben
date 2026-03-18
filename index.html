@@ -1759,11 +1759,11 @@ function buildVisual(){
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:30px;';
       row.innerHTML = `
-        <span style="width:18px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:#445066;flex-shrink:0;">${i+1}</span>
+        <span style="width:18px;text-align:right;font-family:"JetBrains Mono",monospace;font-size:10px;color:#445066;flex-shrink:0;">${i+1}</span>
         <span style="width:168px;font-size:11px;color:#9aa3b8;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${name}">${shortName}</span>
         <div style="flex:1;height:24px;background:rgba(255,255,255,0.06);border-radius:5px;position:relative;overflow:visible;">
           <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;min-width:4px;"></div>
-          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:${stampColor};white-space:nowrap;pointer-events:none;">${label}</span>
+          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:${stampColor};white-space:nowrap;pointer-events:none;">${label}</span>
         </div>`;
       wrap.appendChild(row);
     });
@@ -1793,10 +1793,10 @@ function buildVisual(){
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:22px;';
       row.innerHTML = `
-        <span style="width:44px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:#9aa3b8;flex-shrink:0;">${String(h.h).padStart(2,'0')}:00</span>
+        <span style="width:44px;text-align:right;font-family:"JetBrains Mono",monospace;font-size:10px;color:#9aa3b8;flex-shrink:0;">${String(h.h).padStart(2,'0')}:00</span>
         <div style="flex:1;height:20px;background:rgba(255,255,255,0.05);border-radius:3px;position:relative;">
           <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;min-width:2px;"></div>
-          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:${stampColor};white-space:nowrap;">${revPct}% &nbsp;${f(h.net)}</span>
+          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:600;color:${stampColor};white-space:nowrap;">${revPct}% &nbsp;${f(h.net)}</span>
         </div>`;
       wrap.appendChild(row);
     });
@@ -2779,23 +2779,24 @@ function buildReport(){
 
   /* ── micro helpers ── */
   const fNet=n=>n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const bar=(p,col,h=6)=>`<div style="background:#e2e8f0;border-radius:3px;height:${h}px;overflow:hidden;flex:1;min-width:30px"><div style="height:100%;width:${Math.min(p,100).toFixed(1)}%;background:${col};border-radius:3px"></div></div>`;
+  const bar=(p,col,h=6)=>`<div style="background:#dde5f0;border-radius:3px;height:${h}px;overflow:hidden;flex:1;min-width:30px"><div style="height:100%;width:${Math.min(p,100).toFixed(1)}%;background:${col};border-radius:3px;box-shadow:0 1px 4px ${col}66"></div></div>`;
   const badge=(txt,col)=>`<span style="background:${col}22;color:${col};border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;white-space:nowrap">${txt}</span>`;
-  const kpi=(lbl,val,sub,col,icon='')=>`<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:9px 12px;border-top:3px solid ${col}">
-    <div style="font-size:7.5px;color:#64748b;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:5px">${icon} ${lbl}</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:${col};line-height:1.1;margin-bottom:4px">${val}</div>
-    <div style="font-size:8.5px;color:#334155;line-height:1.4">${sub}</div>
+  const kpi=(lbl,val,sub,col,icon='')=>`<div style="background:linear-gradient(135deg,${col}18 0%,${col}08 100%);border:1.5px solid ${col}55;border-radius:10px;padding:11px 14px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${col};border-radius:10px 10px 0 0"></div>
+    <div style="font-size:7.5px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;margin-bottom:6px">${icon} ${lbl}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;color:${col};line-height:1.1;margin-bottom:5px;text-shadow:0 1px 3px ${col}33">${val}</div>
+    <div style="font-size:8.5px;color:#334155;line-height:1.5;border-top:1px solid ${col}30;padding-top:5px;margin-top:2px">${sub}</div>
   </div>`;
-  const sec=(icon,title,accent=C.navy)=>`<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px;padding-bottom:7px;border-bottom:2px solid #e2e8f0">
-    <span style="font-size:14px">${icon}</span>
+  const sec=(icon,title,accent=C.navy)=>`<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px;padding:7px 12px;background:linear-gradient(90deg,rgba(15,25,35,0.06) 0%,transparent 100%);border-left:4px solid ${C.amber};border-radius:0 6px 6px 0">
+    <span style="font-size:15px">${icon}</span>
     <span style="font-family:'Chakra Petch',sans-serif;font-size:11px;font-weight:700;color:#0f1923;letter-spacing:2px;text-transform:uppercase">${title}</span>
   </div>`;
-  const tHead=(...cols)=>`<thead><tr style="background:#162537;-webkit-print-color-adjust:exact;print-color-adjust:exact">${cols.map(([txt,align,w])=>`<th style="padding:8px ${align==='r'?10:12}px;text-align:${align==='r'?'right':'left'};font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.5px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
+  const tHead=(...cols)=>`<thead><tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact">${cols.map(([txt,align,w])=>`<th style="padding:9px ${align==='r'?10:12}px;text-align:${align==='r'?'right':'left'};font-size:9.5px;color:#f0a500;font-weight:800;letter-spacing:1px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
   const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;background:#fff;font-family:'Sarabun','TH Sarabun New',sans-serif;color:#0f1923;box-sizing:border-box;margin:0 auto 28px;border-radius:4px;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.35);-webkit-print-color-adjust:exact;print-color-adjust:exact;">
     <!-- gradient top rule -->
-    <div style="height:5px;background:linear-gradient(90deg,#f0a500 0%,#22d47a 35%,#3d9be0 65%,#a07ee0 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>
+    <div style="height:6px;background:linear-gradient(90deg,#f0a500 0%,#22d47a 35%,#3d9be0 65%,#a07ee0 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>
     <!-- gradient spine -->
-    <div style="height:5px;background:linear-gradient(90deg,#f0a500 0%,#22d47a 40%,#3d9be0 70%,#a07ee0 100%)"></div>
+    <div style="height:3px;background:linear-gradient(90deg,#f0a50055 0%,#22d47a55 40%,#3d9be055 70%,#a07ee055 100%)"></div>
     <!-- header -->
     <div style="background:#0f1923;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact">
       <div style="display:flex;align-items:center;gap:18px">
@@ -2806,7 +2807,7 @@ function buildReport(){
         <div style="width:1px;height:30px;background:#334155"></div>
         <div>
           <div style="font-size:8px;color:#64748b;letter-spacing:1px">PERIOD</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f0a500;font-weight:600;margin-top:1px">${periodEN}</div>
+          <div style="font-family:"JetBrains Mono",monospace;font-size:12px;color:#f0a500;font-weight:600;margin-top:1px">${periodEN}</div>
         </div>
       </div>
       <div style="text-align:right">
@@ -2817,8 +2818,8 @@ function buildReport(){
     <div class="rpt-scale">
       <div style="padding:20px 28px 52px">${content}</div>
     </div>
-    <div class="rpt-footer" style="position:absolute;bottom:0;left:0;right:0;height:28px;background:#f8fafc;border-top:1px solid #e2e8f0;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px;z-index:10">
-      <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · For Investor Use Only · Confidential</div>
+    <div class="rpt-footer" style="position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(90deg,#0f1923 0%,#162537 100%);border-top:1px solid #22d47a33;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px;z-index:10">
+      <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · For Investor Use Only · <span style="color:#f0a500">CONFIDENTIAL</span></div>
       <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
     </div>
   </div>`;
@@ -2841,11 +2842,11 @@ function buildReport(){
   const p1=pageWrap(`
 
     <!-- Hero Revenue Banner -->
-    <div style="background:linear-gradient(135deg,#0f1923 0%,#162537 60%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:10px;padding:14px 20px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center">
+    <div style="background:linear-gradient(135deg,#0b1520 0%,#0f1f35 40%,#162e4a 75%,#1a2a3d 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:12px;padding:18px 24px;margin-bottom:14px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,0.4);border:1px solid #1e3a5f">
       <div>
-        <div style="font-size:8.5px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">NET REVENUE · ${periodTH}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:#f0a500;line-height:1">฿${fNet(TOTAL_NET)}</div>
-        <div style="font-size:9px;color:#475569;margin-top:5px">เฉลี่ย ฿${avgDailyNet.toLocaleString()} / วัน · ${days} วัน · ${totalBills.toLocaleString()} บิล</div>
+        <div style="font-size:8.5px;color:#64748b;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px;font-weight:700">NET REVENUE · ${periodTH}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;color:#f0a500;line-height:1;text-shadow:0 2px 12px rgba(240,165,0,0.4)">฿${fNet(TOTAL_NET)}</div>
+        <div style="font-size:9px;color:#64748b;margin-top:6px;letter-spacing:.5px">เฉลี่ย ฿${avgDailyNet.toLocaleString()} / วัน · ${days} วัน · ${totalBills.toLocaleString()} บิล</div>
       </div>
       ${(()=>{
         // MoM Growth — คำนวณจากเดือนล่าสุดเทียบเดือนก่อน
@@ -2860,14 +2861,14 @@ function buildReport(){
           const arrow=isUp?'▲':'▼';
           momHtml=`<div style="text-align:center;padding:0 8px;border-left:1px solid #1e3a5f">
             <div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">MoM GROWTH</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${col};line-height:1">${arrow}${pct!==null?Math.abs(pct).toFixed(1)+'%':'—'}</div>
+            <div style="font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:700;color:${col};line-height:1">${arrow}${pct!==null?Math.abs(pct).toFixed(1)+'%':'—'}</div>
             <div style="font-size:8px;color:#64748b;margin-top:3px">${mEN[last.mm]} vs ${mEN[prev.mm]}</div>
           </div>`;
         } else {
           // ข้อมูลเดือนเดียว — แสดง Recovery Rate แทน
           momHtml=`<div style="text-align:center;padding:0 8px;border-left:1px solid #1e3a5f">
             <div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">RECOVERY RATE</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${parseFloat(netRate)>=70?'#22d47a':'#f0a500'};line-height:1">${netRate}%</div>
+            <div style="font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:700;color:${parseFloat(netRate)>=70?'#22d47a':'#f0a500'};line-height:1">${netRate}%</div>
             <div style="font-size:8px;color:#64748b;margin-top:3px">Net / Gross</div>
           </div>`;
         }
@@ -2875,7 +2876,7 @@ function buildReport(){
       })()}
       <div style="text-align:center;padding:0 8px;border-left:1px solid #1e3a5f">
         <div style="font-size:8px;color:#64748b;letter-spacing:1px;margin-bottom:4px">DAILY AVG</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:#22d47a;line-height:1">฿${Math.round(avgDailyNet).toLocaleString()}</div>
+        <div style="font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:700;color:#22d47a;line-height:1">฿${Math.round(avgDailyNet).toLocaleString()}</div>
         <div style="font-size:8px;color:#64748b;margin-top:3px">รายได้เฉลี่ย / วัน</div>
       </div>
     </div>
@@ -2900,7 +2901,10 @@ function buildReport(){
     <!-- KPI row 2 -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:${!showDisc&&months.length>1?'6':'10'}px">
       ${kpi('Total Items',totalItems.toLocaleString(),`${Math.round(totalItems/days)} ชิ้น/วัน เฉลี่ย`,C.purple,'📦')}
-      ${kpi('Peak Hour',pad(peak.h)+':00 น.',`฿${peak.net.toLocaleString()} · ชั่วโมงยอดสูงสุด`,C.sky,'⏰')}
+      ${showDisc
+        ? kpi('Peak Hour',pad(peak.h)+':00 น.',`฿${peak.net.toLocaleString()} · ชั่วโมงยอดสูงสุด`,C.sky,'⏰')
+        : kpi('Avg Daily Bills',Math.round(totalBills/days).toLocaleString()+' บิล',`${totalBills.toLocaleString()} บิล ใน ${days} วัน · traffic/วัน`,C.blue,'🧾')
+      }
       ${kpi('Best Day',bestDay?.date.substring(0,5)||'—',`฿${(bestDay?.net||0).toLocaleString()} · ${dowTH[DOW_MAP[bestDay?.date||'']||'']||''}`,C.green,'📅')}
       ${kpi('Top Category',CATS[0]?.cat||'—',`฿${(CATS[0]?.net||0).toLocaleString()} · ${((CATS[0]?.net||0)/catTotal*100).toFixed(1)}% ของรวม`,C.green,'🏆')}
     </div>
@@ -2915,12 +2919,12 @@ function buildReport(){
         const cols=[C.green,C.sky,C.amber,C.purple];
         const col=cols[i%cols.length];
         const avgBillM=m.bills>0?Math.round(m.net/m.bills):0;
-        return '<div style="background:'+C.white+';border:1px solid '+C.border+';border-radius:9px;padding:12px 14px;border-top:3px solid '+col+'">'
+        return '<div style="background:linear-gradient(160deg,'+col+'18 0%,'+col+'06 100%);border:1.5px solid '+col+'55;border-radius:10px;padding:13px 14px;border-top:4px solid '+col+';-webkit-print-color-adjust:exact;print-color-adjust:exact">'
           +'<div style="font-family:\'Chakra Petch\',sans-serif;font-size:10px;font-weight:700;color:'+col+';margin-bottom:6px">'+mTHF[m.mm]+' '+(m.yy+543)+'</div>'
-          +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:18px;font-weight:700;color:'+C.navy+';margin-bottom:4px">฿'+m.net.toLocaleString()+'</div>'
+          +'<div style="font-family:"JetBrains Mono",monospace;font-size:18px;font-weight:700;color:'+C.navy+';margin-bottom:4px">฿'+m.net.toLocaleString()+'</div>'
           +(diff!==null?'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
             +'<span style="font-size:11px">'+(isUp?'▲':'▼')+'</span>'
-            +'<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+(isUp?C.green:C.red)+'">'+(isUp?'+':'')+diff.toLocaleString()+'</span>'
+            +'<span style="font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;color:'+(isUp?C.green:C.red)+'">'+(isUp?'+':'')+diff.toLocaleString()+'</span>'
             +'<span style="font-size:9px;background:'+(isUp?C.green:C.red)+'22;color:'+(isUp?C.green:C.red)+';border-radius:4px;padding:2px 6px;font-weight:700">'+(isUp?'+':'')+diffPct.toFixed(1)+'%</span>'
             +'<span style="font-size:8px;color:'+C.t3+';margin-left:2px">vs เดือนก่อน</span>'
             +'</div>'
@@ -2954,7 +2958,7 @@ function buildReport(){
                 <span style="font-weight:600;color:#162537">${c.cat}</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${col};font-weight:700">฿${c.net.toLocaleString()}</span>
+                <span style="font-family:"JetBrains Mono",monospace;font-size:9px;color:${col};font-weight:700">฿${c.net.toLocaleString()}</span>
                 <span style="font-weight:700;color:#334155;font-size:9px;width:32px;text-align:right">${p.toFixed(1)}%</span>
               </div>
             </div>
@@ -2975,13 +2979,13 @@ function buildReport(){
           const col=cols[i%cols.length];
           const p=(m.net/maxMonthNet*100);
           const dr2=m.gross>0?(m.discount/m.gross*100).toFixed(0):0;
-          return `<div style="background:#f8fafc;border-radius:7px;padding:10px 12px;margin-bottom:7px;border:1px solid #e2e8f0;border-left:3px solid ${col}">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
-              <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;color:${col}">${mTHF[m.mm]} ${m.yy+543}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#162537;font-weight:700">฿${fNet(m.net)}</span>
+          return `<div style="background:linear-gradient(135deg,${col}16 0%,${col}06 100%);border-radius:9px;padding:11px 13px;margin-bottom:8px;border:1.5px solid ${col}44;border-left:4px solid ${col};-webkit-print-color-adjust:exact;print-color-adjust:exact">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+              <span style="font-family:'Chakra Petch',sans-serif;font-size:10.5px;font-weight:800;color:${col}">${mTHF[m.mm]} ${m.yy+543}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#0f1923;font-weight:700">฿${fNet(m.net)}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">${bar(p,col,7)}<span style="font-size:8px;color:#64748b;white-space:nowrap">${p.toFixed(0)}% ของเดือนสูงสุด</span></div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;font-size:8px;color:#334155">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">${bar(p,col,8)}<span style="font-size:8px;color:#475569;white-space:nowrap;font-weight:600">${p.toFixed(0)}%</span></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;font-size:8px;color:#334155;background:rgba(255,255,255,0.5);border-radius:5px;padding:4px 6px">
               <span>📋 ${m.days} วัน</span><span>🧾 ${m.bills.toLocaleString()} บิล</span>${showDisc?`<span>💸 Disc ${dr2}%</span>`:`<span>📦 ${m.qty.toLocaleString()} ชิ้น</span>`}
             </div>
           </div>`;
@@ -2994,10 +2998,10 @@ function buildReport(){
           const isWE=dw==='Sat'||dw==='Sun';
           const dr2=d.gross>0?(d.discount/d.gross*100).toFixed(0):0;
           return `<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:9px">
-            <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#162537;width:32px;flex-shrink:0">${d.date.substring(0,5)}</span>
+            <span style="font-family:"JetBrains Mono",monospace;font-weight:700;color:#162537;width:32px;flex-shrink:0">${d.date.substring(0,5)}</span>
             <span style="color:${isWE?C.amber:'#94a3b8'};flex-shrink:0;font-size:8px;white-space:nowrap;min-width:52px">${dowTH[dw]||''}</span>
             ${bar(p,isWE?C.amber:C.green,8)}
-            <span style="font-family:'JetBrains Mono',monospace;color:#22d47a;font-weight:700;white-space:nowrap;width:${showDisc?62:72}px;text-align:right">฿${fNet(d.net)}</span>
+            <span style="font-family:"JetBrains Mono",monospace;color:#22d47a;font-weight:700;white-space:nowrap;width:${showDisc?62:72}px;text-align:right">฿${fNet(d.net)}</span>
             ${showDisc?`<span style="color:#f04545;font-size:8px;white-space:nowrap;width:28px;text-align:right">-${dr2}%</span>`:''} 
           </div>`;
         }).join('')}`}
@@ -3009,21 +3013,21 @@ function buildReport(){
     ${sec('💡','Strategic Insights & Recommendations')}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
       ${insights.map(ins=>`
-      <div style="background:#f8fafc;border-radius:8px;padding:10px 12px;border:1px solid #e2e8f0;border-left:3px solid ${ins.col}">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-          <span style="font-size:12px">${ins.icon}</span>
+      <div style="background:linear-gradient(135deg,${ins.col}14 0%,${ins.col}06 100%);border-radius:10px;padding:11px 13px;border:1.5px solid ${ins.col}44;border-left:4px solid ${ins.col};-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <span style="font-size:13px">${ins.icon}</span>
           ${badge(ins.level,ins.col)}
-          <span style="font-size:9px;font-weight:700;color:#162537;line-height:1.3;flex:1">${ins.title}</span>
+          <span style="font-size:9px;font-weight:700;color:#0f1923;line-height:1.3;flex:1">${ins.title}</span>
         </div>
-        <div style="font-size:8.5px;color:#334155;line-height:1.6">${ins.body}</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6;border-top:1px solid ${ins.col}25;padding-top:5px">${ins.body}</div>
       </div>`).join('')}
     </div>
     ${sec('📘','Recovery Rate — คำอธิบายตัวชี้วัด')}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
       <!-- What is Recovery Rate -->
-      <div style="background:#f8fafc;border-radius:10px;padding:14px 16px;border:1px solid #e2e8f0;border-left:4px solid ${C.green}">
-        <div style="font-size:9px;font-weight:700;color:#162537;letter-spacing:.5px;margin-bottom:8px">📗 Recovery Rate คืออะไร?</div>
+      <div style="background:linear-gradient(135deg,#22d47a18 0%,#22d47a06 100%);border-radius:10px;padding:14px 16px;border:1.5px solid #22d47a44;border-left:4px solid ${C.green};-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <div style="font-size:9px;font-weight:800;color:#0f1923;letter-spacing:.5px;margin-bottom:8px">📗 Recovery Rate คืออะไร?</div>
         <div style="font-size:8.5px;color:#334155;line-height:1.8">
           <strong style="color:#162537">Recovery Rate</strong> คือสัดส่วนของยอดขายสุทธิ (Net Revenue) ที่ร้านเก็บได้จริงเมื่อเทียบกับยอดขายรวมก่อนส่วนลด (Gross Revenue)<br><br>
           เป็นตัวชี้วัดหลักที่แสดงว่า <strong style="color:#162537">ทุก ฿100 ที่ลูกค้าสั่ง ร้านเก็บเงินได้จริงกี่บาท</strong>
@@ -3033,40 +3037,40 @@ function buildReport(){
       <!-- Formula -->
       <div style="background:#080b10;border-radius:10px;padding:14px 16px;border:1px solid #e2e8f0">
         <div style="font-size:9px;font-weight:700;color:#94a3b8;letter-spacing:.5px;margin-bottom:10px">🧮 สูตรการคำนวณ</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#ffffff;line-height:2;text-align:center">
+        <div style="font-family:"JetBrains Mono",monospace;font-size:10px;color:#ffffff;line-height:2;text-align:center">
           <span style="color:#22d47a;font-weight:700">Net Revenue</span><br>
           <span style="color:#475569">──────────────────</span> × 100<br>
           <span style="color:#94a3b8">Gross Revenue</span>
         </div>
-        <div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.06);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#94a3b8;text-align:center">
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.06);border-radius:6px;font-family:"JetBrains Mono",monospace;font-size:9px;color:#94a3b8;text-align:center">
           ฿${fNet(TOTAL_NET)} ÷ ฿${totalGross.toLocaleString()} × 100
           <div style="color:${parseFloat(netRate)>=70?C.green:C.amber};font-size:14px;font-weight:700;margin-top:4px">= ${netRate}%</div>
         </div>
       </div>
 
       <!-- Current period result -->
-      <div style="background:#f8fafc;border-radius:10px;padding:14px 16px;border:1px solid #e2e8f0;border-left:4px solid ${parseFloat(netRate)>=70?C.green:C.amber}">
+      <div style="background:linear-gradient(135deg,${parseFloat(netRate)>=70?'#22d47a18':'#f0a50018'} 0%,${parseFloat(netRate)>=70?'#22d47a06':'#f0a50006'} 100%);border-radius:10px;padding:14px 16px;border:1.5px solid ${parseFloat(netRate)>=70?'#22d47a44':'#f0a50044'};border-left:4px solid ${parseFloat(netRate)>=70?C.green:C.amber};-webkit-print-color-adjust:exact;print-color-adjust:exact">
         <div style="font-size:9px;font-weight:700;color:#162537;letter-spacing:.5px;margin-bottom:8px">📊 ผลลัพธ์ช่วงนี้ (${periodTH})</div>
         <div style="font-size:8.5px;color:#334155;line-height:1.9">
-          • Gross Revenue: <strong style="color:#162537;font-family:'JetBrains Mono',monospace">฿${totalGross.toLocaleString()}</strong><br>
-          • Net Revenue: <strong style="color:#22d47a;font-family:'JetBrains Mono',monospace">฿${fNet(TOTAL_NET)}</strong><br>
+          • Gross Revenue: <strong style="color:#162537;font-family:"JetBrains Mono",monospace">฿${totalGross.toLocaleString()}</strong><br>
+          • Net Revenue: <strong style="color:#22d47a;font-family:"JetBrains Mono",monospace">฿${fNet(TOTAL_NET)}</strong><br>
           • <strong style="color:#162537">Recovery Rate = ${netRate}%</strong><br>
           <span style="color:#64748b">ทุก ฿100 ที่ขายได้ ร้านเก็บเงินจริง ฿${netRate}</span>
         </div>
       </div>
 
       <!-- Benchmark -->
-      <div style="background:#f8fafc;border-radius:10px;padding:14px 16px;border:1px solid #e2e8f0;border-left:4px solid ${C.sky}">
+      <div style="background:linear-gradient(135deg,#3d9be018 0%,#3d9be006 100%);border-radius:10px;padding:14px 16px;border:1.5px solid #3d9be044;border-left:4px solid ${C.sky};-webkit-print-color-adjust:exact;print-color-adjust:exact">
         <div style="font-size:9px;font-weight:700;color:#162537;letter-spacing:.5px;margin-bottom:8px">🎯 เกณฑ์มาตรฐาน F&B Airport</div>
         <div style="font-size:8.5px;color:#334155;line-height:1.9">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #e2e8f0">
-            <span>🟢 ดีเยี่ยม</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#22d47a">≥ 75%</span>
+            <span>🟢 ดีเยี่ยม</span><span style="font-family:"JetBrains Mono",monospace;font-weight:700;color:#22d47a">≥ 75%</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #e2e8f0">
-            <span>🟡 อยู่ในเกณฑ์</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#f0a500">65–74%</span>
+            <span>🟡 อยู่ในเกณฑ์</span><span style="font-family:"JetBrains Mono",monospace;font-weight:700;color:#f0a500">65–74%</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">
-            <span>🔴 ต้องปรับปรุง</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#f04545">< 65%</span>
+            <span>🔴 ต้องปรับปรุง</span><span style="font-family:"JetBrains Mono",monospace;font-weight:700;color:#f04545">< 65%</span>
           </div>
           <div style="margin-top:6px;padding:5px 8px;background:${parseFloat(netRate)>=75?C.green:parseFloat(netRate)>=65?C.amber:C.red}22;border-radius:5px;font-size:8px;font-weight:700;color:${parseFloat(netRate)>=75?C.green:parseFloat(netRate)>=65?C.amber:C.red};text-align:center">
             ร้านนี้อยู่ในระดับ: ${parseFloat(netRate)>=75?'🟢 ดีเยี่ยม':parseFloat(netRate)>=65?'🟡 อยู่ในเกณฑ์':'🔴 ต้องปรับปรุง'}
@@ -3095,28 +3099,28 @@ function buildReport(){
           const dw=DOW_MAP[d.date]||'';
           const isWE=dw==='Sat'||dw==='Sun';
           const col=isWE?C.amber:C.green;
-          return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
-            <td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;font-weight:700;color:#162537">${d.date.substring(0,5)}</td>
+          return `<tr style="background:${i%2===0?"#ffffff":"#f0f7ff"};border-bottom:1px solid #dbeafe">
+            <td style="padding:5px 10px;font-family:"JetBrains Mono",monospace;font-weight:700;color:#162537">${d.date.substring(0,5)}</td>
             <td style="padding:5px 8px;color:${isWE?C.amber:'#94a3b8'};font-size:9px;white-space:nowrap">${dowTH[dw]||''}</td>
             <td style="padding:5px 8px;text-align:right">${d.bills.toLocaleString()}</td>
             <td style="padding:5px 8px;text-align:right">${d.qty.toLocaleString()}</td>
             ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#334155">${d.gross.toLocaleString()}</td>`:''}
             ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#f04545">-${d.discount.toLocaleString()}</td>`:''}
-            <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${fNet(d.net)}</td>
+            <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:"JetBrains Mono",monospace">${fNet(d.net)}</td>
             <td style="padding:5px 8px;text-align:right">฿${abvD.toLocaleString()}</td>
             ${showDisc?`<td style="padding:5px 8px;text-align:right;color:${parseFloat(dr2)>30?C.red:C.t4}">${dr2}%</td>`:''} 
             <td style="padding:5px 10px"><div style="display:flex;align-items:center;gap:4px">${bar(p,col,8)}<span style="font-size:7.5px;color:#64748b;white-space:nowrap">${p.toFixed(0)}%</span></div></td>
           </tr>`;
         }).join('')}
-        <tr style="background:#0f1923;color:#ffffff">
-          <td colspan="2" style="padding:6px 10px;font-family:'Chakra Petch',sans-serif;font-size:9px;font-weight:700">TOTAL — ${days} วัน</td>
-          <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${totalBills.toLocaleString()}</td>
-          <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${totalItems.toLocaleString()}</td>
-          ${showDisc?`<td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">฿${totalGross.toLocaleString()}</td>`:''}
-          ${showDisc?`<td style="padding:6px 8px;text-align:right;color:${C.pink};font-family:'JetBrains Mono',monospace">-฿${totalDisc.toLocaleString()}</td>`:''}
-          <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:'JetBrains Mono',monospace;font-size:11px">฿${fNet(TOTAL_NET)}</td>
-          <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">฿${abv.toLocaleString()}</td>
-          ${showDisc?`<td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${discRate}%</td>`:''}
+        <tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);color:#ffffff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+          <td colspan="2" style="padding:8px 10px;font-family:'Chakra Petch',sans-serif;font-size:9.5px;font-weight:800;color:#f0a500;letter-spacing:1px">TOTAL — ${days} วัน</td>
+          <td style="padding:6px 8px;text-align:right;font-family:"JetBrains Mono",monospace">${totalBills.toLocaleString()}</td>
+          <td style="padding:6px 8px;text-align:right;font-family:"JetBrains Mono",monospace">${totalItems.toLocaleString()}</td>
+          ${showDisc?`<td style="padding:6px 8px;text-align:right;font-family:"JetBrains Mono",monospace">฿${totalGross.toLocaleString()}</td>`:''}
+          ${showDisc?`<td style="padding:6px 8px;text-align:right;color:${C.pink};font-family:"JetBrains Mono",monospace">-฿${totalDisc.toLocaleString()}</td>`:''}
+          <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:"JetBrains Mono",monospace;font-size:11px">฿${fNet(TOTAL_NET)}</td>
+          <td style="padding:6px 8px;text-align:right;font-family:"JetBrains Mono",monospace">฿${abv.toLocaleString()}</td>
+          ${showDisc?`<td style="padding:6px 8px;text-align:right;font-family:"JetBrains Mono",monospace">${discRate}%</td>`:''}
           <td style="padding:6px 10px;font-size:8px;color:#94a3b8">${showDisc?'Recovery: '+netRate+'%':''}</td>
         </tr>
       </tbody>
@@ -3132,14 +3136,14 @@ function buildReport(){
           const col=cols[i%cols.length];
           const avbM=m.bills>0?Math.round(m.net/m.bills):0;
           const drM=m.gross>0?(m.discount/m.gross*100).toFixed(1):0;
-          return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
+          return `<tr style="background:${i%2===0?"#ffffff":"#f0f7ff"};border-bottom:1px solid #dbeafe">
             <td style="padding:6px 10px;font-family:'Chakra Petch',sans-serif;font-weight:700;color:${col}">${mTHF[m.mm]} ${m.yy+543}</td>
             <td style="padding:6px 8px;text-align:right">${m.days}</td>
             <td style="padding:6px 8px;text-align:right">${m.bills.toLocaleString()}</td>
             <td style="padding:6px 8px;text-align:right">${m.qty.toLocaleString()}</td>
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:#334155">${m.gross.toLocaleString()}</td>`:''}
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:#f04545">-${m.discount.toLocaleString()}</td>`:''}
-            <td style="padding:6px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${fNet(m.net)}</td>
+            <td style="padding:6px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:"JetBrains Mono",monospace">${fNet(m.net)}</td>
             <td style="padding:6px 8px;text-align:right">฿${avbM.toLocaleString()}</td>
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:${parseFloat(drM)>30?C.red:C.t4}">${drM}%</td>`:''} 
           </tr>`;
@@ -3170,14 +3174,14 @@ function buildReport(){
               const pct2=(p.net/TOTAL_NET*100);
               const name=p.p.includes('/')?p.p.split('/').slice(1).join('/').trim():p.p;
               const medals=['🥇','🥈','🥉'];
-              return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
+              return `<tr style="background:${i%2===0?"#ffffff":"#f0f7ff"};border-bottom:1px solid #dbeafe">
                 <td style="padding:5px 6px;text-align:center;font-size:${i<3?'12':'10'}px">${i<3?medals[i]:(i+1)}</td>
                 <td style="padding:5px 6px">
                   <div style="font-weight:600;color:#162537;font-size:8.5px">${name.substring(0,22)}</div>
                   <div style="display:flex;align-items:center;gap:3px;margin-top:2px">${bar(p.net/maxProd*100,col,5)}</div>
                 </td>
                 <td style="padding:5px 6px;text-align:right;color:#334155">฿${rpu.toLocaleString()}</td>
-                <td style="padding:5px 6px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${p.net.toLocaleString()}</td>
+                <td style="padding:5px 6px;text-align:right;font-weight:700;color:#22d47a;font-family:"JetBrains Mono",monospace">${p.net.toLocaleString()}</td>
                 <td style="padding:5px 6px;text-align:right;font-weight:600;color:#334155">${pct2.toFixed(1)}%</td>
               </tr>`;
             }).join('')}
@@ -3199,7 +3203,7 @@ function buildReport(){
           <tbody>
             ${promoRows.map(([name,v],i)=>{
               const dr2=v.sales>0?(v.disc/v.sales*100).toFixed(1):0;
-              return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
+              return `<tr style="background:${i%2===0?"#ffffff":"#f0f7ff"};border-bottom:1px solid #dbeafe">
                 <td style="padding:5px 6px">
                   <div style="font-weight:600;color:#162537;font-size:8.5px">${name}</div>
                   <div style="margin-top:2px">${bar(v.disc/maxPromoD*100,C.red,5)}</div>
@@ -3221,14 +3225,14 @@ function buildReport(){
           return `<div style="display:flex;align-items:center;gap:10px;background:#f8fafc;border-radius:7px;padding:8px 12px;margin-bottom:6px;border:1px solid #e2e8f0">
             <span style="font-size:16px">${medals[i]}</span>
             <div style="flex:1">
-              <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${cols[i]};font-size:12px">${date.substring(0,5)} <span style="font-size:9px;font-weight:400;color:#64748b">${dowTH[dw]||dw}</span></div>
+              <div style="font-family:"JetBrains Mono",monospace;font-weight:700;color:${cols[i]};font-size:12px">${date.substring(0,5)} <span style="font-size:9px;font-weight:400;color:#64748b">${dowTH[dw]||dw}</span></div>
               <div style="font-size:8.5px;color:#334155;margin-top:2px">${v.cnt.toLocaleString()} ครั้ง</div>
             </div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#f04545">-฿${v.disc.toLocaleString()}</div>
+            <div style="font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:700;color:#f04545">-฿${v.disc.toLocaleString()}</div>
           </div>`;
         }).join('')}`:''}
 
-        `:(showDisc?`<div style="background:#f8fafc;border-radius:8px;padding:20px;text-align:center;color:#64748b;font-size:11px;border:1px dashed ${C.border}">⚠️ ไม่พบข้อมูลโปรโมชั่น</div>`:`<div style="background:#f8fafc;border-radius:8px;padding:16px;color:#334155;font-size:10px;border:1px solid #e2e8f0;line-height:1.8"><strong style="color:#162537">สรุป Revenue สำหรับ Investor</strong><br>Net Revenue รวม: <strong style="color:#22d47a">฿${fNet(TOTAL_NET)}</strong><br>จำนวนบิล: <strong>${totalBills.toLocaleString()}</strong> บิล · เฉลี่ย ${avgDailyB} บิล/วัน<br>Avg Bill Value: <strong>฿${abv.toLocaleString()}</strong> ต่อบิล</div>`)}
+        `:(showDisc?`<div style="background:#f8fafc;border-radius:8px;padding:20px;text-align:center;color:#64748b;font-size:11px;border:1px dashed ${C.border}">⚠️ ไม่พบข้อมูลโปรโมชั่น</div>`:`<div style="background:linear-gradient(135deg,#22d47a14 0%,#3d9be00a 100%);border-radius:10px;padding:18px;color:#334155;font-size:10px;border:1.5px solid #22d47a44;line-height:1.9;-webkit-print-color-adjust:exact;print-color-adjust:exact"><strong style="color:#0f1923;font-size:11px;display:block;margin-bottom:8px;letter-spacing:.5px">📊 สรุป Revenue สำหรับ Investor</strong>Net Revenue รวม: <strong style="color:#22d47a;font-family:'JetBrains Mono',monospace;font-size:13px">฿${fNet(TOTAL_NET)}</strong><br>จำนวนบิล: <strong style="color:#0f1923">${totalBills.toLocaleString()}</strong> บิล · เฉลี่ย ${avgDailyB} บิล/วัน<br>Avg Bill Value: <strong style="color:#0f1923">฿${abv.toLocaleString()}</strong> ต่อบิล</div>`)}
       </div>
     </div>
 
@@ -3242,17 +3246,18 @@ function buildReport(){
           const avg=v.days>0?Math.round(v.net/v.days):0;
           const maxDow=Math.max(...Object.values(dowAgg).map(x=>x.days>0?x.net/x.days:0),1);
           const isWE=dw==='Sat'||dw==='Sun';
-          return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:9px">
-            <span style="width:26px;color:${isWE?C.amber:C.t4};font-weight:600;flex-shrink:0">${dw}</span>
-            <span style="font-size:8px;color:#64748b;width:40px;flex-shrink:0">${dowTH[dw]||''}</span>
-            ${bar(avg/maxDow*100,isWE?C.amber:C.green,9)}
-            <span style="font-family:'JetBrains Mono',monospace;color:${isWE?C.amber:C.navy};font-weight:700;white-space:nowrap;width:60px;text-align:right">฿${avg.toLocaleString()}</span>
-            <span style="font-size:7.5px;color:#64748b;white-space:nowrap">${v.days}วัน</span>
+          return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:9px;padding:5px 8px;border-radius:6px;background:${isWE?'rgba(240,165,0,0.08)':'rgba(240,244,250,0.6)'}">
+            <span style="width:26px;color:${isWE?C.amber:'#334155'};font-weight:700;flex-shrink:0">${dw}</span>
+            <span style="font-size:8px;color:#475569;width:52px;flex-shrink:0">${dowTH[dw]||''}</span>
+            ${bar(avg/maxDow*100,isWE?C.amber:C.green,10)}
+            <span style="font-family:'JetBrains Mono',monospace;color:${isWE?C.amber:'#0f1923'};font-weight:700;white-space:nowrap;width:68px;text-align:right">฿${avg.toLocaleString()}</span>
+            <span style="font-size:7.5px;color:#94a3b8;white-space:nowrap">${v.days}วัน</span>
           </div>`;
         }).join('')}
       </div>
-      <!-- Hourly overall -->
+      <!-- Hourly / Time Block -->
       <div>
+        ${showDisc?`
         ${sec('⏰','Hourly Revenue — ภาพรวมทุกช่วงเวลา')}
         <table style="width:100%;border-collapse:collapse;font-size:9px">
           ${tHead(['เวลา','l','18%'],['Revenue (฿)','r',''],['%','r','10%'],['Trend','l','20%'])}
@@ -3263,15 +3268,56 @@ function buildReport(){
               const barPct=h.net/maxH*100;
               const isPeak=h.net===maxH;
               const hCol=h.h>=20?C.red:h.h>=17?C.amber:C.sky;
-              return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
-                <td style="padding:4px 6px;font-family:'JetBrains Mono',monospace;font-weight:700;color:${hCol}">${pad(h.h)}:00</td>
-                <td style="padding:4px 6px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">฿${h.net.toLocaleString()}${isPeak?' ★':''}</td>
-                <td style="padding:4px 6px;text-align:right;color:#334155">${p2.toFixed(1)}%</td>
-                <td style="padding:4px 6px"><div style="display:flex;align-items:center;gap:3px">${bar(barPct,hCol,8)}</div></td>
-              </tr>`;
+              return '<tr style="background:'+(i%2===0?'#ffffff':'#f8fafc')+';border-bottom:1px solid #e2e8f0">'
+                +'<td style="padding:4px 6px;font-family:"JetBrains Mono",monospace;font-weight:700;color:'+hCol+'">'+pad(h.h)+':00</td>'
+                +'<td style="padding:4px 6px;text-align:right;font-weight:700;color:#22d47a;font-family:"JetBrains Mono",monospace">฿'+h.net.toLocaleString()+(isPeak?' ★':'')+'</td>'
+                +'<td style="padding:4px 6px;text-align:right;color:#334155">'+p2.toFixed(1)+'%</td>'
+                +'<td style="padding:4px 6px"><div style="display:flex;align-items:center;gap:3px">'+bar(barPct,hCol,8)+'</div></td>'
+                +'</tr>';
             }).join('')}
           </tbody>
-        </table>
+        </table>`:(()=>{
+          // Investor mode: Time Block (ไม่ระบุชั่วโมง)
+          const blocks=[
+            {label:'เช้า',sub:'Morning',h1:5,h2:10,icon:'🌅',col:'#3d9be0'},
+            {label:'กลางวัน',sub:'Midday',h1:11,h2:14,icon:'☀️',col:'#f0a500'},
+            {label:'บ่าย',sub:'Afternoon',h1:15,h2:17,icon:'🌤️',col:'#22d47a'},
+            {label:'เย็น',sub:'Evening',h1:18,h2:19,icon:'🌆',col:'#a07ee0'},
+            {label:'ค่ำ',sub:'Night',h1:20,h2:22,icon:'🌙',col:'#3d9be0'},
+          ];
+          const totalNet2=HOURS.reduce((s,h)=>s+h.net,0)||1;
+          const blockData=blocks.map(b=>{
+            const net=HOURS.filter(h=>h.h>=b.h1&&h.h<=b.h2).reduce((s,h)=>s+h.net,0);
+            const pct=net/totalNet2*100;
+            return {...b,net,pct};
+          });
+          const maxPct=Math.max(...blockData.map(b=>b.pct),1);
+          return sec('📊','Revenue by Daypart — Customer Traffic Pattern')
+            +'<div style="font-size:8.5px;color:#64748b;margin-bottom:10px">สัดส่วนรายได้แบ่งตามช่วงเวลา · แสดงพฤติกรรม Traffic ของลูกค้า</div>'
+            +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px">'
+            +blockData.map(b=>`<div style="background:linear-gradient(160deg,${b.col}20 0%,${b.col}08 100%);border:1.5px solid ${b.col}55;border-top:4px solid ${b.col};border-radius:10px;padding:12px 8px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+                <div style="font-size:18px;margin-bottom:5px">${b.icon}</div>
+                <div style="font-size:9.5px;font-weight:800;color:#0f1923;margin-bottom:2px">${b.label}</div>
+                <div style="font-size:8px;color:#64748b;margin-bottom:8px">${b.sub}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:${b.col};text-shadow:0 1px 6px ${b.col}44">${b.pct.toFixed(0)}%</div>
+                <div style="height:6px;background:rgba(0,0,0,0.1);border-radius:3px;margin-top:6px;overflow:hidden">
+                  <div style="height:100%;width:${(b.pct/maxPct*100).toFixed(0)}%;background:${b.col};border-radius:3px"></div>
+                </div>
+              </div>`).join('')
+            +'</div>'
+            +'<div style="background:linear-gradient(135deg,#eff6ff 0%,#f0f9ff 100%);border:1.5px solid #bae6fd;border-radius:10px;padding:12px 14px;font-size:8.5px;color:#0369a1;line-height:1.7;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+            +'<strong style="font-size:9px">📌 Key Insight:</strong> '
+            +(()=>{
+              const topB=blockData.reduce((a,b)=>b.pct>a.pct?b:a);
+              const dayBlocks=blockData.filter(b=>b.label!=='ค่ำ');
+              const dayNet=dayBlocks.reduce((s,b)=>s+b.net,0);
+              const dayPct=(dayNet/totalNet2*100).toFixed(0);
+              return `Daytime operations (เช้า–เย็น) สร้าง <strong>${dayPct}%</strong> ของรายได้รวม · `
+                +`ช่วง${topB.label}เป็น Top Revenue Daypart ที่ <strong>${topB.pct.toFixed(0)}%</strong> · `
+                +'แสดงให้เห็น Customer Base ที่มีความหลากหลายตลอดทั้งวัน';
+            })()
+            +'</div>';
+        })()}
       </div>
     </div>
 
@@ -3306,67 +3352,92 @@ function buildReport(){
             const p2=(d.net/mMax*100);
             const dr2=d.gross>0?(d.discount/d.gross*100).toFixed(1):0;
             const mAbv=d.bills>0?Math.round(d.net/d.bills):0;
-            return `<tr style="background:${i%2===0?"#ffffff":"#f8fafc"};border-bottom:1px solid #e2e8f0">
-              <td style="padding:5px 10px;font-family:'JetBrains Mono',monospace;font-weight:700;color:#162537">${d.date.substring(0,5)}</td>
+            return `<tr style="background:${i%2===0?"#ffffff":"#f0f7ff"};border-bottom:1px solid #dbeafe">
+              <td style="padding:5px 10px;font-family:"JetBrains Mono",monospace;font-weight:700;color:#162537">${d.date.substring(0,5)}</td>
               <td style="padding:5px 8px;color:${isWE?C.amber:'#94a3b8'};font-size:9px;white-space:nowrap">${dowTH[dw]||''}</td>
               <td style="padding:5px 8px;text-align:right">${d.bills.toLocaleString()}</td>
               <td style="padding:5px 8px;text-align:right">${d.qty.toLocaleString()}</td>
               ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#334155">${d.gross.toLocaleString()}</td>`:''}
               ${showDisc?`<td style="padding:5px 8px;text-align:right;color:#f04545">-${d.discount.toLocaleString()}</td>`:''}
-              <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:'JetBrains Mono',monospace">${fNet(d.net)}</td>
+              <td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:"JetBrains Mono",monospace">${fNet(d.net)}</td>
               <td style="padding:5px 8px;text-align:right">฿${mAbv.toLocaleString()}</td>
               <td style="padding:5px 10px"><div style="display:flex;align-items:center;gap:4px">${bar(p2,isWE?C.amber:col,8)}<span style="font-size:7.5px;color:#64748b">${p2.toFixed(0)}%</span></div></td>
             </tr>`;
           }).join('')}
-          <tr style="background:#0f1923;color:#ffffff">
-            <td colspan="2" style="padding:6px 10px;font-family:'Chakra Petch',sans-serif;font-size:9px">TOTAL ${mTHF[m.mm]}</td>
+          <tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);color:#ffffff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+            <td colspan="2" style="padding:8px 10px;font-family:'Chakra Petch',sans-serif;font-size:9.5px;font-weight:800;color:#f0a500;letter-spacing:1px">TOTAL ${mTHF[m.mm]}</td>
             <td style="padding:6px 8px;text-align:right">${m.bills.toLocaleString()}</td>
             <td style="padding:6px 8px;text-align:right">${m.qty.toLocaleString()}</td>
             ${showDisc?`<td style="padding:6px 8px;text-align:right">฿${m.gross.toLocaleString()}</td>`:''}
             ${showDisc?`<td style="padding:6px 8px;text-align:right;color:${C.pink}">-฿${m.discount.toLocaleString()}</td>`:''}
-            <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:'JetBrains Mono',monospace">฿${fNet(m.net)}</td>
+            <td style="padding:6px 8px;text-align:right;color:${C.lime};font-family:"JetBrains Mono",monospace">฿${fNet(m.net)}</td>
             <td style="padding:6px 8px;text-align:right">฿${mAvgB.toLocaleString()}</td>
             <td style="padding:6px 10px;font-size:8px;color:#94a3b8">${showDisc?'Disc: '+mDR+'%':''}</td>
           </tr>
         </tbody>
       </table>
 
-      <!-- Hourly Revenue for this month -->
-      ${sec('⏰',`Hourly Revenue — ${mTHF[m.mm]} ${m.yy+543}`)}
-      <div style="font-size:9px;color:#64748b;margin-bottom:8px">ยอดขายรายชั่วโมง · รวมทั้ง ${m.days} วันใน${mTHF[m.mm]} ${m.yy+543}</div>
+      <!-- Hourly / Time Block for this month -->
       ${(()=>{
-        const hrs2=Array.from({length:18},(_,i)=>i+5);
+        const hrs2c=Array.from({length:18},(_,i)=>i+5);
         const mHourMap={};
         salesRows.forEach(r=>{
           const[rd,rm,ry]=r.date.split('/').map(Number);
           if(rm!==m.mm||ry!==m.yy) return;
           const h=parseInt((r.time||'00:00').split(':')[0])||0;
           if(!mHourMap[h]) mHourMap[h]={net:0,bills:new Set(),qty:0};
-          mHourMap[h].net+=r.net;
-          mHourMap[h].qty+=r.qty;
-          mHourMap[h].bills.add(r.doc);
+          mHourMap[h].net+=r.net; mHourMap[h].qty+=r.qty; mHourMap[h].bills.add(r.doc);
         });
-        const mHours=hrs2.map(h=>({h,net:mHourMap[h]?.net||0,qty:mHourMap[h]?.qty||0,bills:mHourMap[h]?mHourMap[h].bills.size:0}));
+        const mHours=hrs2c.map(h=>({h,net:mHourMap[h]?.net||0,qty:mHourMap[h]?.qty||0,bills:mHourMap[h]?mHourMap[h].bills.size:0}));
         const mMaxH=Math.max(...mHours.map(x=>x.net),1);
         const mTotalH=mHours.reduce((s,x)=>s+x.net,0)||1;
-        const headHtml=tHead(['เวลา','l','13%'],['Revenue (฿)','r','18%'],['% ของเดือน','r','10%'],['ชิ้น','r','8%'],['บิล','r','7%'],['Trend','l','']);
-        const rowsHtml=mHours.filter(x=>x.net>0).map((h,i)=>{
-          const isPeak=h.net===mMaxH;
-          const pct2=(h.net/mTotalH*100).toFixed(1);
-          const barPct=(h.net/mMaxH*100);
-          const hCol=h.h>=20?C.red:h.h>=17?C.amber:C.sky;
-          const peakBadge=isPeak?'<span style="font-size:7.5px;background:'+col+'33;color:'+col+';border-radius:3px;padding:1px 5px;margin-left:4px;font-weight:700">PEAK</span>':'';
-          const tr='<tr style="background:'+(i%2===0?C.white:C.bg)+';border-bottom:1px solid '+C.border+(isPeak?';box-shadow:inset 2px 0 0 '+col:'')+'">'
-            +'<td style="padding:5px 10px;font-family:\'JetBrains Mono\',monospace;font-weight:700;color:'+hCol+'">'+pad(h.h)+':00</td>'
-            +'<td style="padding:5px 8px;text-align:right;font-weight:700;color:'+C.green+';font-family:\'JetBrains Mono\',monospace">฿'+h.net.toLocaleString()+peakBadge+'</td>'
-            +'<td style="padding:5px 8px;text-align:right;color:'+C.t4+'">'+pct2+'%</td>'
-            +'<td style="padding:5px 8px;text-align:right">'+h.qty.toLocaleString()+'</td>'
-            +'<td style="padding:5px 8px;text-align:right">'+h.bills.toLocaleString()+'</td>'
-            +'<td style="padding:5px 10px"><div style="display:flex;align-items:center;gap:4px">'+bar(barPct,hCol,9)+'<span style="font-size:7.5px;color:'+C.t3+';white-space:nowrap">'+barPct.toFixed(0)+'%</span></div></td>'
-            +'</tr>';
-          return tr;
-        }).join('');
-        return '<table style="width:100%;border-collapse:collapse;font-size:9.5px">'+headHtml+'<tbody>'+rowsHtml+'</tbody></table>';
+        if(showDisc){
+          const headHtml=tHead(['เวลา','l','13%'],['Revenue (฿)','r','18%'],['% ของเดือน','r','10%'],['ชิ้น','r','8%'],['บิล','r','7%'],['Trend','l','']);
+          const rowsHtml=mHours.filter(x=>x.net>0).map((h,i)=>{
+            const isPeak=h.net===mMaxH;
+            const pct2=(h.net/mTotalH*100).toFixed(1);
+            const barPct=(h.net/mMaxH*100);
+            const hCol=h.h>=20?C.red:h.h>=17?C.amber:C.sky;
+            const peakBadge=isPeak?'<span style="font-size:7.5px;background:'+col+'33;color:'+col+';border-radius:3px;padding:1px 5px;margin-left:4px;font-weight:700">PEAK</span>':'';
+            return '<tr style="background:'+(i%2===0?'#ffffff':'#f8fafc')+';border-bottom:1px solid #e2e8f0'+(isPeak?';box-shadow:inset 2px 0 0 '+col:'')+'">'
+              +'<td style="padding:5px 10px;font-family:"JetBrains Mono",monospace;font-weight:700;color:'+hCol+'">'+pad(h.h)+':00</td>'
+              +'<td style="padding:5px 8px;text-align:right;font-weight:700;color:#22d47a;font-family:"JetBrains Mono",monospace">฿'+h.net.toLocaleString()+peakBadge+'</td>'
+              +'<td style="padding:5px 8px;text-align:right;color:#94a3b8">'+pct2+'%</td>'
+              +'<td style="padding:5px 8px;text-align:right">'+h.qty.toLocaleString()+'</td>'
+              +'<td style="padding:5px 8px;text-align:right">'+h.bills.toLocaleString()+'</td>'
+              +'<td style="padding:5px 10px"><div style="display:flex;align-items:center;gap:4px">'+bar(barPct,hCol,9)+'</div></td>'
+              +'</tr>';
+          }).join('');
+          return sec('⏰',`Hourly Revenue — ${mTHF[m.mm]} ${m.yy+543}`)
+            +'<table style="width:100%;border-collapse:collapse;font-size:9.5px">'+headHtml+'<tbody>'+rowsHtml+'</tbody></table>';
+        } else {
+          const blocks=[
+            {label:'เช้า',sub:'Morning',h1:5,h2:10,icon:'🌅',col2:'#3d9be0'},
+            {label:'กลางวัน',sub:'Midday',h1:11,h2:14,icon:'☀️',col2:'#f0a500'},
+            {label:'บ่าย',sub:'Afternoon',h1:15,h2:17,icon:'🌤️',col2:'#22d47a'},
+            {label:'เย็น',sub:'Evening',h1:18,h2:19,icon:'🌆',col2:'#a07ee0'},
+            {label:'ค่ำ',sub:'Night',h1:20,h2:22,icon:'🌙',col2:'#3d9be0'},
+          ];
+          const bData=blocks.map(b=>{
+            const bNet=mHours.filter(h=>h.h>=b.h1&&h.h<=b.h2).reduce((s,h)=>s+h.net,0);
+            return {...b,bNet,pct:bNet/mTotalH*100};
+          });
+          const mxP=Math.max(...bData.map(b=>b.pct),1);
+          const dayNet=bData.filter(b=>b.label!=='ค่ำ').reduce((s,b)=>s+b.bNet,0);
+          return sec('📊',`Revenue by Daypart — ${mTHF[m.mm]} ${m.yy+543}`)
+            +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px">'
+            +bData.map(b=>'<div style="background:linear-gradient(160deg,'+b.col2+'20 0%,'+b.col2+'08 100%);border:1.5px solid '+b.col2+'55;border-top:4px solid '+b.col2+';border-radius:10px;padding:11px 8px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+              +'<div style="font-size:16px;margin-bottom:5px">'+b.icon+'</div>'
+              +'<div style="font-size:9.5px;font-weight:800;color:#0f1923">'+b.label+'</div>'
+              +'<div style="font-size:8px;color:#64748b;margin-bottom:6px">'+b.sub+'</div>'
+              +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:700;color:'+b.col2+'">'+b.pct.toFixed(0)+'%</div>'
+              +'<div style="height:6px;background:rgba(0,0,0,0.1);border-radius:3px;margin-top:6px"><div style="height:100%;width:'+(b.pct/mxP*100).toFixed(0)+'%;background:'+b.col2+';border-radius:3px"></div></div>'
+              +'</div>').join('')
+            +'</div>'
+            +'<div style="background:linear-gradient(135deg,#eff6ff 0%,#f0f9ff 100%);border:1.5px solid #bae6fd;border-radius:10px;padding:10px 14px;font-size:8.5px;color:#0369a1;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+            +'Daytime (เช้า–เย็น) สร้าง <strong>'+(dayNet/mTotalH*100).toFixed(0)+'%</strong> ของรายได้ '+mTHF[m.mm]+' · Customer traffic กระจายตัวสม่ำเสมอตลอดวัน'
+            +'</div>';
+        }
       })()}
     `,mi+3,months.length+2);
   }):[];
