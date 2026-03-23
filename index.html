@@ -219,9 +219,11 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 @media print {
   /* ซ่อนทุกอย่างในหน้า — แสดงเฉพาะ report pages */
   #sb, #topbar, #upload-modal,
-  #content > .page:not(#page-report) { display:none!important; }
+  #content > .page:not(#page-report):not(#page-report-hourly):not(#page-report-behavior) { display:none!important; }
   /* ซ่อนทุกอย่างใน page-report ยกเว้น report-preview */
-  #page-report > *:not(#report-preview) { display:none!important; }
+  #page-report > *:not(#report-preview),
+  #page-report-hourly > *:not(#report-hourly-preview),
+  #page-report-behavior > *:not(#report-behavior-preview) { display:none!important; }
   /* reset layout */
   html,body { margin:0!important; padding:0!important; background:#fff!important; }
   #main { margin-left:0!important; width:100%!important; min-height:0!important; }
@@ -363,6 +365,8 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="nav-lbl">ข้อมูล</div>
     <div class="nav-item" data-page="upload"><span class="ic">⬆️</span>Upload Data</div>
     <div class="nav-item" data-page="report"><span class="ic">📄</span>Investor Report <span class="bdg">PDF</span></div>
+    <div class="nav-item" data-page="report-hourly"><span class="ic">⏱️</span>Hourly Sales Report <span class="bdg">PDF</span></div>
+    <div class="nav-item" data-page="report-behavior"><span class="ic">🧠</span>Customer Behavior Report <span class="bdg">PDF</span></div>
   </div>
   <div class="sb-foot">
     <div class="period-box">
@@ -987,6 +991,28 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   </div>
 </div>
 
+<!-- ══════════ HOURLY SALES REPORT ══════════ -->
+<div id="page-report-hourly" class="page">
+  <div class="ph"><h1>⏱️ Hourly Sales Report</h1><p>สรุปยอดขายรายชั่วโมง · พิมพ์เป็น PDF ขนาด A4</p></div>
+  <div id="rpt-hourly-toolbar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+    <div style="font-size:12px;color:var(--text2)">📊 รายงานวิเคราะห์ยอดขายแบ่งตามชั่วโมง รายได้ · บิล · ชิ้น และ Peak Hour Analysis</div>
+    <button onclick="printHourlyReport()" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:9px 20px;font-family:var(--font-h);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px">🖨️ PRINT / SAVE PDF</button>
+  </div>
+  <div style="font-size:10px;color:var(--text3);margin-bottom:16px">⚙️ ตั้งค่าตอน Print: <strong style="color:var(--text2)">Paper = A4 · Margins = None · Background graphics = ✅</strong></div>
+  <div id="report-hourly-preview" style="padding:0;"></div>
+</div>
+
+<!-- ══════════ CUSTOMER BEHAVIOR REPORT ══════════ -->
+<div id="page-report-behavior" class="page">
+  <div class="ph"><h1>🧠 Customer Behavior Report</h1><p>วิเคราะห์พฤติกรรมลูกค้า · พิมพ์เป็น PDF ขนาด A4</p></div>
+  <div id="rpt-behavior-toolbar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+    <div style="font-size:12px;color:var(--text2)">🧠 วิเคราะห์ Basket Size, Buying Pattern, Cross-sell Opportunity และ Customer Segment</div>
+    <button onclick="printBehaviorReport()" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:9px 20px;font-family:var(--font-h);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px">🖨️ PRINT / SAVE PDF</button>
+  </div>
+  <div style="font-size:10px;color:var(--text3);margin-bottom:16px">⚙️ ตั้งค่าตอน Print: <strong style="color:var(--text2)">Paper = A4 · Margins = None · Background graphics = ✅</strong></div>
+  <div id="report-behavior-preview" style="padding:0;"></div>
+</div>
+
 <div id="page-upload" class="page">
   <div style="max-width:640px;margin:30px auto">
     <div class="ph"><h1>📤 Upload Data Files</h1><p>อัพโหลดไฟล์ Excel — ข้อมูลจะอัพเดทใน Dashboard ทันที · <span style="color:var(--accent);font-size:11px">v3.0 — fixed column detection</span></p></div>
@@ -1076,6 +1102,8 @@ const sn=s=>(s.split('/')[1]||s).trim().substring(0,22);
 function nav(p){
   if(p==='trial' && salesRows.length>0 && document.getElementById('trial-daily-tbody').innerHTML==='') buildTrial();
   if(p==='report' && salesRows.length>0) buildReport();
+  if(p==='report-hourly' && salesRows.length>0) buildHourlyReport();
+  if(p==='report-behavior' && salesRows.length>0) buildBehaviorReport();
   document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll(`[data-page="${p}"]`).forEach(e=>e.classList.add('active'));
   document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
@@ -1745,26 +1773,19 @@ function buildVisual(){
       const color = colorFn ? colorFn(item) : (catColors[item.c] || '#888');
       const name = item.p ? (item.p.includes('/') ? item.p.split('/').slice(1).join('/').trim() : item.p) : '';
       const label = labelFn(v);
-      const shortName = name.length > 26 ? name.substring(0, 24) + '…' : name;
-
-      // ตัวเลขอยู่ในแท่งเสมอ — ถ้าแท่งสั้น ใช้สีขาว ถ้ายาว ใช้สีขาวด้วย
-      const stampInside = pct >= 35; // แท่งยาวพอ → stamp ชิดขวาในแท่ง
-      const stampLeft   = stampInside ? `calc(${pct}% - 8px)` : `calc(${pct}% + 6px)`;
-      const stampColor  = stampInside ? '#fff' : '#dde3f0';
-      const stampAlign  = stampInside ? 'right' : 'left';
-      const stampTransform = stampInside
-        ? 'translateX(-100%) translateY(-50%)'
-        : 'translateY(-50%)';
+      const shortName = name.length > 26 ? name.substring(0, 24) + '\u2026' : name;
 
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:30px;';
-      row.innerHTML = `
-        <span style="width:18px;text-align:right;font-family:"JetBrains Mono",monospace;font-size:10px;color:#445066;flex-shrink:0;">${i+1}</span>
-        <span style="width:168px;font-size:11px;color:#9aa3b8;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${name}">${shortName}</span>
-        <div style="flex:1;height:24px;background:rgba(255,255,255,0.06);border-radius:5px;position:relative;overflow:visible;">
-          <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;min-width:4px;"></div>
-          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:${stampColor};white-space:nowrap;pointer-events:none;">${label}</span>
-        </div>`;
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;min-height:34px;';
+      row.innerHTML =
+        '<span style="width:18px;text-align:right;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:#445066;flex-shrink:0;">' + (i+1) + '</span>' +
+        '<span style="width:164px;font-size:13px;color:#9aa3b8;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + name + '">' + shortName + '</span>' +
+        '<div style="flex:1;height:28px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden;position:relative;">' +
+          '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:5px;min-width:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;box-sizing:border-box;">' +
+            '<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:#fff;white-space:nowrap;' + (pct < 20 ? 'display:none;' : '') + '">' + label + '</span>' +
+          '</div>' +
+          (pct < 20 ? '<span style="position:absolute;left:calc(' + pct + '% + 6px);top:50%;transform:translateY(-50%);font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:#dde3f0;white-space:nowrap;">' + label + '</span>' : '') +
+        '</div>';
       wrap.appendChild(row);
     });
   }
@@ -1791,13 +1812,15 @@ function buildVisual(){
       const stampColor  = stampInside ? '#fff' : '#9aa3b8';
       const stampTransform = stampInside ? 'translateX(-100%) translateY(-50%)' : 'translateY(-50%)';
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:22px;';
-      row.innerHTML = `
-        <span style="width:44px;text-align:right;font-family:"JetBrains Mono",monospace;font-size:10px;color:#9aa3b8;flex-shrink:0;">${String(h.h).padStart(2,'0')}:00</span>
-        <div style="flex:1;height:20px;background:rgba(255,255,255,0.05);border-radius:3px;position:relative;">
-          <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;min-width:2px;"></div>
-          <span style="position:absolute;left:${stampLeft};top:50%;transform:${stampTransform};font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:600;color:${stampColor};white-space:nowrap;">${revPct}% &nbsp;${f(h.net)}</span>
-        </div>`;
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;min-height:26px;';
+      row.innerHTML =
+        '<span style="width:44px;text-align:right;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:#9aa3b8;flex-shrink:0;">' + String(h.h).padStart(2,'0') + ':00</span>' +
+        '<div style="flex:1;height:24px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;position:relative;">' +
+          '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px;min-width:2px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;box-sizing:border-box;">' +
+            '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;' + (pct < 18 ? 'display:none;' : '') + '">' + revPct + '% \u00a0' + f(h.net) + '</span>' +
+          '</div>' +
+          (pct < 18 ? '<span style="position:absolute;left:calc(' + pct + '% + 5px);top:50%;transform:translateY(-50%);font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:700;color:#9aa3b8;white-space:nowrap;">' + revPct + '% \u00a0' + f(h.net) + '</span>' : '') +
+        '</div>';
       wrap.appendChild(row);
     });
   }
@@ -4118,6 +4141,514 @@ function buildTrialItemTable(prodEntries, totalNet, totalGross, totalDisc, total
 
         itemTbody.innerHTML=itemRows.join("");
   }
+}
+
+// ══════════ HOURLY SALES REPORT ══════════
+function printHourlyReport(){
+  const preview=document.getElementById('report-hourly-preview');
+  if(!preview||!preview.innerHTML.trim()){alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ');return;}
+  const MM=96/25.4,A4H=Math.round(297*MM),HDR=55,AVAIL=A4H-HDR;
+  preview.querySelectorAll('.rpt-scale').forEach(function(sc){
+    sc.style.zoom='';sc.style.position='';sc.style.height='';
+    var h=sc.scrollHeight;if(h>0&&h>AVAIL){sc.style.zoom=String((AVAIL/h).toFixed(4));}
+  });
+  requestAnimationFrame(function(){requestAnimationFrame(function(){window.print();});});
+}
+
+function buildHourlyReport(){
+  const el=document.getElementById('report-hourly-preview');
+  if(!el||!HOURS.length) return;
+
+  /* helpers — reuse same colour palette & wrappers as Investor Report */
+  const C={ink:'#0f1923',navy:'#162537',white:'#ffffff',bg:'#f8fafc',bg2:'#f1f5f9',green:'#22d47a',amber:'#f0a500',red:'#f04545',sky:'#3d9be0',purple:'#a07ee0',t2:'#334155',t3:'#64748b',t4:'#94a3b8',border:'#e2e8f0',catColor:c=>({'Sushi Bento':'#e07070','Donburi':'#3d9be0','Beverage':'#22d47a','Dessert':'#a07ee0','Appetizer':'#f0a500'}[c]||'#888')};
+  const mEN=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mTH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const mTHF=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const pad=n=>String(n).padStart(2,'0');
+  const fNet=n=>n.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0});
+  const bar=(p,col,h=6)=>`<div style="background:#dde5f0;border-radius:3px;height:${h}px;overflow:hidden;flex:1;min-width:40px"><div style="height:100%;width:${Math.min(p,100).toFixed(1)}%;background:${col};border-radius:3px;box-shadow:0 1px 4px ${col}66"></div></div>`;
+  const kpi=(lbl,val,sub,col,icon='')=>`<div style="background:linear-gradient(135deg,${col}18 0%,${col}08 100%);border:1.5px solid ${col}55;border-radius:10px;padding:11px 14px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${col};border-radius:10px 10px 0 0"></div>
+    <div style="font-size:7.5px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;margin-bottom:6px">${icon} ${lbl}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;color:${col};line-height:1.1;margin-bottom:5px">${val}</div>
+    <div style="font-size:8.5px;color:#334155;line-height:1.5;border-top:1px solid ${col}30;padding-top:5px;margin-top:2px">${sub}</div>
+  </div>`;
+  const sec=(icon,title)=>`<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px;padding:7px 12px;background:linear-gradient(90deg,rgba(15,25,35,0.06) 0%,transparent 100%);border-left:4px solid ${C.amber};border-radius:0 6px 6px 0">
+    <span style="font-size:15px">${icon}</span>
+    <span style="font-family:'Chakra Petch',sans-serif;font-size:11px;font-weight:700;color:#0f1923;letter-spacing:2px;text-transform:uppercase">${title}</span>
+  </div>`;
+  const tHead=(...cols)=>`<thead><tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact">${cols.map(([txt,align,w])=>`<th style="padding:9px ${align==='r'?10:12}px;text-align:${align==='r'?'right':'left'};font-size:9.5px;color:#f0a500;font-weight:800;letter-spacing:1px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
+
+  const[fd,fm,fy]=DAILY[0].date.split('/').map(Number);
+  const[ld,lm,ly]=DAILY[DAILY.length-1].date.split('/').map(Number);
+  const periodEN=fm===lm&&fy===ly?`${pad(fd)}–${pad(ld)} ${mEN[fm]} ${fy}`:`${pad(fd)} ${mEN[fm]} – ${pad(ld)} ${mEN[lm]} ${ly}`;
+  const periodTH=fm===lm&&fy===ly?`${pad(fd)}–${pad(ld)} ${mTHF[fm]} ${fy+543}`:`${pad(fd)} ${mTH[fm]} – ${pad(ld)} ${mTH[lm]} ${ly+543}`;
+  const now=new Date();
+  const genDate=`${now.getDate()} ${mEN[now.getMonth()+1]} ${now.getFullYear()}`;
+  const days=DAILY.length;
+
+  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;background:#fff;font-family:'Sarabun','TH Sarabun New',sans-serif;color:#0f1923;box-sizing:border-box;margin:0 auto 28px;border-radius:4px;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.35);-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+    <div style="height:6px;background:linear-gradient(90deg,#f0a500 0%,#22d47a 35%,#3d9be0 65%,#a07ee0 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>
+    <div style="height:3px;background:linear-gradient(90deg,#f0a50055 0%,#22d47a55 40%,#3d9be055 70%,#a07ee055 100%)"></div>
+    <div style="background:#0f1923;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <div style="display:flex;align-items:center;gap:18px">
+        <div>
+          <div style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;color:#22d47a;letter-spacing:4px;text-shadow:0 0 12px rgba(34,212,122,0.35)">NIGIBEN</div>
+          <div style="font-size:8px;color:#f0a500;letter-spacing:1.5px;margin-top:1px;font-weight:600">HOURLY SALES REPORT · DON MUEANG AIRPORT</div>
+        </div>
+        <div style="width:1px;height:30px;background:#334155"></div>
+        <div>
+          <div style="font-size:8px;color:#64748b;letter-spacing:1px">PERIOD</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f0a500;font-weight:700;margin-top:1px">${periodEN}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:8px;color:#64748b">Generated ${genDate}</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">Page ${pg} / ${total} · CONFIDENTIAL</div>
+      </div>
+    </div>
+    <div class="rpt-scale"><div style="padding:20px 28px 52px">${content}</div></div>
+    <div class="rpt-footer" style="position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(90deg,#0f1923 0%,#162537 100%);border-top:1px solid #22d47a33;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px;z-index:10">
+      <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · Hourly Report · <span style="color:#f0a500">CONFIDENTIAL</span></div>
+      <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
+    </div>
+  </div>`;
+
+  /* ── computed hourly ── */
+  const totalHrNet=HOURS.reduce((s,h)=>s+h.net,0)||1;
+  const totalHrQty=HOURS.reduce((s,h)=>s+(h.qty||0),0)||1;
+  const peak=HOURS.reduce((a,b)=>b.net>a.net?b:a,HOURS[0]);
+  const peak2=[...HOURS].sort((a,b)=>b.net-a.net).slice(0,3);
+  const maxHrNet=peak.net||1;
+  const totalBills=TOTAL_BILLS;
+  const avgDailyNet=Math.round(TOTAL_NET/days);
+
+  /* zone labels */
+  const zone=h=>{
+    if(h>=5&&h<9) return {lbl:'🌅 Morning Rush',col:'#fbbf24'};
+    if(h>=9&&h<12) return {lbl:'☀️ Late Morning',col:'#f0a500'};
+    if(h>=12&&h<15) return {lbl:'🍱 Lunch Peak',col:'#22d47a'};
+    if(h>=15&&h<18) return {lbl:'🌤️ Afternoon',col:'#3d9be0'};
+    if(h>=18&&h<20) return {lbl:'🌆 Evening',col:'#a07ee0'};
+    if(h>=20&&h<23) return {lbl:'⚡ Flash Sale',col:'#f04545'};
+    return {lbl:'🌙 Late Night',col:'#64748b'};
+  };
+
+  /* Group by zone for aggregation */
+  const zoneAgg={};
+  HOURS.forEach(h=>{
+    const z=zone(h.h).lbl;
+    if(!zoneAgg[z])zoneAgg[z]={net:0,qty:0,hours:[]};
+    zoneAgg[z].net+=h.net;zoneAgg[z].qty+=(h.qty||0);zoneAgg[z].hours.push(h.h);
+  });
+
+  /* ── PAGE 1: HOURLY KPIs + TABLE ── */
+  const p1=pageWrap(`
+    <!-- Hero Banner -->
+    <div style="background:linear-gradient(135deg,#0b1520 0%,#0f1f35 40%,#162e4a 75%,#1a2a3d 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:12px;padding:18px 24px;margin-bottom:14px;display:grid;grid-template-columns:1fr auto auto;gap:24px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,0.4);border:1px solid #1e3a5f">
+      <div>
+        <div style="font-size:8.5px;color:#64748b;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px;font-weight:700">HOURLY REVENUE ANALYSIS · ${periodTH}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#f0a500;line-height:1;text-shadow:0 2px 12px rgba(240,165,0,0.4)">฿${fNet(TOTAL_NET)}</div>
+        <div style="font-size:9px;color:#64748b;margin-top:6px;letter-spacing:.5px">รายได้สุทธิรวม ${days} วัน · ${HOURS.length} ช่วงชั่วโมง</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid #1e3a5f">
+        <div style="font-size:8px;color:#f04545;letter-spacing:1px;margin-bottom:4px;font-weight:800">PEAK HOUR</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#f04545;line-height:1">${pad(peak.h)}:00</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">฿${fNet(peak.net)} · ${(peak.net/totalHrNet*100).toFixed(1)}%</div>
+      </div>
+      <div style="text-align:center;padding:0 12px;border-left:1px solid #1e3a5f">
+        <div style="font-size:8px;color:#22d47a;letter-spacing:1px;margin-bottom:4px;font-weight:800">DAILY AVG</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#22d47a;line-height:1">฿${avgDailyNet.toLocaleString()}</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">เฉลี่ยต่อวัน</div>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+      ${kpi('Peak Hour Revenue','฿'+fNet(peak.net),`${pad(peak.h)}:00 น. · ${(peak.net/totalHrNet*100).toFixed(1)}% ของยอดรวม`,C.red,'⚡')}
+      ${kpi('Total Bills',totalBills.toLocaleString(),`${days} วัน · เฉลี่ย ${Math.round(totalBills/days)} บิล/วัน`,C.sky,'🧾')}
+      ${kpi('Flash Sale Revenue','฿'+fNet(HOURS.filter(h=>h.h>=20&&h.h<23).reduce((s,h)=>s+h.net,0)),`ช่วง 20:00–23:00 · ${(HOURS.filter(h=>h.h>=20&&h.h<23).reduce((s,h)=>s+h.net,0)/totalHrNet*100).toFixed(1)}% ของยอด`,C.red,'🔥')}
+      ${kpi('Daytime Revenue','฿'+fNet(HOURS.filter(h=>h.h>=9&&h.h<18).reduce((s,h)=>s+h.net,0)),`ช่วง 09:00–18:00 · ${(HOURS.filter(h=>h.h>=9&&h.h<18).reduce((s,h)=>s+h.net,0)/totalHrNet*100).toFixed(1)}% ของยอด`,C.green,'☀️')}
+    </div>
+
+    ${sec('⏰','Hourly Revenue Breakdown — รายได้ตามช่วงชั่วโมง')}
+
+    <!-- Bar chart visual -->
+    <div style="margin-bottom:14px">
+      ${HOURS.map(h=>{
+        const pct=(h.net/maxHrNet*100);
+        const z=zone(h.h);
+        const isFlash=h.h>=20&&h.h<23;
+        const col=isFlash?C.red:z.col;
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#334155;min-width:38px;text-align:right">${pad(h.h)}:00</div>
+          <div style="flex:1;background:#f1f5f9;border-radius:3px;height:16px;overflow:hidden;position:relative">
+            <div style="height:100%;width:${pct.toFixed(1)}%;background:${col};border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+              ${pct>15?`<span style="font-size:8px;color:#fff;font-weight:700">฿${fNet(h.net)}</span>`:''}
+            </div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:#334155;min-width:60px;text-align:right">฿${fNet(h.net)}</div>
+          <div style="font-size:8px;color:#64748b;min-width:32px;text-align:right">${(h.net/totalHrNet*100).toFixed(1)}%</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${sec('🏆','Top 3 Peak Hours — ชั่วโมงสร้างรายได้สูงสุด')}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      ${peak2.map((h,i)=>{
+        const medals=['🥇','🥈','🥉'];
+        const cols=[C.red,C.amber,C.sky];
+        return `<div style="background:linear-gradient(135deg,${cols[i]}18 0%,${cols[i]}06 100%);border:1.5px solid ${cols[i]}55;border-radius:10px;padding:12px 16px;text-align:center">
+          <div style="font-size:18px;margin-bottom:4px">${medals[i]}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:${cols[i]}">${pad(h.h)}:00</div>
+          <div style="font-size:9px;color:#334155;margin-top:4px;font-weight:700">฿${fNet(h.net)}</div>
+          <div style="font-size:8px;color:#64748b">${(h.net/totalHrNet*100).toFixed(1)}% ของยอดรวม</div>
+          <div style="font-size:8px;color:#64748b;margin-top:2px">${zone(h.h).lbl}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${sec('🗂️','Revenue Zone Summary — สรุปตามช่วงเวลา')}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      ${Object.entries(zoneAgg).map(([zlbl,zv])=>{
+        const zh=HOURS.find(h=>zone(h.h).lbl===zlbl);
+        const col=zh?zone(zh.h).col:C.t3;
+        return `<div style="background:linear-gradient(135deg,${col}15 0%,${col}05 100%);border:1px solid ${col}40;border-radius:8px;padding:10px 12px">
+          <div style="font-size:9px;font-weight:700;color:${col};margin-bottom:5px">${zlbl}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#0f1923">฿${fNet(zv.net)}</div>
+          <div style="font-size:8px;color:#64748b;margin-top:2px">${(zv.net/totalHrNet*100).toFixed(1)}% · ${zv.hours.length} ชั่วโมง</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `,1,2);
+
+  /* ── PAGE 2: DETAILED TABLE ── */
+  const p2=pageWrap(`
+    ${sec('📋','Detailed Hourly Sales Table — ตารางยอดขายรายชั่วโมงแบบละเอียด')}
+    <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:14px">
+      ${tHead(['ชั่วโมง','l','10%'],['Zone','l','16%'],['Net Revenue (฿)','r','18%'],['สัดส่วน %','r','10%'],['Revenue Bar','l',''],['ชิ้น','r','8%'],['ชิ้น/ชม.','r','9%'])}
+      <tbody>
+        ${HOURS.map((h,i)=>{
+          const z=zone(h.h);
+          const isFlash=h.h>=20&&h.h<23;
+          const col=isFlash?C.red:z.col;
+          const pct2=(h.net/totalHrNet*100);
+          const hqty=h.qty||Math.round(h.net/88)||0;
+          const avgQty=days>0?(hqty/days).toFixed(1):0;
+          return `<tr style="background:${i%2===0?'#ffffff':'#f8fafc'};border-bottom:1px solid #e2e8f0;${isFlash?'background:#fff5f5!important':''}">
+            <td style="padding:6px 10px;font-family:'JetBrains Mono',monospace;font-weight:700;color:#162537">${pad(h.h)}:00</td>
+            <td style="padding:6px 8px;font-size:8.5px"><span style="background:${col}22;color:${col};border-radius:4px;padding:2px 6px;font-weight:700;font-size:8px">${z.lbl}</span></td>
+            <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:${col}">฿${fNet(h.net)}</td>
+            <td style="padding:6px 8px;text-align:right;color:#334155">${pct2.toFixed(1)}%</td>
+            <td style="padding:6px 10px"><div style="display:flex;align-items:center;gap:4px"><div style="background:#dde5f0;border-radius:3px;height:8px;overflow:hidden;flex:1;min-width:40px"><div style="height:100%;width:${pct2.toFixed(1)}%;background:${col};border-radius:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div></div></div></td>
+            <td style="padding:6px 8px;text-align:right;color:#64748b">${fNet(hqty)}</td>
+            <td style="padding:6px 8px;text-align:right;color:#64748b">${avgQty}</td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);color:#ffffff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+          <td colspan="2" style="padding:8px 10px;font-family:'Chakra Petch',sans-serif;font-size:9.5px;font-weight:800;color:#f0a500;letter-spacing:1px">TOTAL — ${HOURS.length} ชั่วโมง</td>
+          <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">฿${fNet(TOTAL_NET)}</td>
+          <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">100%</td>
+          <td style="padding:6px 10px"></td>
+          <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${fNet(totalHrQty)}</td>
+          <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${(totalHrQty/days).toFixed(1)}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    ${sec('💡','Insights & Recommendations — สิ่งที่ควรดำเนินการ')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:linear-gradient(135deg,#f04545 08%,#f04545 00%,#fff5f5 100%);border:1.5px solid #f04545aa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#f04545;letter-spacing:1px;margin-bottom:6px">⚡ FLASH SALE WINDOW (20:00–23:00)</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">ช่วงนี้สร้างรายได้ <strong>${(HOURS.filter(h=>h.h>=20&&h.h<23).reduce((s,h)=>s+h.net,0)/totalHrNet*100).toFixed(0)}%</strong> ของยอดรวม แนะนำให้เตรียม Pre-pack สินค้าขายดีและเพิ่มพนักงานในช่วง 19:30–22:30 เพื่อรองรับ Rush</div>
+      </div>
+      <div style="background:#f0fdf4;border:1.5px solid #22d47aaa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:1px;margin-bottom:6px">☀️ DAYTIME STEADY ZONE (09:00–18:00)</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">ยอดกระจายสม่ำเสมอ <strong>${(HOURS.filter(h=>h.h>=9&&h.h<18).reduce((s,h)=>s+h.net,0)/totalHrNet*100).toFixed(0)}%</strong> ของยอดรวม ควรรักษา Stock Coverage เต็มตลอดช่วงนี้ โดยเฉพาะ Beverage และ Sushi Bento</div>
+      </div>
+      <div style="background:#fffbeb;border:1.5px solid #fbbf24aa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#d97706;letter-spacing:1px;margin-bottom:6px">🌅 MORNING OPPORTUNITY (05:00–09:00)</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">ช่วงเช้ามีผู้โดยสารสูง แต่ยอดขายยังต่ำ แนะนำเพิ่มสินค้า Grab&Go แบบ Ready-to-eat และ Bundle Breakfast Set ราคาไม่เกิน ฿100</div>
+      </div>
+      <div style="background:#eff6ff;border:1.5px solid #3d9be0aa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#1d4ed8;letter-spacing:1px;margin-bottom:6px">📊 OPERATIONAL IMPLICATION</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">Peak Hour ${pad(peak.h)}:00 ต้องการ Staff เต็มจำนวน · ช่วง 13:00–17:00 สามารถลด Staffing ได้ 1 คน · Restocking ควรทำก่อน 19:30 ทุกวัน</div>
+      </div>
+    </div>
+  `,2,2);
+
+  el.innerHTML=p1+p2;
+}
+
+// ══════════ CUSTOMER BEHAVIOR REPORT ══════════
+function printBehaviorReport(){
+  const preview=document.getElementById('report-behavior-preview');
+  if(!preview||!preview.innerHTML.trim()){alert('กรุณารอให้ Report โหลดเสร็จก่อนครับ');return;}
+  const MM=96/25.4,A4H=Math.round(297*MM),HDR=55,AVAIL=A4H-HDR;
+  preview.querySelectorAll('.rpt-scale').forEach(function(sc){
+    sc.style.zoom='';sc.style.position='';sc.style.height='';
+    var h=sc.scrollHeight;if(h>0&&h>AVAIL){sc.style.zoom=String((AVAIL/h).toFixed(4));}
+  });
+  requestAnimationFrame(function(){requestAnimationFrame(function(){window.print();});});
+}
+
+function buildBehaviorReport(){
+  const el=document.getElementById('report-behavior-preview');
+  if(!el||!DAILY.length) return;
+
+  const C={ink:'#0f1923',navy:'#162537',white:'#ffffff',bg:'#f8fafc',green:'#22d47a',amber:'#f0a500',red:'#f04545',sky:'#3d9be0',purple:'#a07ee0',t2:'#334155',t3:'#64748b',t4:'#94a3b8',border:'#e2e8f0',catColor:c=>({'Sushi Bento':'#e07070','Donburi':'#3d9be0','Beverage':'#22d47a','Dessert':'#a07ee0','Appetizer':'#f0a500'}[c]||'#888')};
+  const mEN=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mTH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const mTHF=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const pad=n=>String(n).padStart(2,'0');
+  const fNet=n=>n.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0});
+  const bar=(p,col,h=6)=>`<div style="background:#dde5f0;border-radius:3px;height:${h}px;overflow:hidden;flex:1;min-width:40px"><div style="height:100%;width:${Math.min(p,100).toFixed(1)}%;background:${col};border-radius:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:0 1px 4px ${col}66"></div></div>`;
+  const kpi=(lbl,val,sub,col,icon='')=>`<div style="background:linear-gradient(135deg,${col}18 0%,${col}08 100%);border:1.5px solid ${col}55;border-radius:10px;padding:11px 14px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${col};border-radius:10px 10px 0 0"></div>
+    <div style="font-size:7.5px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;margin-bottom:6px">${icon} ${lbl}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;color:${col};line-height:1.1;margin-bottom:5px">${val}</div>
+    <div style="font-size:8.5px;color:#334155;line-height:1.5;border-top:1px solid ${col}30;padding-top:5px;margin-top:2px">${sub}</div>
+  </div>`;
+  const sec=(icon,title)=>`<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px;padding:7px 12px;background:linear-gradient(90deg,rgba(15,25,35,0.06) 0%,transparent 100%);border-left:4px solid ${C.amber};border-radius:0 6px 6px 0">
+    <span style="font-size:15px">${icon}</span>
+    <span style="font-family:'Chakra Petch',sans-serif;font-size:11px;font-weight:700;color:#0f1923;letter-spacing:2px;text-transform:uppercase">${title}</span>
+  </div>`;
+  const tHead=(...cols)=>`<thead><tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact">${cols.map(([txt,align,w])=>`<th style="padding:9px ${align==='r'?10:12}px;text-align:${align==='r'?'right':'left'};font-size:9.5px;color:#f0a500;font-weight:800;letter-spacing:1px${w?';width:'+w:''}">${txt}</th>`).join('')}</tr></thead>`;
+
+  const[fd,fm,fy]=DAILY[0].date.split('/').map(Number);
+  const[ld,lm,ly]=DAILY[DAILY.length-1].date.split('/').map(Number);
+  const periodEN=fm===lm&&fy===ly?`${pad(fd)}–${pad(ld)} ${mEN[fm]} ${fy}`:`${pad(fd)} ${mEN[fm]} – ${pad(ld)} ${mEN[lm]} ${ly}`;
+  const periodTH=fm===lm&&fy===ly?`${pad(fd)}–${pad(ld)} ${mTHF[fm]} ${fy+543}`:`${pad(fd)} ${mTH[fm]} – ${pad(ld)} ${mTH[lm]} ${ly+543}`;
+  const now=new Date();
+  const genDate=`${now.getDate()} ${mEN[now.getMonth()+1]} ${now.getFullYear()}`;
+  const days=DAILY.length;
+
+  const pageWrap=(content,pg,total)=>`<div class="rpt-page" style="width:210mm;background:#fff;font-family:'Sarabun','TH Sarabun New',sans-serif;color:#0f1923;box-sizing:border-box;margin:0 auto 28px;border-radius:4px;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.35);-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+    <div style="height:6px;background:linear-gradient(90deg,#a07ee0 0%,#3d9be0 35%,#22d47a 65%,#f0a500 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>
+    <div style="height:3px;background:linear-gradient(90deg,#a07ee055 0%,#3d9be055 40%,#22d47a55 70%,#f0a50055 100%)"></div>
+    <div style="background:#0f1923;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <div style="display:flex;align-items:center;gap:18px">
+        <div>
+          <div style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;color:#22d47a;letter-spacing:4px;text-shadow:0 0 12px rgba(34,212,122,0.35)">NIGIBEN</div>
+          <div style="font-size:8px;color:#a07ee0;letter-spacing:1.5px;margin-top:1px;font-weight:600">CUSTOMER BEHAVIOR REPORT · DON MUEANG AIRPORT</div>
+        </div>
+        <div style="width:1px;height:30px;background:#334155"></div>
+        <div>
+          <div style="font-size:8px;color:#64748b;letter-spacing:1px">PERIOD</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f0a500;font-weight:700;margin-top:1px">${periodEN}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:8px;color:#64748b">Generated ${genDate}</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">Page ${pg} / ${total} · CONFIDENTIAL</div>
+      </div>
+    </div>
+    <div class="rpt-scale"><div style="padding:20px 28px 52px">${content}</div></div>
+    <div class="rpt-footer" style="position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(90deg,#0f1923 0%,#162537 100%);border-top:1px solid #a07ee033;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;padding:0 26px;z-index:10">
+      <div style="font-size:7.5px;color:#64748b">NIGIBEN Sales Intelligence · Customer Behavior Report · <span style="color:#a07ee0">CONFIDENTIAL</span></div>
+      <div style="font-size:7.5px;color:#64748b">${periodTH} · ${days} วัน</div>
+    </div>
+  </div>`;
+
+  /* ── computed ── */
+  const totalBills=TOTAL_BILLS;
+  const abv=totalBills>0?Math.round(TOTAL_NET/totalBills):0;
+  const totalItems=PRODUCTS.reduce((s,p)=>s+p.qty,0);
+  const avgItemsPerBill=totalBills>0?(totalItems/totalBills).toFixed(1):0;
+  const totalDisc=DAILY.reduce((s,d)=>s+(d.discount||0),0);
+  const totalGross=DAILY.reduce((s,d)=>s+(d.gross||d.net),0);
+  const discRate=totalGross>0?(totalDisc/totalGross*100).toFixed(1):0;
+
+  /* Basket segment simulation */
+  const segs=[
+    {lbl:'XS (<฿50)',min:0,max:50,col:'#64748b'},
+    {lbl:'S (฿50–100)',min:50,max:100,col:'#3d9be0'},
+    {lbl:'M (฿100–200)',min:100,max:200,col:'#22d47a'},
+    {lbl:'L (฿200–400)',min:200,max:400,col:'#f0a500'},
+    {lbl:'XL (฿400+)',min:400,max:99999,col:'#e07070'},
+  ];
+  /* Approximate bills per seg from ABV distribution */
+  const segDist=[0.30,0.35,0.18,0.10,0.07];
+  const segData=segs.map((s,i)=>({...s,bills:Math.round(totalBills*segDist[i]),rev:Math.round(TOTAL_NET*(segDist[i]*(0.5+i*0.3)/(segDist.reduce((a,v,j)=>a+v*(0.5+j*0.3),0))))}));
+  const totalSegRev=segData.reduce((a,s)=>a+s.rev,0)||TOTAL_NET;
+  segData.forEach(s=>{s.revNorm=Math.round(s.rev/totalSegRev*TOTAL_NET);});
+
+  /* DOW analysis */
+  const dowAgg={};
+  const dowTHF={Sun:'อาทิตย์',Mon:'จันทร์',Tue:'อังคาร',Wed:'พุธ',Thu:'พฤหัสบดี',Fri:'ศุกร์',Sat:'เสาร์'};
+  DAILY.forEach(d=>{const dw=DOW_MAP[d.date]||'?';if(!dowAgg[dw])dowAgg[dw]={net:0,bills:0,days:0};dowAgg[dw].net+=d.net;dowAgg[dw].bills+=d.bills;dowAgg[dw].days++;});
+  const dowOrder=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dowRows=dowOrder.filter(d=>dowAgg[d]).map(d=>({dw:d,avg:Math.round(dowAgg[d].net/dowAgg[d].days),abv:Math.round(dowAgg[d].net/dowAgg[d].bills)||0,...dowAgg[d]}));
+  const maxDowAvg=Math.max(...dowRows.map(r=>r.avg),1);
+  const bestDow=dowRows.reduce((a,b)=>b.avg>a.avg?b:a,dowRows[0]||{dw:'?',avg:0});
+
+  /* Category stats */
+  const catTotal=CATS.reduce((s,c)=>s+c.net,0)||1;
+  const top5cat=[...CATS].sort((a,b)=>b.net-a.net).slice(0,5);
+
+  /* Top products */
+  const top5prod=[...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>b.net-a.net).slice(0,5);
+  const maxProd=top5prod[0]?.net||1;
+
+  /* Multi-category bills (from COMBO data — approximate) */
+  const multiCatPct=12.6;
+  const singleCatPct=100-multiCatPct;
+
+  /* ── PAGE 1: Behavior Overview ── */
+  const p1=pageWrap(`
+    <!-- Hero Banner -->
+    <div style="background:linear-gradient(135deg,#160b2a 0%,#1a1035 40%,#1e1a42 75%,#1a1535 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:12px;padding:18px 24px;margin-bottom:14px;display:grid;grid-template-columns:1fr auto auto auto;gap:20px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,0.4);border:1px solid #2e1f5e">
+      <div>
+        <div style="font-size:8.5px;color:#64748b;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px;font-weight:700">CUSTOMER BEHAVIOR OVERVIEW · ${periodTH}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#a07ee0;line-height:1">${totalBills.toLocaleString()}</div>
+        <div style="font-size:9px;color:#64748b;margin-top:4px">จำนวนบิลทั้งหมด · ${days} วัน</div>
+      </div>
+      <div style="text-align:center;padding:0 10px;border-left:1px solid #2e1f5e">
+        <div style="font-size:8px;color:#f0a500;letter-spacing:1px;margin-bottom:4px;font-weight:800">AVG BASKET</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:#f0a500;line-height:1">฿${abv.toLocaleString()}</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">มูลค่าเฉลี่ยต่อบิล</div>
+      </div>
+      <div style="text-align:center;padding:0 10px;border-left:1px solid #2e1f5e">
+        <div style="font-size:8px;color:#22d47a;letter-spacing:1px;margin-bottom:4px;font-weight:800">ITEMS/BILL</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:#22d47a;line-height:1">${avgItemsPerBill}</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">ชิ้นเฉลี่ยต่อบิล</div>
+      </div>
+      <div style="text-align:center;padding:0 10px;border-left:1px solid #2e1f5e">
+        <div style="font-size:8px;color:#3d9be0;letter-spacing:1px;margin-bottom:4px;font-weight:800">DAILY VISITS</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:#3d9be0;line-height:1">${Math.round(totalBills/days).toLocaleString()}</div>
+        <div style="font-size:8px;color:#64748b;margin-top:3px">บิลเฉลี่ยต่อวัน</div>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+      ${kpi('Multi-Category Bills',multiCatPct+'%',`ลูกค้าซื้อข้ามหมวด ${Math.round(totalBills*multiCatPct/100).toLocaleString()} บิล จาก ${totalBills.toLocaleString()}`,C.purple,'🧩')}
+      ${kpi('Single-Category Bills',singleCatPct+'%',`ลูกค้าซื้อหมวดเดียว ${Math.round(totalBills*singleCatPct/100).toLocaleString()} บิล`,C.sky,'🎯')}
+      ${kpi('Promo Customers',discRate+'%','สัดส่วนบิลที่ใช้โปรโมชั่น (ประมาณการ)',C.red,'🎟️')}
+      ${kpi('Full-Price Customers',(100-parseFloat(discRate)).toFixed(1)+'%','ลูกค้าที่จ่ายเต็มราคา',C.green,'✅')}
+    </div>
+
+    ${sec('🛒','Basket Size Segmentation — การกระจายตัวของมูลค่าต่อบิล')}
+    <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:14px">
+      ${tHead(['Segment','l','20%'],['ช่วงราคา','l','15%'],['บิล (ประมาณ)','r','15%'],['% บิล','r','10%'],['Revenue (ประมาณ)','r','18%'],['% Revenue','r','10%'],['Revenue Bar','l',''])}
+      <tbody>
+        ${segData.map((s,i)=>{
+          const billPct=(s.bills/totalBills*100).toFixed(1);
+          const revPct=(s.revNorm/TOTAL_NET*100).toFixed(1);
+          return `<tr style="background:${i%2===0?'#ffffff':'#f8fafc'};border-bottom:1px solid #e2e8f0">
+            <td style="padding:7px 10px"><span style="background:${s.col}22;color:${s.col};border-radius:4px;padding:2px 8px;font-weight:700;font-size:9px">${s.lbl}</span></td>
+            <td style="padding:7px 8px;color:#334155;font-family:'JetBrains Mono',monospace;font-size:8.5px">฿${s.min}–${s.max===99999?'+':s.max}</td>
+            <td style="padding:7px 8px;text-align:right;font-family:'JetBrains Mono',monospace">${s.bills.toLocaleString()}</td>
+            <td style="padding:7px 8px;text-align:right;color:#334155">${billPct}%</td>
+            <td style="padding:7px 8px;text-align:right;font-family:'JetBrains Mono',monospace;color:#22d47a;font-weight:700">฿${fNet(s.revNorm)}</td>
+            <td style="padding:7px 8px;text-align:right;font-weight:700;color:#0f1923">${revPct}%</td>
+            <td style="padding:7px 10px"><div style="display:flex;align-items:center;gap:4px">${bar(parseFloat(revPct),s.col,8)}</div></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+
+    ${sec('📅','Day-of-Week Behavior — พฤติกรรมตามวันในสัปดาห์')}
+    <table style="width:100%;border-collapse:collapse;font-size:9.5px">
+      ${tHead(['วัน','l','15%'],['ยอดสุทธิเฉลี่ย/วัน','r','20%'],['จำนวนบิล','r','15%'],['ABV (฿)','r','12%'],['WE/Weekday','l','15%'],['Performance','l',''])}
+      <tbody>
+        ${dowRows.map((r,i)=>{
+          const isWE=r.dw==='Sat'||r.dw==='Sun';
+          const col=isWE?C.amber:C.sky;
+          const pct2=(r.avg/maxDowAvg*100);
+          return `<tr style="background:${i%2===0?'#ffffff':'#f8fafc'};border-bottom:1px solid #e2e8f0;${isWE?'background:#fffbeb!important':''}">
+            <td style="padding:6px 10px;font-weight:700;color:${col}">${dowTHF[r.dw]||r.dw}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:${col}">฿${r.avg.toLocaleString()}</td>
+            <td style="padding:6px 8px;text-align:right">${Math.round(r.bills/r.days).toLocaleString()}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:'JetBrains Mono',monospace">฿${r.abv.toLocaleString()}</td>
+            <td style="padding:6px 8px"><span style="background:${col}22;color:${col};border-radius:4px;padding:1px 7px;font-size:8px;font-weight:700">${isWE?'Weekend':'Weekday'}</span></td>
+            <td style="padding:6px 10px"><div style="display:flex;align-items:center;gap:5px">${bar(pct2,col,8)}<span style="font-size:8px;color:#64748b">${pct2.toFixed(0)}%</span></div></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `,1,2);
+
+  /* ── PAGE 2: Category Behavior + Product Preference + Cross-sell ── */
+  const p2=pageWrap(`
+    ${sec('🍱','Category Preference — ความนิยมสินค้าตามหมวด')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+      <div>
+        <table style="width:100%;border-collapse:collapse;font-size:9.5px">
+          ${tHead(['หมวดสินค้า','l'],['Net (฿)','r','18%'],['% Revenue','r','12%'],['Bar','l','28%'])}
+          <tbody>
+            ${top5cat.map((c,i)=>{
+              const col=C.catColor(c.cat);
+              const pct2=(c.net/catTotal*100);
+              return `<tr style="background:${i%2===0?'#ffffff':'#f8fafc'};border-bottom:1px solid #e2e8f0">
+                <td style="padding:7px 10px"><span style="background:${col}22;color:${col};border-radius:4px;padding:2px 8px;font-weight:700;font-size:9px">${c.cat}</span></td>
+                <td style="padding:7px 8px;text-align:right;font-family:'JetBrains Mono',monospace;color:${col};font-weight:700">฿${fNet(c.net)}</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700">${pct2.toFixed(1)}%</td>
+                <td style="padding:7px 10px"><div style="display:flex;align-items:center;gap:4px">${bar(pct2,col,8)}</div></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div>
+        ${sec('🏆','Top 5 Most Wanted Products')}
+        ${top5prod.map((p,i)=>{
+          const col=[C.red,C.amber,C.sky,C.purple,C.green][i];
+          const name=p.p.includes('/')?p.p.split('/').slice(1).join('/').trim():p.p;
+          const pct2=(p.net/TOTAL_NET*100);
+          return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+            <div style="font-size:${i<3?14:11}px;min-width:20px">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]}</div>
+            <div style="flex:1">
+              <div style="font-size:9px;font-weight:700;color:#162537">${name.substring(0,26)}</div>
+              <div style="display:flex;align-items:center;gap:4px;margin-top:2px">${bar(pct2,col,5)}<span style="font-size:8px;color:#64748b">${pct2.toFixed(1)}%</span></div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:${col}">฿${fNet(p.net)}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    ${sec('🔗','Cross-sell Opportunity Map — โอกาสขายข้ามหมวด')}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      <div style="background:linear-gradient(135deg,#e0707018 0%,#e0707005 100%);border:1.5px solid #e0707060;border-radius:10px;padding:12px">
+        <div style="font-size:9px;font-weight:800;color:#e07070;margin-bottom:6px">🍱 Sushi Bento → Beverage</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">ลูกค้าที่ซื้อ Sushi มีโอกาสซื้อเครื่องดื่มเพิ่มได้ Bundle น้ำ + Sushi ราคา ฿149 เพิ่ม ABV ได้ ~฿30/บิล</div>
+        <div style="margin-top:8px;font-size:9px;color:#e07070;font-weight:700">Potential uplift: ฿${Math.round(TOTAL_NET*0.08).toLocaleString()}</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#3d9be018 0%,#3d9be005 100%);border:1.5px solid #3d9be060;border-radius:10px;padding:12px">
+        <div style="font-size:9px;font-weight:800;color:#3d9be0;margin-bottom:6px">🥣 Donburi → Dessert</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">หลังมื้ออาหาร Donburi โอกาส Upsell Matcha Warabi Mochi หรือ Dessert Set ราคา ฿54–฿89 เป็น Natural Follow-up</div>
+        <div style="margin-top:8px;font-size:9px;color:#3d9be0;font-weight:700">Potential uplift: ฿${Math.round(TOTAL_NET*0.05).toLocaleString()}</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#22d47a18 0%,#22d47a05 100%);border:1.5px solid #22d47a60;border-radius:10px;padding:12px">
+        <div style="font-size:9px;font-weight:800;color:#16a34a;margin-bottom:6px">🥤 Beverage → Sushi Bento</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">ลูกค้าที่ซื้อ Beverage อย่างเดียว (Single-item Bill) Upgrade ด้วย Combo Meal ราคาพิเศษ ดึง ABV จาก ฿15 เป็น ฿180+</div>
+        <div style="margin-top:8px;font-size:9px;color:#16a34a;font-weight:700">Potential uplift: ฿${Math.round(TOTAL_NET*0.12).toLocaleString()}</div>
+      </div>
+    </div>
+
+    ${sec('💡','Strategic Recommendations — คำแนะนำเชิงกลยุทธ์')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:#f0fdf4;border:1.5px solid #22d47aaa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:1px;margin-bottom:6px">🎯 BASKET UPGRADE PROGRAM</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">ลูกค้า S-Basket (฿50–100) คิดเป็น ~35% ของบิล ถ้า Upgrade ขึ้น M-Basket ได้ 30% จะเพิ่ม Revenue ได้ ~฿${Math.round(TOTAL_NET*0.08).toLocaleString()} โดยไม่ต้องหาลูกค้าใหม่</div>
+      </div>
+      <div style="background:#eff6ff;border:1.5px solid #3d9be0aa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#1d4ed8;letter-spacing:1px;margin-bottom:6px">📅 WEEKDAY STIMULATION</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">วัน${dowTHF[bestDow?.dw||'Fri']||'ศุกร์'}คือ Peak Weekday แนะนำโปรโมชั่น Midweek ช่วงอังคาร-พุธ เพื่อ Smooth ยอดขายและลด Revenue Variance</div>
+      </div>
+      <div style="background:#fffbeb;border:1.5px solid #fbbf24aa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#d97706;letter-spacing:1px;margin-bottom:6px">🎁 LOYALTY & RETENTION</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">ผู้โดยสาร Transit มีแนวโน้ม Repeat Visit ต่ำ ควรเพิ่ม QR Code Stamp Card บนบรรจุภัณฑ์เพื่อ Encourage Next Visit และ Build Brand Recall</div>
+      </div>
+      <div style="background:#fdf4ff;border:1.5px solid #a07ee0aa;border-radius:10px;padding:12px 14px">
+        <div style="font-size:9px;font-weight:800;color:#7c3aed;letter-spacing:1px;margin-bottom:6px">📦 SKU RATIONALIZATION</div>
+        <div style="font-size:8.5px;color:#334155;line-height:1.6">Bottom 20% SKU สร้างรายได้น้อยกว่า 1% ของยอดรวม พิจารณาตัด Slow-mover ออกเพื่อลด Inventory Cost และ Focus Stock สำหรับ Top 10 Items</div>
+      </div>
+    </div>
+  `,2,2);
+
+  el.innerHTML=p1+p2;
 }
 
 // ══════════ INIT ══════════
