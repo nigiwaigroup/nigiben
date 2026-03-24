@@ -3,217 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIGIBEN Dashboard v2 — Don Mueang</title>
+<title>NIGIBEN Dashboard v2.5 — Don Mueang</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
-  --bg:#080b10;--surface:#10131a;--surface2:#161b24;--surface3:#1d2330;
-  --border:#242c3d;--border2:#2e3a52;
-  --accent:#f0a500;--accent2:#ffc94d;--accent-dim:rgba(240,165,0,.1);
-  --green:#22d47a;--red:#f04545;--blue:#3d9be0;--purple:#a07ee0;--cyan:#2ec8c8;
-  --text:#dde3f0;--text2:#7e8caa;--text3:#445066;
-  --font-h:'Chakra Petch',sans-serif;--font-b:'Sarabun','Noto Sans Thai',sans-serif;--font-m:'JetBrains Mono',monospace;
-  --sw:256px;--r:12px;--rs:8px;
+  --bg:#07090f;--surface:#0d1117;--surface2:#131920;--surface3:#1a2130;
+  --border:#1e2736;--border2:#283447;
+  --accent:#f0a500;--accent2:#ffc94d;--accent-dim:rgba(240,165,0,.09);
+  --green:#16c26a;--red:#e53e3e;--blue:#3b82f6;--purple:#8b5cf6;--cyan:#06b6d4;
+  --text:#e2e8f4;--text2:#8899b0;--text3:#4a5c72;
+  --shadow:0 2px 12px rgba(0,0,0,.4);
+  --font-h:'Chakra Petch',sans-serif;
+  --font-b:'Sarabun','Noto Sans Thai',sans-serif;
+  --font-m:'JetBrains Mono',monospace;
+  --sw:248px;--r:10px;--rs:7px;
+  --ts-xs:11px;--ts-sm:13px;--ts-base:14px;--ts-md:15px;--ts-lg:17px;--ts-xl:24px;--ts-2xl:30px;
+}
+html.light{
+  --bg:#f1f5f9;--surface:#ffffff;--surface2:#f8fafc;--surface3:#f1f5f9;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --accent:#d97706;--accent2:#f59e0b;--accent-dim:rgba(217,119,6,.09);
+  --green:#059669;--red:#dc2626;--blue:#2563eb;--purple:#7c3aed;--cyan:#0891b2;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --shadow:0 1px 8px rgba(0,0,0,.07);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden;font-size:var(--ts-base);}
 
-/* SIDEBAR */
+/* ── SIDEBAR — cleaner, tighter ── */
 #sb{width:var(--sw);min-height:100vh;background:var(--surface);border-right:1px solid var(--border);
   display:flex;flex-direction:column;position:fixed;left:0;top:0;z-index:100;overflow-y:auto;}
-.sb-logo{padding:22px 18px 14px;border-bottom:1px solid var(--border);}
-.sb-logo .brand{font-family:var(--font-h);font-size:22px;font-weight:700;color:var(--accent);letter-spacing:3px;text-shadow:none;}
-.sb-logo .sub{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-.sb-logo .loc{font-size:11px;color:var(--text2);margin-top:6px;}
-.nav-sec{padding:10px 0 2px;}
-.nav-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 18px 5px;font-family:var(--font-h);}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;font-size:12.5px;color:var(--text2);
-  cursor:pointer;transition:all .18s;border-left:2px solid transparent;}
+.sb-logo{padding:20px 16px 12px;border-bottom:1px solid var(--border);}
+.sb-logo .brand{font-family:var(--font-h);font-size:20px;font-weight:700;color:var(--green);letter-spacing:4px;}
+.sb-logo .sub{font-size:var(--ts-xs);color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+.sb-logo .loc{font-size:var(--ts-sm);color:var(--text2);margin-top:5px;}
+.nav-sec{padding:8px 0 2px;}
+.nav-lbl{font-size:var(--ts-xs);letter-spacing:1.5px;text-transform:uppercase;color:var(--text);
+  padding:0 16px 4px;font-family:var(--font-h);font-weight:700;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:var(--ts-sm);color:var(--text2);
+  cursor:pointer;transition:all .15s;border-left:2px solid transparent;line-height:1.4;}
 .nav-item:hover{color:var(--text);background:var(--surface2);}
 .nav-item.active{color:var(--accent);background:var(--accent-dim);border-left-color:var(--accent);}
-.nav-item .ic{font-size:14px;width:17px;text-align:center;}
-.nav-item .bdg{margin-left:auto;background:var(--accent);color:#000;font-size:9px;font-weight:700;
-  padding:1px 5px;border-radius:8px;font-family:var(--font-h);}
-.sb-foot{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);}
-.period-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;}
-.period-box .pl{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
-.period-box .pv{font-size:12px;color:var(--accent2);font-family:var(--font-m);margin-top:2px;}
-.sb-day-row{display:grid;grid-template-columns:32px 1fr 54px;align-items:center;gap:4px;font-size:10px;}
+.nav-item .ic{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+.nav-item .bdg{margin-left:auto;background:var(--accent);color:#000;font-size:8px;font-weight:700;
+  padding:1px 5px;border-radius:6px;font-family:var(--font-h);flex-shrink:0;}
+.sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--border);}
+.period-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;}
+.period-box .pl{font-size:var(--ts-xs);color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+.period-box .pv{font-size:var(--ts-sm);color:var(--accent2);font-family:var(--font-m);margin-top:2px;}
+.sb-day-row{display:grid;grid-template-columns:30px 1fr 52px;align-items:center;gap:4px;font-size:var(--ts-xs);}
 .sb-day-lbl{color:var(--text3);font-family:var(--font-m);}
-.sb-day-bar-wrap{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;}
+.sb-day-bar-wrap{height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;}
 .sb-day-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s;}
-.sb-day-val{color:var(--text2);text-align:right;font-family:var(--font-m);font-size:10px;}
-.upbtn{margin-top:9px;width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--rs);
-  padding:8px;font-size:12px;font-weight:700;font-family:var(--font-h);cursor:pointer;letter-spacing:1px;}
-.upbtn:hover{opacity:.85;}
+.sb-day-val{color:var(--text2);text-align:right;font-family:var(--font-m);font-size:var(--ts-xs);}
+.upbtn{margin-top:8px;width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--rs);
+  padding:8px;font-size:var(--ts-sm);font-weight:700;font-family:var(--font-h);cursor:pointer;letter-spacing:1px;transition:opacity .15s;}
+.upbtn:hover{opacity:.82;}
 
-/* MAIN */
-#main{margin-left:var(--sw);flex:1;}
-#topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 26px;gap:14px;position:sticky;top:0;z-index:90;}
-.tb-title{font-family:var(--font-h);font-size:14px;font-weight:600;flex:1;}
-.tb-live{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-family:var(--font-m);}
-.tb-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.tb-date{font-size:11px;color:var(--text3);font-family:var(--font-m);}
-#content{padding:22px 26px 44px;}
-.page{display:none;}.page.active{display:block;animation:fadeIn .28s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ── MAIN LAYOUT ── */
+#main{margin-left:var(--sw);flex:1;min-width:0;}
+#topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:90;}
+.tb-title{font-family:var(--font-h);font-size:var(--ts-md);font-weight:600;flex:1;letter-spacing:.5px;}
+.tb-live{display:flex;align-items:center;gap:5px;font-size:var(--ts-xs);color:var(--green);font-family:var(--font-m);letter-spacing:.5px;}
+.tb-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-date{font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-m);}
+#content{padding:20px 24px 48px;}
+.page{display:none;}.page.active{display:block;animation:fadeIn .22s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-/* COMPONENTS */
-.sec-title{font-family:var(--font-h);font-size:12px;font-weight:600;color:var(--accent);
-  letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
-.ph{margin-bottom:22px;}
-.ph h1{font-family:var(--font-h);font-size:20px;font-weight:700;}
-.ph p{font-size:12px;color:var(--text2);margin-top:4px;}
+/* ── SECTION TITLE — F-pattern anchor ── */
+.sec-title{font-family:var(--font-h);font-size:var(--ts-xs);font-weight:700;color:var(--text2);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;padding-left:8px;border-left:2px solid var(--accent);}
+.ph{margin-bottom:18px;}
+.ph h1{font-family:var(--font-h);font-size:var(--ts-lg);font-weight:700;letter-spacing:.5px;}
+.ph p{font-size:var(--ts-sm);color:var(--text2);margin-top:3px;}
 
-/* GRID */
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
-.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px;}
-.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px;}
-.g12{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-bottom:18px;}
-.mb{margin-bottom:18px;}
+/* ── GRID — tighter gutters ── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:16px;}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:16px;}
+.mb{margin-bottom:16px;}
 
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;transition:border-color .2s;}
+/* ── CARD — less border noise ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:border-color .15s;}
 .card:hover{border-color:var(--border2);}
 
-/* KPI */
+/* ── KPI — Dashboard-Pro: left accent bar + sparkline space ── */
 .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:16px 18px;position:relative;overflow:hidden;}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);}
+  padding:14px 16px;position:relative;overflow:hidden;}
+/* left bar replaces top bar — stronger visual anchor */
+.kpi::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--accent);border-radius:var(--r) 0 0 var(--r);}
 .kpi.g::before{background:var(--green);}
 .kpi.b::before{background:var(--blue);}
 .kpi.p::before{background:var(--purple);}
 .kpi.r::before{background:var(--red);}
 .kpi.c::before{background:var(--cyan);}
-.kpi-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-family:var(--font-h);}
-.kpi-val{font-family:var(--font-m);font-size:24px;font-weight:500;margin:5px 0 3px;}
+/* label: smaller, lighter — let the number breathe */
+.kpi-lbl{font-size:var(--ts-xs);letter-spacing:1px;text-transform:uppercase;color:var(--text2);font-family:var(--font-h);font-weight:600;}
+/* value: bigger, bolder — 5-second rule */
+.kpi-val{font-family:var(--font-m);font-size:var(--ts-2xl);font-weight:700;margin:6px 0 2px;line-height:1;letter-spacing:-0.5px;}
 .kpi-val.ac{color:var(--accent);}
 .kpi-val.gc{color:var(--green);}
 .kpi-val.rc{color:var(--red);}
 .kpi-val.bc{color:var(--blue);}
 .kpi-val.pc{color:var(--purple);}
-.kpi-sub{font-size:11px;color:var(--text2);}
-.kpi-ico{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:26px;opacity:.12;}
+/* sub: dimmer, smaller */
+.kpi-sub{font-size:var(--ts-xs);color:var(--text2);line-height:1.4;}
+/* icon: ghost — non-data ink, keep very faint */
+.kpi-ico{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:22px;opacity:.07;}
 
-/* CHART */
-.ct{font-family:var(--font-h);font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;}
-.cs{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;}
+/* ── CHART TITLES — hierarchy ── */
+.ct{font-family:var(--font-h);font-size:var(--ts-md);font-weight:600;color:var(--text);margin-bottom:8px;letter-spacing:.3px;}
+.cs{font-size:var(--ts-xs);color:var(--text3);margin-top:6px;line-height:1.6;padding-top:6px;border-top:1px solid var(--border);}
 
-/* TABLE */
+/* ── TABLE — cleaner rows, readable ── */
 .tw{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{text-align:left;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);
-  font-family:var(--font-h);padding:7px 10px;border-bottom:1px solid var(--border);cursor:pointer;}
+table{width:100%;border-collapse:collapse;font-size:var(--ts-sm);}
+thead th{text-align:left;font-size:var(--ts-xs);letter-spacing:1px;text-transform:uppercase;color:var(--text3);
+  font-family:var(--font-h);padding:6px 10px;border-bottom:1px solid var(--border);font-weight:700;}
 thead th.num{text-align:right;}
 thead th:hover{color:var(--text2);}
 thead th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
 thead th.sortable:hover{color:var(--accent);}
 thead th.sorted-asc::after{content:' ↑';color:var(--accent);}
 thead th.sorted-desc::after{content:' ↓';color:var(--accent);}
-thead th.sortable:not(.sorted-asc):not(.sorted-desc)::after{content:' ↕';opacity:.35;}
-#promo-btn-row button.active{border-color:var(--accent)!important;background:rgba(240,165,0,0.1)!important;color:var(--accent)!important;}
-tbody tr{border-bottom:1px solid rgba(255,255,255,.035);transition:background .12s;}
+thead th.sortable:not(.sorted-asc):not(.sorted-desc)::after{content:' ↕';opacity:.3;}
+#promo-btn-row button.active{border-color:var(--accent)!important;background:rgba(240,165,0,0.08)!important;color:var(--accent)!important;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.025);transition:background .1s;}
 tbody tr:hover{background:var(--surface2);}
-tbody td{padding:8px 10px;vertical-align:middle;}
-tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
+tbody td{padding:7px 10px;vertical-align:middle;}
+tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
 .rb{width:18px;height:18px;border-radius:3px;background:var(--surface3);display:inline-flex;align-items:center;
-  justify-content:center;font-family:var(--font-h);font-size:9px;font-weight:700;color:var(--text3);}
-.rb.g1{background:rgba(240,165,0,.2);color:var(--accent);}
-.rb.g2{background:rgba(200,200,220,.12);color:#c0c0d0;}
-.rb.g3{background:rgba(180,110,50,.15);color:#c88050;}
+  justify-content:center;font-family:var(--font-h);font-size:8px;font-weight:700;color:var(--text3);}
+.rb.g1{background:rgba(240,165,0,.18);color:var(--accent);}
+.rb.g2{background:rgba(200,200,220,.1);color:#a0aec0;}
+.rb.g3{background:rgba(180,110,50,.12);color:#b07040;}
 .catbdg{display:inline-flex;align-items:center;gap:3px;background:var(--surface3);
-  border-radius:20px;padding:1px 7px;font-size:10px;color:var(--text2);}
-.pbar{height:4px;border-radius:2px;background:var(--accent);}
-.pbwrap{height:4px;border-radius:2px;background:var(--surface3);overflow:hidden;margin-top:3px;}
+  border-radius:20px;padding:1px 7px;font-size:var(--ts-xs);color:var(--text2);}
+.pbar{height:3px;border-radius:2px;background:var(--accent);}
+.pbwrap{height:3px;border-radius:2px;background:var(--surface3);overflow:hidden;margin-top:3px;}
 .pbfill{height:100%;border-radius:2px;transition:width 1s;}
 
 /* HEATMAP */
-.hm-cell{height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-family:var(--font-m);color:rgba(255,255,255,.75);cursor:default;transition:transform .12s;}
-.hm-cell:hover{transform:scale(1.15);z-index:1;position:relative;}
-.hm-rlbl{font-size:9px;color:var(--text3);font-family:var(--font-m);display:flex;align-items:center;padding-right:6px;white-space:nowrap;}
-.hm-clbl{font-size:9px;color:var(--text3);font-family:var(--font-m);text-align:center;padding:1px 0;}
+.hm-cell{height:24px;border-radius:3px;display:flex;align-items:center;justify-content:center;
+  font-size:var(--ts-xs);font-family:var(--font-m);color:rgba(255,255,255,.8);cursor:default;transition:transform .1s;}
+.hm-cell:hover{transform:scale(1.12);z-index:1;position:relative;}
+.hm-rlbl{font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-m);display:flex;align-items:center;padding-right:6px;white-space:nowrap;}
+.hm-clbl{font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-m);text-align:center;padding:1px 0;}
 
 /* PROGRESS ROWS */
-.pr-row{margin-bottom:11px;}
+.pr-row{margin-bottom:10px;}
 .pr-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
-.pr-name{font-size:12px;}
-.pr-val{font-size:11px;font-family:var(--font-m);color:var(--text2);}
+.pr-name{font-size:var(--ts-sm);}
+.pr-val{font-size:var(--ts-xs);font-family:var(--font-m);color:var(--text2);}
 
 /* TAGS */
-.tag-sushi{color:#e07070;}.tag-donburi{color:#4d9de0;}.tag-bev{color:#22d47a;}
-.tag-dessert{color:#a07ee0;}.tag-app{color:var(--accent);}
+.tag-sushi{color:#e07070;}.tag-donburi{color:#4d9de0;}.tag-bev{color:var(--green);}
+.tag-dessert{color:var(--purple);}.tag-app{color:var(--accent);}
 
 /* COMBO CARD */
 .combo-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
-  padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+  padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
 .combo-pills{display:flex;align-items:center;gap:6px;flex:1;flex-wrap:wrap;}
-.combo-pill{padding:3px 10px;border-radius:20px;font-size:11px;font-family:var(--font-h);font-weight:600;}
-.combo-plus{color:var(--text3);font-size:14px;}
+.combo-pill{padding:2px 9px;border-radius:20px;font-size:var(--ts-sm);font-family:var(--font-h);font-weight:600;}
+.combo-plus{color:var(--text3);font-size:13px;}
 .combo-stat{text-align:right;min-width:80px;}
-.combo-cnt{font-family:var(--font-m);font-size:14px;color:var(--accent);}
-.combo-rev{font-size:10px;color:var(--text2);}
+.combo-cnt{font-family:var(--font-m);font-size:var(--ts-md);color:var(--accent);}
+.combo-rev{font-size:var(--ts-xs);color:var(--text2);}
 
-/* INSIGHT BOX */
-.insight{background:linear-gradient(135deg,rgba(240,165,0,.08),rgba(240,165,0,.03));
-  border:1px solid rgba(240,165,0,.2);border-radius:var(--rs);padding:12px 16px;margin-top:14px;}
-.insight-head{font-family:var(--font-h);font-size:11px;color:var(--accent);letter-spacing:1px;margin-bottom:6px;}
-.insight p{font-size:12px;color:var(--text2);line-height:1.6;}
+/* INSIGHT BOX — less saturated, cleaner */
+.insight{background:rgba(240,165,0,.05);border:1px solid rgba(240,165,0,.15);
+  border-radius:var(--rs);padding:10px 14px;margin-top:12px;border-left:3px solid var(--accent);}
+.insight-head{font-family:var(--font-h);font-size:var(--ts-xs);color:var(--accent);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase;}
+.insight p{font-size:var(--ts-sm);color:var(--text2);line-height:1.6;}
 .insight strong{color:var(--text);}
 
 /* UPLOAD */
-.upcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:18px;}
-.upcard h3{font-family:var(--font-h);font-size:15px;margin-bottom:6px;}
-.upcard p{font-size:12px;color:var(--text2);margin-bottom:18px;}
-.drop{border:2px dashed var(--border);border-radius:var(--rs);padding:28px;text-align:center;
-  cursor:pointer;transition:all .2s;position:relative;}
+.upcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px;}
+.upcard h3{font-family:var(--font-h);font-size:var(--ts-md);margin-bottom:5px;}
+.upcard p{font-size:var(--ts-sm);color:var(--text2);margin-bottom:16px;}
+.drop{border:1.5px dashed var(--border);border-radius:var(--rs);padding:24px;text-align:center;
+  cursor:pointer;transition:all .18s;position:relative;}
 .drop:hover,.drop.dv{border-color:var(--accent);background:var(--accent-dim);}
 .drop input{position:absolute;inset:0;opacity:0;cursor:pointer;}
-.drop-ico{font-size:32px;margin-bottom:8px;}
-.drop-txt{font-size:13px;color:var(--text2);}
-.fstatus{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);
-  border-radius:var(--rs);margin-top:10px;font-size:12px;}
+.drop-ico{font-size:28px;margin-bottom:7px;}
+.drop-txt{font-size:var(--ts-sm);color:var(--text2);}
+.fstatus{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface2);
+  border-radius:var(--rs);margin-top:8px;font-size:var(--ts-sm);}
 .fstatus.ok{border-left:3px solid var(--green);}
 .fstatus.err{border-left:3px solid var(--red);}
 .proc-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--rs);
-  padding:11px;font-size:13px;font-weight:700;font-family:var(--font-h);cursor:pointer;letter-spacing:1px;margin-top:8px;}
-.proc-btn:hover{opacity:.85;}.proc-btn:disabled{opacity:.4;cursor:not-allowed;}
+  padding:10px;font-size:var(--ts-sm);font-weight:700;font-family:var(--font-h);cursor:pointer;letter-spacing:1px;margin-top:8px;transition:opacity .15s;}
+.proc-btn:hover{opacity:.82;}.proc-btn:disabled{opacity:.35;cursor:not-allowed;}
 
 /* SORT CONTROLS */
-.sc{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.sc{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 .sc input,.sc select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
-  padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-b);outline:none;}
+  padding:5px 9px;color:var(--text);font-size:var(--ts-sm);font-family:var(--font-b);outline:none;}
 .sc input:focus,.sc select:focus{border-color:var(--accent);}
-.sc input{width:180px;}
-.sc-cnt{font-size:11px;color:var(--text3);margin-left:auto;}
+.sc input{width:176px;}
+.sc-cnt{font-size:var(--ts-xs);color:var(--text3);margin-left:auto;}
 
 /* LEGEND */
-.leg{display:flex;flex-direction:column;gap:7px;justify-content:center;}
-.leg-item{display:flex;align-items:center;gap:7px;font-size:11px;}
-.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
-.leg-pct{margin-left:auto;font-family:var(--font-m);font-size:10px;color:var(--text2);}
+.leg{display:flex;flex-direction:column;gap:6px;justify-content:center;}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:var(--ts-sm);}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.leg-pct{margin-left:auto;font-family:var(--font-m);font-size:var(--ts-xs);color:var(--text2);}
 
 /* TOP/BOTTOM tabs */
-.tab-btns{display:flex;gap:6px;margin-bottom:14px;}
-.tab-btn{padding:6px 16px;border-radius:var(--rs);font-size:12px;font-family:var(--font-h);
-  cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .2s;}
+.tab-btns{display:flex;gap:6px;margin-bottom:12px;}
+.tab-btn{padding:5px 14px;border-radius:var(--rs);font-size:var(--ts-sm);font-family:var(--font-h);
+  cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .15s;}
 .tab-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 
-::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 .mono{font-family:var(--font-m);}
 .flex-r{display:flex;align-items:center;gap:8px;}
 
-@keyframes modalIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes modalOut{to{opacity:0;transform:scale(.92)}}
+@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes modalOut{to{opacity:0;transform:scale(.93)}}
 
 /* ── PRINT / PDF STYLES ── */
 @media print {
@@ -282,10 +300,21 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     box-shadow:0 24px 80px rgba(0,0,0,.6);
     animation:modalIn .3s cubic-bezier(.34,1.56,.64,1) both;
   ">
-    <div style="text-align:center;margin-bottom:28px">
-      <div style="font-family:var(--font-h);font-size:26px;font-weight:700;color:#22d47a;letter-spacing:3px">NIGIBEN</div>
-      <div style="font-size:13px;color:var(--text3);margin-top:6px;letter-spacing:1px">Sales Intelligence Dashboard</div>
-      <div style="width:40px;height:2px;background:var(--accent);margin:14px auto 0;border-radius:2px"></div>
+    <!-- Theme toggle (top-right of modal) -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
+      <button id="modal-theme-toggle" onclick="toggleTheme()" title="สลับ Dark / Light"
+        style="display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);
+               border-radius:20px;padding:4px 12px;cursor:pointer;font-family:var(--font-b);font-size:12px;
+               color:var(--text2);transition:all .2s;">
+        <span id="modal-theme-icon">🌙</span>
+        <span id="modal-theme-label">Dark</span>
+      </button>
+    </div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-family:var(--font-h);font-size:28px;font-weight:700;color:#22d47a;letter-spacing:4px">NIGIBEN</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:5px;letter-spacing:1px">Sales Intelligence Dashboard</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;letter-spacing:.5px;">v2.5 · 24 มี.ค. 2568</div>
+      <div style="width:40px;height:2px;background:var(--accent);margin:12px auto 0;border-radius:2px"></div>
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:20px;text-align:center">
       อัพโหลดไฟล์ Excel เพื่อเริ่มต้นใช้งาน Dashboard
@@ -330,7 +359,8 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 
 <nav id="sb">
   <div class="sb-logo">
-    <div class="brand">NIGIBEN</div><div style="font-size:9px;color:var(--text3);text-align:center;margin-top:2px">build 1773114687</div>
+    <div class="brand">NIGIBEN</div>
+    <div style="font-size:9px;color:var(--text3);text-align:center;margin-top:2px;letter-spacing:.5px;">v2.5 · 24 มี.ค. 2568</div>
     <div class="sub">Sales Intelligence Dashboard</div>
     <div class="loc">✈️ สนามบินดอนเมือง · Grab&amp;Go</div>
   </div>
@@ -351,6 +381,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="nav-lbl">โปรโมชั่น</div>
     <div class="nav-item" data-page="disc-hm"><span class="ic">💸</span>Discount Leak Heatmap</div>
     <div class="nav-item" data-page="promo"><span class="ic">🎫</span>Promotion Breakdown</div>
+    <div class="nav-item" data-page="promo-product"><span class="ic">🔍</span>Promo × Product</div>
     <div class="nav-item" data-page="quality"><span class="ic">⚖️</span>Basket Quality</div>
   </div>
   <div class="nav-sec">
@@ -358,12 +389,11 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="nav-item" data-page="market"><span class="ic">🥢</span>Market Basket Analysis</div>
     <div class="nav-item" data-page="combo"><span class="ic">🍙</span>Combo &amp; Opportunity</div>
     <div class="nav-item" data-page="topbot"><span class="ic">🏆</span>Top 10 / Bottom 10</div>
-    <div class="nav-item" data-page="products"><span class="ic">🍛</span>Sales by Quantity<span class="bdg">60</span></div>
+    <div class="nav-item" data-page="products"><span class="ic">🍛</span>Sales by Quantity<span class="bdg" id="bdg-products">60</span></div>
     <div class="nav-item" data-page="trial"><span class="ic">🆕</span>สินค้าทดลองขาย</div>
   </div>
   <div class="nav-sec">
-    <div class="nav-lbl">ข้อมูล</div>
-    <div class="nav-item" data-page="upload"><span class="ic">⬆️</span>Upload Data</div>
+    <div class="nav-lbl">รายงาน</div>
     <div class="nav-item" data-page="report"><span class="ic">📄</span>Investor Report <span class="bdg">PDF</span></div>
     <div class="nav-item" data-page="report-hourly"><span class="ic">⏱️</span>Hourly Sales Report <span class="bdg">PDF</span></div>
     <div class="nav-item" data-page="report-behavior"><span class="ic">🧠</span>Customer Behavior Report <span class="bdg">PDF</span></div>
@@ -383,6 +413,13 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="tb-title" id="tb-title">Performance Overview</div>
     <div class="tb-live">LIVE DATA</div>
     <div class="tb-date" id="tb-date"></div>
+    <button id="theme-toggle" onclick="toggleTheme()" title="สลับ Dark / Light"
+      style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);
+             border-radius:20px;padding:5px 13px;cursor:pointer;font-family:var(--font-b);font-size:var(--ts-sm);
+             color:var(--text2);transition:all .2s;flex-shrink:0;">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-label">Dark</span>
+    </button>
   </div>
   <div id="content">
 
@@ -408,6 +445,32 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
     <div class="ct">เปรียบเทียบยอดขายรายวัน — Gross Revenue vs Net Revenue</div>
     <div style="height:260px"><canvas id="ch-daily-compare"></canvas></div>
     <div class="cs">📌 แท่งสีส้ม = ยอดขาย <strong>ก่อนหักส่วนลด</strong> (Gross) · แท่งสีเขียว = ยอดขาย <strong>หลังหักส่วนลด</strong> (Net) · เส้นสีแดง = มูลค่าส่วนลดที่หายไปในแต่ละวัน</div>
+  </div>
+
+  <div class="sec-title">💸 Discount Trend Analysis</div>
+  <div class="card mb">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px;" id="disc-trend-kpis">
+      <div style="background:var(--surface2);border-radius:var(--rs);padding:10px 14px;border-left:3px solid var(--red);">
+        <div style="font-size:var(--ts-xs);color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Avg Disc Rate / Day</div>
+        <div id="dt-avg-rate" style="font-family:var(--font-m);font-size:var(--ts-xl);font-weight:700;color:var(--red);margin-top:4px;">—</div>
+        <div id="dt-avg-rate-sub" style="font-size:var(--ts-xs);color:var(--text2);margin-top:2px;">ส่วนลดเฉลี่ยต่อวันเทียบ Gross</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--rs);padding:10px 14px;border-left:3px solid var(--accent);">
+        <div style="font-size:var(--ts-xs);color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Peak Discount Day</div>
+        <div id="dt-peak-day" style="font-family:var(--font-m);font-size:var(--ts-xl);font-weight:700;color:var(--accent);margin-top:4px;">—</div>
+        <div id="dt-peak-day-sub" style="font-size:var(--ts-xs);color:var(--text2);margin-top:2px;">วันที่ให้ส่วนลดสูงสุด</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--rs);padding:10px 14px;border-left:3px solid var(--green);">
+        <div style="font-size:var(--ts-xs);color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Trend Direction</div>
+        <div id="dt-trend-dir" style="font-family:var(--font-m);font-size:var(--ts-xl);font-weight:700;color:var(--green);margin-top:4px;">—</div>
+        <div id="dt-trend-sub" style="font-size:var(--ts-xs);color:var(--text2);margin-top:2px;">แนวโน้มการให้ส่วนลด</div>
+      </div>
+    </div>
+    <div class="ct">Discount Rate % รายวัน (ส่วนลด ÷ Gross Revenue)</div>
+    <div style="height:200px"><canvas id="ch-disc-rate-trend"></canvas></div>
+    <div class="ct" style="margin-top:18px;">ยอด Discount (฿) และ Net Revenue รายวัน</div>
+    <div style="height:200px"><canvas id="ch-disc-abs-trend"></canvas></div>
+    <div class="cs" id="disc-trend-insight">📌 กำลังโหลดข้อมูล...</div>
   </div>
 
   <div class="sec-title">🥧 สัดส่วนยอดขายตามหมวดสินค้า</div>
@@ -682,6 +745,83 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
   </div>
 </div>
 
+<!-- ══════════ PROMO × PRODUCT (INTELLIGENCE) ══════════ -->
+<div id="page-promo-product" class="page">
+  <div class="ph">
+    <h1>🔬 Product–Promotion Intelligence</h1>
+    <p>วิเคราะห์ความเชื่อมโยงสินค้า × โปรโมชั่น · Mapping by Discount Logic · Flash Sale · Staff Discount · Promo Dependency Score</p>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="card mb" style="padding:12px 16px;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="position:relative;flex:1;min-width:200px;">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);">🔍</span>
+        <input id="pp-search" type="text" placeholder="ค้นหาสินค้า..."
+          oninput="renderPPI()"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
+                 padding:7px 12px 7px 32px;color:var(--text);font-size:var(--ts-sm);font-family:var(--font-b);outline:none;">
+      </div>
+      <select id="pp-cat-filter" onchange="renderPPI()"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
+               padding:7px 12px;color:var(--text);font-size:var(--ts-sm);font-family:var(--font-b);outline:none;">
+        <option value="">📦 ทุกหมวด</option>
+        <option value="Sushi Bento">Sushi Bento</option>
+        <option value="Donburi">Donburi</option>
+        <option value="Beverage">Beverage</option>
+        <option value="Dessert">Dessert</option>
+        <option value="Appetizer">Appetizer</option>
+      </select>
+      <select id="pp-dep-filter" onchange="renderPPI()"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
+               padding:7px 12px;color:var(--text);font-size:var(--ts-sm);font-family:var(--font-b);outline:none;">
+        <option value="">🎯 ทุกระดับ Dependency</option>
+        <option value="critical">🔴 Critical (>70%)</option>
+        <option value="high">🟠 High (50–70%)</option>
+        <option value="medium">🟡 Medium (30–50%)</option>
+        <option value="low">🟢 Low (<30%)</option>
+      </select>
+      <select id="pp-sort" onchange="renderPPI()"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
+               padding:7px 12px;color:var(--text);font-size:var(--ts-sm);font-family:var(--font-b);outline:none;">
+        <option value="dep">เรียงตาม Dependency ↓</option>
+        <option value="net">เรียงตาม Revenue ↓</option>
+        <option value="flash">เรียงตาม Flash Sale % ↓</option>
+        <option value="qty">เรียงตาม ชิ้น ↓</option>
+      </select>
+      <button onclick="document.getElementById('pp-search').value='';document.getElementById('pp-cat-filter').value='';document.getElementById('pp-dep-filter').value='';renderPPI();"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
+               padding:7px 11px;color:var(--text2);font-size:var(--ts-sm);cursor:pointer;">✕</button>
+      <span id="pp-count" style="font-size:var(--ts-xs);color:var(--text3);margin-left:auto;"></span>
+    </div>
+  </div>
+
+  <!-- Insight Banner -->
+  <div id="pp-insight-banner" style="margin-bottom:16px;"></div>
+
+  <!-- Summary Table -->
+  <div class="card mb">
+    <div class="ct">📊 Summary Table — สินค้า × โปรโมชั่น × Dependency Score</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:var(--ts-sm);" id="pp-table">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);">
+            <th style="padding:8px 10px;text-align:left;font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;min-width:180px;">สินค้า</th>
+            <th style="padding:8px 8px;text-align:right;font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ชิ้น</th>
+            <th style="padding:8px 10px;text-align:left;font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;min-width:160px;">Promo หลัก</th>
+            <th style="padding:8px 8px;text-align:right;font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Net Revenue</th>
+            <th style="padding:8px 8px;text-align:right;font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Flash Sale %</th>
+            <th style="padding:8px 8px;text-align:right;font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Staff Disc %</th>
+            <th style="padding:8px 8px;text-align:center;font-size:var(--ts-xs);color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;min-width:130px;">Promo Dependency</th>
+          </tr>
+        </thead>
+        <tbody id="pp-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Detail modal anchor -->
+</div>
+
 <!-- ══════════ QUALITY ══════════ -->
 <div id="page-quality" class="page">
   <div class="ph"><h1>⚖️ Basket Quality Analysis</h1><p>คุณภาพบิล: เต็มราคา vs ลดราคา</p></div>
@@ -727,42 +867,61 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:11px;}
 <!-- ══════════ COMBO & OPPORTUNITY ══════════ -->
 <div id="page-combo" class="page">
   <div class="ph"><h1>🔗 Combo &amp; Opportunity Insights</h1><p>พฤติกรรมการซื้อรายบิล — การซื้อข้ามหมวดสินค้าและโอกาสสร้างรายได้เพิ่ม</p></div>
+
+  <!-- KPI Row -->
   <div class="g4 mb">
-    <div class="kpi"><div class="kpi-lbl">Multi-Category Bills</div><div class="kpi-val" style="color:var(--cyan)">332</div><div class="kpi-sub">12.6% ของบิลทั้งหมด</div></div>
-    <div class="kpi g"><div class="kpi-lbl">Single-Category Bills</div><div class="kpi-val gc">—</div><div class="kpi-sub">87.4% ของบิลทั้งหมด</div></div>
+    <div class="kpi"><div class="kpi-lbl">Multi-Category Bills</div><div id="combo-multi-val" class="kpi-val" style="color:var(--cyan)">—</div><div id="combo-multi-sub" class="kpi-sub">—</div></div>
+    <div class="kpi g"><div class="kpi-lbl">Single-Category Bills</div><div id="combo-single-val" class="kpi-val gc">—</div><div id="combo-single-sub" class="kpi-sub">—</div></div>
     <div class="kpi ac"><div class="kpi-lbl">Top Combo Revenue</div><div id="kpi-peak-rev" class="kpi-val ac">฿115,115</div><div class="kpi-sub">Donburi + Sushi Bento</div></div>
-    <div class="kpi p"><div class="kpi-lbl">Avg Items per Bill</div><div class="kpi-val pc">1.64</div><div class="kpi-sub">ชิ้นเฉลี่ยต่อบิล</div></div>
+    <div class="kpi p"><div class="kpi-lbl">Avg Items per Bill</div><div id="combo-ipb-val" class="kpi-val pc">—</div><div id="combo-ipb-sub" class="kpi-sub">ชิ้นเฉลี่ยต่อบิล</div></div>
   </div>
 
+  <!-- Main 2-col layout: Top Products + Sales Mix -->
+  <div class="g2 mb">
+    <!-- LEFT: Top Products by Revenue — style จากรูปตัวอย่าง -->
+    <div class="card" style="background:var(--surface);">
+      <div class="ct" style="margin-bottom:4px;">Top Products by Revenue</div>
+      <div style="font-size:var(--ts-xs);color:var(--text3);margin-bottom:16px;">รู้ให้ว่ามูลอยู่หมวดไหนในรายได้จริง</div>
+      <div id="combo-top-products" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
+    <!-- RIGHT: Sales Mix Donut Cards -->
+    <div class="card" style="background:var(--surface);">
+      <div class="ct" style="margin-bottom:4px;">Sales Mix</div>
+      <div style="font-size:var(--ts-xs);color:var(--text3);margin-bottom:16px;">ดูสัดส่วนเพื่อวางกลยุทธ์สินค้าและช่องทาง</div>
+      <div id="combo-sales-mix" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
+      <div style="margin-top:18px;">
+        <div class="ct" style="margin-bottom:8px;font-size:var(--ts-sm);">Bills per Category</div>
+        <div id="combo-bills-mix" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: Combo Pairs + Items per Bill -->
   <div class="g2 mb">
     <div class="card">
-      <div class="ct">สัดส่วนบิล: Single vs Multi Category</div>
-      <div style="height:220px"><canvas id="ch-combo-pie"></canvas></div>
-      <div class="cs">📌 บิลที่ซื้อหลายหมวดมีเพียง <strong>12.6%</strong> แต่มีมูลค่าสูงกว่าบิล Single Category มาก — โอกาส Cross-sell ยังมีอีกมาก</div>
+      <div class="ct" style="margin-bottom:12px;">🔗 Top Combo Pairs</div>
+      <div id="combo-list"></div>
     </div>
     <div class="card">
-      <div class="ct">จำนวนสินค้าต่อบิล (Items per Bill Distribution)</div>
-      <div style="height:220px"><canvas id="ch-items-per-bill"></canvas></div>
-      <div class="cs">📌 77.9% ของลูกค้าซื้อสินค้าเพียง <strong>1 ชิ้น</strong> — นี่คือโอกาสที่ยิ่งใหญ่ที่สุดในการเพิ่มรายได้ต่อบิล</div>
+      <div class="ct">Items per Bill Distribution</div>
+      <div style="height:200px;margin-top:8px;"><canvas id="ch-items-per-bill"></canvas></div>
+      <div class="cs" id="combo-ipb-insight">📌 กำลังโหลด...</div>
     </div>
   </div>
 
-  <div class="card mb">
-    <div class="ct">🔗 Top Combo Pairs — การซื้อข้ามหมวดที่พบบ่อยที่สุด</div>
-    <div id="combo-list"></div>
-    <div class="insight">
-      <div class="insight-head">💡 Strategic Insights — โอกาสเพิ่มรายได้</div>
-      <p><strong>Combo 1 (Donburi + Sushi Bento):</strong> เกิดขึ้น 115 บิล ได้รายได้ ฿115,115 (เฉลี่ย ฿1,001/บิล) — ลูกค้ากลุ่มนี้ใช้จ่ายสูงมาก ควรสร้าง Bundle Set ราคาพิเศษเพื่อกระตุ้นการซื้อ</p>
-      <p style="margin-top:6px"><strong>Combo 2 (Beverage + Sushi Bento):</strong> 79 บิล — แนะนำ "Sushi + Drink Set" ราคาพิเศษ เพื่อเพิ่ม Conversion Rate จากลูกค้าที่มาซื้อ Sushi เพียงอย่างเดียว</p>
-      <p style="margin-top:6px"><strong>โอกาสจาก Single-item Bills:</strong> ลูกค้า 2,055 ราย (77.9%) ซื้อเพียง 1 ชิ้น — หากเพิ่ม ABV ได้แค่ ฿50 จะสร้างรายได้เพิ่ม <strong>฿102,750</strong> ต่อ 9 วัน</p>
-    </div>
-  </div>
-
+  <!-- Opportunity insight -->
   <div class="card">
-    <div class="ct">Opportunity Matrix — โอกาสการ Cross-sell</div>
-    <div style="height:280px"><canvas id="ch-combo-bubble"></canvas></div>
-    <div class="cs">📌 X = จำนวนบิล Combo · Y = รายได้เฉลี่ยต่อบิล · ขนาด Bubble = ยอดรายได้รวม · Bubble มุมขวาบนคือ Combo ที่ควรส่งเสริมมากที่สุด</div>
+    <div class="ct">💡 Opportunity Matrix — Cross-sell</div>
+    <div style="height:260px;margin-top:8px;"><canvas id="ch-combo-bubble"></canvas></div>
+    <div class="insight" id="combo-insight-box">
+      <div class="insight-head">💡 Strategic Insights</div>
+      <p id="combo-insight-text">กำลังโหลดข้อมูล...</p>
+    </div>
   </div>
+
+  <!-- hidden canvas for legacy compat -->
+  <canvas id="ch-combo-pie" style="display:none;"></canvas>
 </div>
 
 <!-- ══════════ TOP/BOTTOM 10 ══════════ -->
@@ -1080,14 +1239,15 @@ var BASKET_DIST=[0,0,0,0,0]; // bill count per range <50,50-99,100-149...
 // ══════════ UTILS ══════════
 const f=n=>'฿'+Math.round(n).toLocaleString();
 const fn=n=>Math.round(n).toLocaleString();
-Chart.defaults.color='#7e8caa';
-Chart.defaults.font.family="'Sarabun',sans-serif";
+Chart.defaults.color='#e2e8f4';
+Chart.defaults.font.family="'Sarabun','Noto Sans Thai',sans-serif";
+Chart.defaults.font.size=12;
 Chart.defaults.plugins.legend.display=false;
 // Register datalabels plugin but disable globally — enable per-chart only
 Chart.register(ChartDataLabels);
 Chart.defaults.set('plugins.datalabels',{display:false});
-const grd={color:'rgba(255,255,255,0.05)',drawBorder:false};
-const catColors={"Sushi Bento":"#e07070","Donburi":"#3d9be0","Beverage":"#22d47a","Dessert":"#a07ee0","Appetizer":"#f0a500"};
+const grd={color:()=>document.documentElement.classList.contains('light')?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.04)',drawBorder:false};
+const catColors={"Sushi Bento":"#e07070","Donburi":"#3b82f6","Beverage":"#16c26a","Dessert":"#8b5cf6","Appetizer":"#f0a500"};
 const promoColors={"Flash Sale 21:00-22:00":"#ff1f1f","Flash Sale 20:00-21:00":"#ffb347","Staff Discount 15%":"#c77dff","Partners Discount":"#39ff14","Staff Discount 10%":"#06d6a0","Flash Sale 19:00-20:00":"#f72585","Flash Sale 18:00-19:00":"#ffd60a","Staff Discount 5%":"#4cc9f0","Grab&Go Discount":"#7bed9f","Birthday Discount":"#ff6b81"};
 // Partial-match color lookup: finds first key that the promo name contains
 function getPromoColor(name){
@@ -1104,6 +1264,7 @@ function nav(p){
   if(p==='report' && salesRows.length>0) buildReport();
   if(p==='report-hourly' && salesRows.length>0) buildHourlyReport();
   if(p==='report-behavior' && salesRows.length>0) buildBehaviorReport();
+  if(p==='promo-product' && salesRows.length>0) buildPromoProduct();
   document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll(`[data-page="${p}"]`).forEach(e=>e.classList.add('active'));
   document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
@@ -1170,6 +1331,9 @@ function buildOverview(){
   const avgDaily=days>0?Math.round(TOTAL_NET/days):0;
   set('kpi-avg-daily')('฿'+avgDaily.toLocaleString());
   set('kpi-avg-daily-sub')('เฉลี่ย Net Revenue ต่อวัน · '+days+' วัน');
+  // Update SKU count badge dynamically
+  const bdgProd = document.getElementById('bdg-products');
+  if(bdgProd && PRODUCTS.length) bdgProd.textContent = PRODUCTS.length;
   // Update all period labels
   if(DAILY.length>0){
     const firstDate=DAILY[0].date, lastDate=DAILY[DAILY.length-1].date;
@@ -1232,7 +1396,7 @@ function buildOverview(){
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:12,font:{size:11}}},
+      plugins:{legend:{display:true,labels:{color:'var(--text2)',boxWidth:12,font:{size:11}}},
         tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
       scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
     }
@@ -1248,6 +1412,149 @@ function buildOverview(){
   });
   const cl=document.getElementById('cat-leg');
   CATS.forEach(c=>{cl.innerHTML+=`<div class="leg-item"><div class="leg-dot" style="background:${c.color}"></div>${c.cat}<span class="leg-pct">${(c.net/TOTAL_NET*100).toFixed(1)}%</span></div>`;});
+
+  // ── Discount Trend Charts ──
+  if(DAILY.length > 0){
+    const discRates = DAILY.map(d => d.gross>0 ? +(d.discount/d.gross*100).toFixed(1) : 0);
+    const labels    = DAILY.map(d=>{ const dw=DOW_MAP[d.date]||''; return d.date.substring(0,5)+(dw?'('+dw.substring(0,1)+')':''); });
+    const maxDisc   = Math.max(...DAILY.map(d=>d.discount), 1);
+    const avgRate   = discRates.reduce((s,v)=>s+v,0)/discRates.length;
+
+    // KPI: avg rate
+    const rEl = document.getElementById('dt-avg-rate');
+    if(rEl) rEl.textContent = avgRate.toFixed(1)+'%';
+
+    // KPI: peak discount day
+    const peakIdx  = DAILY.reduce((mi,d,i)=>d.discount>DAILY[mi].discount?i:mi, 0);
+    const peakEl   = document.getElementById('dt-peak-day');
+    const peakSubEl= document.getElementById('dt-peak-day-sub');
+    if(peakEl)    peakEl.textContent    = DAILY[peakIdx].date.substring(0,5);
+    if(peakSubEl) peakSubEl.textContent = '฿'+Math.round(DAILY[peakIdx].discount).toLocaleString()+' ('+discRates[peakIdx].toFixed(1)+'% ของ Gross)';
+
+    // KPI: trend direction (compare first half vs second half avg)
+    const half    = Math.floor(discRates.length/2);
+    const firstH  = half>0 ? discRates.slice(0,half).reduce((s,v)=>s+v,0)/half : 0;
+    const secondH = half>0 ? discRates.slice(half).reduce((s,v)=>s+v,0)/(discRates.length-half) : 0;
+    const diff    = secondH - firstH;
+    const trendEl = document.getElementById('dt-trend-dir');
+    const trendSub= document.getElementById('dt-trend-sub');
+    if(trendEl){
+      if(Math.abs(diff)<0.5){ trendEl.textContent='⟶ Stable'; trendEl.style.color='var(--blue)'; }
+      else if(diff>0){ trendEl.textContent='▲ เพิ่มขึ้น +'+diff.toFixed(1)+'%'; trendEl.style.color='var(--red)'; }
+      else { trendEl.textContent='▼ ลดลง '+diff.toFixed(1)+'%'; trendEl.style.color='var(--green)'; }
+    }
+    if(trendSub) trendSub.textContent = 'ครึ่งแรก '+firstH.toFixed(1)+'% → ครึ่งหลัง '+secondH.toFixed(1)+'%';
+
+    // Chart 1: Disc Rate % trend (line + area)
+    mkChart('ch-disc-rate-trend',{
+      type:'line',
+      data:{
+        labels,
+        datasets:[
+          {
+            label:'Discount Rate %',
+            data:discRates,
+            borderColor:'#e53e3e',
+            backgroundColor:'rgba(229,62,62,0.12)',
+            fill:true, tension:0.4,
+            pointBackgroundColor: discRates.map(v => v > avgRate*1.3 ? '#e53e3e' : '#f59e0b'),
+            pointRadius: discRates.map(v => v > avgRate*1.3 ? 6 : 4),
+            pointHoverRadius:8,
+            borderWidth:2.5
+          },
+          {
+            label:'Avg Rate',
+            data: DAILY.map(()=>+avgRate.toFixed(1)),
+            borderColor:'rgba(240,165,0,0.6)',
+            borderDash:[6,4],
+            borderWidth:1.5,
+            pointRadius:0,
+            fill:false
+          }
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true, labels:{color:'#e2e8f4', boxWidth:12, font:{size:11}}},
+          tooltip:{callbacks:{label:ctx => ctx.dataset.label+': '+ctx.raw+'%'}}
+        },
+        scales:{
+          x:{grid:grd, ticks:{color:'#e2e8f4', font:{size:11}}},
+          y:{
+            grid:grd,
+            ticks:{callback:v=>v+'%', color:'#e2e8f4', font:{size:11}},
+            suggestedMin:0
+          }
+        }
+      }
+    });
+
+    // Chart 2: Abs Discount (฿) stacked with Net — dual axis
+    mkChart('ch-disc-abs-trend',{
+      type:'bar',
+      data:{
+        labels,
+        datasets:[
+          {
+            label:'Net Revenue (฿)',
+            data:DAILY.map(d=>d.net),
+            backgroundColor:'rgba(22,194,106,0.65)',
+            borderRadius:4, borderSkipped:false, order:2
+          },
+          {
+            label:'Discount (฿)',
+            data:DAILY.map(d=>d.discount),
+            backgroundColor:'rgba(229,62,62,0.75)',
+            borderRadius:4, borderSkipped:false, order:2
+          },
+          {
+            label:'Disc Rate %',
+            data:discRates,
+            type:'line',
+            borderColor:'#f59e0b',
+            backgroundColor:'transparent',
+            pointBackgroundColor:'#f59e0b',
+            pointRadius:4, tension:0.4,
+            borderWidth:2, yAxisID:'y2', order:1
+          }
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true, labels:{color:'#e2e8f4', boxWidth:12, font:{size:11}}},
+          tooltip:{
+            callbacks:{
+              label:ctx => {
+                if(ctx.dataset.yAxisID==='y2') return ctx.dataset.label+': '+ctx.raw+'%';
+                return ctx.dataset.label+': ฿'+Math.round(ctx.raw).toLocaleString();
+              }
+            }
+          }
+        },
+        scales:{
+          x:{grid:grd, stacked:true, ticks:{color:'#e2e8f4', font:{size:11}}},
+          y:{grid:grd, stacked:true, ticks:{callback:v=>'฿'+Math.round(v/1000)+'K', color:'#e2e8f4', font:{size:11}}},
+          y2:{
+            position:'right', grid:{display:false},
+            ticks:{callback:v=>v+'%', color:'#f59e0b', font:{size:11}},
+            suggestedMin:0
+          }
+        }
+      }
+    });
+
+    // Insight text
+    const insightEl = document.getElementById('disc-trend-insight');
+    if(insightEl){
+      const highDiscDays = DAILY.filter((d,i)=>discRates[i]>avgRate*1.3);
+      const trendTxt = Math.abs(diff)<0.5 ? 'มีเสถียรภาพ ไม่เพิ่มหรือลดอย่างมีนัยสำคัญ'
+        : diff>0 ? `มีแนวโน้ม <strong style="color:var(--red)">เพิ่มขึ้น ${diff.toFixed(1)}%</strong> ในช่วงหลัง — ควรตรวจสอบ Flash Sale Policy`
+        : `มีแนวโน้ม <strong style="color:var(--green)">ลดลง ${Math.abs(diff).toFixed(1)}%</strong> ในช่วงหลัง — การจัดการ Discount มีประสิทธิภาพมากขึ้น`;
+      insightEl.innerHTML = `📌 Discount Rate เฉลี่ย <strong>${avgRate.toFixed(1)}%</strong> ของ Gross Revenue · Trend ${trendTxt} · วันที่ Discount Rate สูงเกินเกณฑ์ (>${(avgRate*1.3).toFixed(1)}%): <strong>${highDiscDays.length} วัน</strong>`;
+    }
+  }
 
   // Cat table
   const maxN=Math.max(...CATS.map(c=>c.net));
@@ -1717,7 +2024,7 @@ function buildDOW(){
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:12,font:{size:11}}},
+      plugins:{legend:{display:true,labels:{color:'var(--text2)',boxWidth:12,font:{size:11}}},
         tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?f(ctx.raw):fn(ctx.raw)+' บิล'}}},
       scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},
         y1:{grid:{display:false},position:'right',ticks:{color:'#22d47a'}}}
@@ -1836,7 +2143,7 @@ function buildVisual(){
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`สินค้าลำดับ${ctx.label}: ${ctx.raw}% สะสม`}}},
-      scales:{x:{grid:grd,title:{display:true,text:'ลำดับสินค้า (เรียงตามยอดขาย)',color:'#445066'}},y:{grid:grd,ticks:{callback:v=>v+'%'},max:100}}
+      scales:{x:{grid:grd,title:{display:true,text:'ลำดับสินค้า (เรียงตามยอดขาย)',color:'#e2e8f4'}},y:{grid:grd,ticks:{callback:v=>v+'%'},max:100}}
     }
   });
 
@@ -1845,8 +2152,8 @@ function buildVisual(){
     type:'bubble',
     data:{datasets:CATS.map(c=>({label:c.cat,data:[{x:c.qty,y:c.net,r:Math.sqrt(c.qty)/3+5}],backgroundColor:c.color+'99',borderColor:c.color,borderWidth:1}))},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:10,font:{size:11}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fn(ctx.raw.x)} ชิ้น · ${f(ctx.raw.y)}`}}},
-      scales:{x:{grid:grd,title:{display:true,text:'จำนวนชิ้น',color:'#445066'}},y:{grid:grd,title:{display:true,text:'ยอดรายได้ (฿)',color:'#445066'},ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
+      plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:10,font:{size:11}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fn(ctx.raw.x)} ชิ้น · ${f(ctx.raw.y)}`}}},
+      scales:{x:{grid:grd,title:{display:true,text:'จำนวนชิ้น',color:'#e2e8f4'}},y:{grid:grd,title:{display:true,text:'ยอดรายได้ (฿)',color:'#e2e8f4'},ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
     }
   });
 }
@@ -1884,7 +2191,7 @@ function buildBasket(){
     </div>`).join('');
   mkChart('ch-bseg-bills',{type:'doughnut',
     data:{labels:segs.map(s=>s.l),datasets:[{data:segs.map(s=>s.cnt),backgroundColor:segs.map(s=>s.c),borderWidth:0,hoverOffset:5}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#7e8caa',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+fn(ctx.raw)+'('+( ctx.raw/TOTAL_BILLS*100).toFixed(1)+'%)'}}}}
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#e2e8f4',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+fn(ctx.raw)+'('+( ctx.raw/TOTAL_BILLS*100).toFixed(1)+'%)'}}}}
   });
   mkChart('ch-bseg-rev',{type:'bar',
     data:{labels:segs.map(s=>s.l),datasets:[{data:segs.map(s=>s.tot),backgroundColor:segs.map(s=>s.c),borderRadius:4}]},
@@ -1894,7 +2201,7 @@ function buildBasket(){
   const dist=[700,1031,215,130,117,181,100,165];
   mkChart('ch-bdist',{type:'bar',
     data:{labels:ranges,datasets:[{data:dist,backgroundColor:'rgba(61,155,224,0.65)',borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:grd,title:{display:true,text:'มูลค่าบิล (฿)',color:'#445066'}},y:{grid:grd}}}
+    options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:grd,title:{display:true,text:'มูลค่าบิล (฿)',color:'#e2e8f4'}},y:{grid:grd}}}
   });
 }
 
@@ -1952,7 +2259,7 @@ function buildHourlySalesHM(){
       {label:'Items',data:HOURS.map(h=>h.qty),borderColor:'#3d9be0',backgroundColor:'transparent',tension:.4,yAxisID:'y1',borderDash:[4,4]}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?f(ctx.raw):fn(ctx.raw)+' ชิ้น'}}},
+      plugins:{legend:{display:true,labels:{color:'var(--text2)',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?f(ctx.raw):fn(ctx.raw)+' ชิ้น'}}},
       scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},y1:{grid:{display:false},position:'right',ticks:{color:'#3d9be0'}}}
     }
   });
@@ -1984,7 +2291,7 @@ function buildCatHM(){
     data:{labels:hrs.map(h=>`${String(h).padStart(2,'0')}:00`),
       datasets:cats.map(cat=>({label:cat,data:CAT_HOUR[cat],backgroundColor:catColors[cat]+'55',borderColor:catColors[cat],fill:true,tension:.4,borderWidth:1.5}))},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
+      plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
       scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
     }
   });
@@ -2044,7 +2351,7 @@ function buildDiscHM(){
     data:{labels:DAILY.map(d=>d.date.substring(0,5)),
       datasets:promoNames.map(n=>({label:n,data:stacked.map(d=>d[n]||0),backgroundColor:getPromoColor(n),borderRadius:3}))},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
+      plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
       scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
     }
   });
@@ -2203,7 +2510,7 @@ function buildQuality(){
        backgroundColor:'rgba(240,84,84,.75)',borderRadius:3}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:12}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
+      plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:12}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
       scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
     }
   });
@@ -2223,7 +2530,7 @@ function buildQuality(){
 function buildMarket(){
   mkChart('ch-polar',{type:'polarArea',
     data:{labels:CATS.map(c=>c.cat),datasets:[{data:CATS.map(c=>c.net),backgroundColor:CATS.map(c=>c.color+'99'),borderColor:CATS.map(c=>c.color),borderWidth:1}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{color:'#7e8caa',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{color:'var(--text2)',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)}}}}
   });
   const maxQ=Math.max(...CATS.map(c=>c.qty));
   document.getElementById('cat-pbars').innerHTML=CATS.map(c=>`<div class="pr-row">
@@ -2255,49 +2562,168 @@ function buildCombo(){
     {a:"Appetizer",b:"Donburi",cnt:14,rev:6011,avgBill:429},
     {a:"Appetizer",b:"Dessert",cnt:5,rev:1530,avgBill:306}
   ];
-  const maxCnt=combos[0].cnt;
-  document.getElementById('combo-list').innerHTML=combos.map((c,i)=>`
-    <div class="combo-card">
-      <span style="font-family:var(--font-h);font-size:12px;color:var(--text3);width:20px">${i+1}</span>
-      <div class="combo-pills">
-        <span class="combo-pill" style="background:${catColors[c.a]}22;color:${catColors[c.a]};border:1px solid ${catColors[c.a]}44">${c.a}</span>
-        <span class="combo-plus">+</span>
-        <span class="combo-pill" style="background:${catColors[c.b]}22;color:${catColors[c.b]};border:1px solid ${catColors[c.b]}44">${c.b}</span>
-      </div>
-      <div style="flex:1"><div class="pbwrap" style="max-width:120px"><div class="pbfill" style="width:${c.cnt/maxCnt*100}%;background:${catColors[c.a]}"></div></div></div>
-      <div class="combo-stat"><div class="combo-cnt">${fn(c.cnt)} บิล</div><div class="combo-rev">${f(c.rev)} · avg ${f(c.avgBill)}/บิล</div></div>
-    </div>`).join('');
 
-  // BUG4 fixed: compute single vs multi-cat bills from real salesRows
+  // ── Bills / Revenue per category ──
   const _billCats={};
   salesRows.forEach(r=>{if(!_billCats[r.doc])_billCats[r.doc]=new Set();_billCats[r.doc].add(r.cat);});
-  const _multiCat=Object.values(_billCats).filter(s=>s.size>1).length;
-  const _singleCat=Math.max(0,TOTAL_BILLS-_multiCat);
-  mkChart('ch-combo-pie',{type:'doughnut',
-    data:{labels:['Single Category','Multi Category'],datasets:[{data:[_singleCat,_multiCat],backgroundColor:['rgba(61,155,224,0.75)','rgba(240,165,0,0.85)'],borderWidth:0,hoverOffset:4}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#7e8caa',boxWidth:10,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+fn(ctx.raw)+'('+( ctx.raw/TOTAL_BILLS*100).toFixed(1)+'%)'}}}}
-  });
-  // BUG5 fixed: compute items-per-bill from real salesRows
+  const _multiCat  = Object.values(_billCats).filter(s=>s.size>1).length;
+  const _singleCat = Math.max(0, TOTAL_BILLS - _multiCat);
+
+  // Update KPIs
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl('combo-multi-val',  fn(_multiCat));
+  setEl('combo-multi-sub',  (_multiCat/TOTAL_BILLS*100).toFixed(1)+'% ของบิลทั้งหมด');
+  setEl('combo-single-val', fn(_singleCat));
+  setEl('combo-single-sub', (_singleCat/TOTAL_BILLS*100).toFixed(1)+'% ของบิลทั้งหมด');
+  const _ipbMapKpi={};
+  salesRows.forEach(r=>{_ipbMapKpi[r.doc]=(_ipbMapKpi[r.doc]||0)+r.qty;});
+  const _ipbAvg=TOTAL_BILLS>0?(Object.values(_ipbMapKpi).reduce((s,v)=>s+v,0)/TOTAL_BILLS).toFixed(2):'—';
+  setEl('combo-ipb-val', _ipbAvg);
+
+  // ── TOP PRODUCTS (style จากรูปตัวอย่าง: horizontal bar + label ขวา) ──
+  const top5 = [...PRODUCTS].filter(p=>p.net>0).sort((a,b)=>b.net-a.net).slice(0,5);
+  const maxRev = top5[0]?.net || 1;
+  const barColors = ['#06b6d4','#16c26a','#f59e0b','#e07070','#8b5cf6'];
+  const topEl = document.getElementById('combo-top-products');
+  if(topEl && top5.length){
+    topEl.innerHTML = top5.map((p,i)=>{
+      const name  = p.p.includes('/') ? p.p.split('/').slice(1).join('/').trim() : p.p;
+      const short = name.length>22 ? name.substring(0,20)+'…' : name;
+      const pct   = (p.net/maxRev*100).toFixed(1);
+      const col   = barColors[i];
+      const kVal  = p.net>=1000 ? '฿'+(p.net/1000).toFixed(1)+'k' : '฿'+p.net;
+      return `<div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:100px;font-size:var(--ts-sm);color:var(--text);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${short}</div>
+        <div style="flex:1;position:relative;height:20px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${col};border-radius:10px;transition:width .6s ease;"></div>
+        </div>
+        <div style="font-family:var(--font-m);font-size:var(--ts-sm);font-weight:700;color:var(--text);min-width:48px;text-align:right;">${kVal}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── SALES MIX: Donut Cards per Category (style จากรูปตัวอย่าง) ──
+  const catTotal = CATS.reduce((s,c)=>s+c.net,0)||1;
+  const billTotal = TOTAL_BILLS||1;
+  const catBillCount={};
+  salesRows.forEach(r=>{if(!catBillCount[r.cat])catBillCount[r.cat]=new Set();catBillCount[r.cat].add(r.doc);});
+
+  const mixEl = document.getElementById('combo-sales-mix');
+  if(mixEl && CATS.length){
+    mixEl.innerHTML = CATS.map(cat=>{
+      const pct  = (cat.net/catTotal*100).toFixed(0);
+      const col  = cat.color || catColors[cat.cat] || '#888';
+      const kRev = cat.net>=1000 ? '฿'+(cat.net/1000).toFixed(1)+'k revenue' : '฿'+cat.net+' revenue';
+      // mini donut via conic-gradient
+      const deg  = Math.round(cat.net/catTotal*360);
+      return `<div style="
+        background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);
+        padding:14px 10px;text-align:center;cursor:default;transition:transform .15s;
+        display:flex;flex-direction:column;align-items:center;gap:8px;"
+        onmouseenter="this.style.transform='translateY(-3px)'"
+        onmouseleave="this.style.transform=''">
+        <!-- Donut via SVG -->
+        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
+          <svg viewBox="0 0 36 36" style="width:72px;height:72px;transform:rotate(-90deg);">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="4"/>
+            <circle cx="18" cy="18" r="14" fill="none" stroke="${col}" stroke-width="4"
+              stroke-dasharray="${(cat.net/catTotal*87.96).toFixed(1)} 87.96"
+              stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+            font-family:var(--font-m);font-size:14px;font-weight:700;color:var(--text);">${pct}%</div>
+        </div>
+        <div style="font-family:var(--font-h);font-size:var(--ts-sm);font-weight:700;color:var(--text);">${cat.cat}</div>
+        <div style="font-size:var(--ts-xs);color:${col};font-weight:600;">${kRev}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Bills mix cards
+  const billsMixEl = document.getElementById('combo-bills-mix');
+  if(billsMixEl && CATS.length){
+    billsMixEl.innerHTML = CATS.map(cat=>{
+      const bills = catBillCount[cat.cat]?.size || 0;
+      const pct   = (bills/billTotal*100).toFixed(0);
+      const col   = cat.color || catColors[cat.cat] || '#888';
+      return `<div style="
+        background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);
+        padding:10px;text-align:center;">
+        <div style="font-family:var(--font-m);font-size:var(--ts-lg);font-weight:700;color:${col};">${pct}%</div>
+        <div style="font-size:var(--ts-xs);color:var(--text);margin-top:2px;font-weight:600;">${cat.cat}</div>
+        <div style="font-size:var(--ts-xs);color:var(--text2);margin-top:1px;">${bills.toLocaleString()} บิล</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── COMBO LIST ──
+  const maxCnt=combos[0].cnt;
+  document.getElementById('combo-list').innerHTML=combos.map((cm,i)=>`
+    <div class="combo-card">
+      <span style="font-family:var(--font-h);font-size:var(--ts-xs);color:var(--text3);width:18px;">${i+1}</span>
+      <div class="combo-pills">
+        <span class="combo-pill" style="background:${catColors[cm.a]}22;color:${catColors[cm.a]};border:1px solid ${catColors[cm.a]}44">${cm.a}</span>
+        <span class="combo-plus">+</span>
+        <span class="combo-pill" style="background:${catColors[cm.b]}22;color:${catColors[cm.b]};border:1px solid ${catColors[cm.b]}44">${cm.b}</span>
+      </div>
+      <div style="flex:1"><div class="pbwrap"><div class="pbfill" style="width:${cm.cnt/maxCnt*100}%;background:${catColors[cm.a]}"></div></div></div>
+      <div class="combo-stat"><div class="combo-cnt">${fn(cm.cnt)} บิล</div><div class="combo-rev">${f(cm.rev)} · avg ${f(cm.avgBill)}/บิล</div></div>
+    </div>`).join('');
+
+  // ── ITEMS PER BILL bar chart ──
   const _ipbMap={};
   salesRows.forEach(r=>{_ipbMap[r.doc]=(_ipbMap[r.doc]||0)+r.qty;});
   const _ipbVals=Object.values(_ipbMap);
   const _ipbData=[1,2,3,4,5,6].map(n=>_ipbVals.filter(q=>n<6?q===n:q>=6).length);
+  const single1Pct = TOTAL_BILLS>0?(_ipbData[0]/TOTAL_BILLS*100).toFixed(1):0;
+  const ipbInsight = document.getElementById('combo-ipb-insight');
+  if(ipbInsight) ipbInsight.innerHTML=`📌 <strong>${single1Pct}%</strong> ของลูกค้าซื้อเพียง 1 ชิ้น — โอกาส Cross-sell ยังมีอีกมาก`;
   mkChart('ch-items-per-bill',{type:'bar',
-    data:{labels:['1 ชิ้น','2 ชิ้น','3 ชิ้น','4 ชิ้น','5 ชิ้น','6+ ชิ้น'],
-    datasets:[{data:_ipbData,backgroundColor:['rgba(240,84,84,.8)','rgba(240,165,0,.8)','rgba(61,155,224,.8)','rgba(34,212,122,.8)','rgba(160,126,224,.8)','rgba(46,200,200,.8)'],borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>fn(ctx.raw)+' บิล ('+( ctx.raw/TOTAL_BILLS*100).toFixed(1)+'%)'}}},scales:{x:{grid:grd},y:{grid:grd}}}
-  });
-  mkChart('ch-combo-bubble',{type:'bubble',
-    data:{datasets:combos.slice(0,6).map(c=>({
-      label:`${c.a}+${c.b}`,
-      data:[{x:c.cnt,y:c.avgBill,r:Math.sqrt(c.rev)/25}],
-      backgroundColor:catColors[c.a]+'88',borderColor:catColors[c.a],borderWidth:1
-    }))},
+    data:{labels:['1','2','3','4','5','6+'],
+    datasets:[{
+      data:_ipbData,
+      backgroundColor:barColors,
+      borderRadius:6, borderSkipped:false
+    }]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,labels:{color:'#7e8caa',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fn(ctx.raw.x)} บิล · avg ${f(ctx.raw.y)}/บิล`}}},
-      scales:{x:{grid:grd,title:{display:true,text:'จำนวนบิล',color:'#445066'}},y:{grid:grd,title:{display:true,text:'Avg Bill Value (฿)',color:'#445066'},ticks:{callback:v=>'฿'+v}}}
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>fn(ctx.raw)+' บิล ('+(_ipbData[ctx.dataIndex]/TOTAL_BILLS*100).toFixed(1)+'%)'}}
+      },
+      scales:{
+        x:{grid:grd, ticks:{color:'#e2e8f4',font:{size:11}}, title:{display:true,text:'จำนวนชิ้น/บิล',color:'#8899b0',font:{size:11}}},
+        y:{grid:grd, ticks:{color:'#e2e8f4',font:{size:11}}}
+      }
     }
   });
+
+  // ── BUBBLE (Opportunity Matrix) ──
+  mkChart('ch-combo-bubble',{type:'bubble',
+    data:{datasets:combos.slice(0,6).map(cm=>({
+      label:`${cm.a}+${cm.b}`,
+      data:[{x:cm.cnt, y:cm.avgBill, r:Math.sqrt(cm.rev)/22}],
+      backgroundColor:catColors[cm.a]+'88', borderColor:catColors[cm.a], borderWidth:1.5
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:true,labels:{color:'#e2e8f4',boxWidth:10,font:{size:11}}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fn(ctx.raw.x)} บิล · avg ${f(ctx.raw.y)}/บิล`}}
+      },
+      scales:{
+        x:{grid:grd,title:{display:true,text:'จำนวนบิล Combo',color:'#8899b0'},ticks:{color:'#e2e8f4'}},
+        y:{grid:grd,title:{display:true,text:'Avg Bill Value (฿)',color:'#8899b0'},ticks:{callback:v=>'฿'+v,color:'#e2e8f4'}}
+      }
+    }
+  });
+
+  // ── Insight text ──
+  const insightEl = document.getElementById('combo-insight-text');
+  if(insightEl && TOTAL_BILLS>0){
+    const opp50 = Math.round(_ipbData[0]*50);
+    insightEl.innerHTML = `
+      <strong>Combo #1 (${combos[0].a} + ${combos[0].b}):</strong> ${fn(combos[0].cnt)} บิล · ${f(combos[0].rev)} · เฉลี่ย ${f(combos[0].avgBill)}/บิล — ควรสร้าง Bundle Set ราคาพิเศษ<br>
+      <span style="margin-top:5px;display:block"><strong>Single-item Bills:</strong> ${fn(_ipbData[0])} บิล (${single1Pct}%) — ถ้าเพิ่ม ABV ได้ ฿50/บิล จะสร้างรายได้เพิ่ม <strong>฿${opp50.toLocaleString()}</strong></span>`;
+  }
 }
 
 function buildTopBot(){
@@ -4651,9 +5077,550 @@ function buildBehaviorReport(){
   el.innerHTML=p1+p2;
 }
 
+// ══════════ PROMO × PRODUCT INTELLIGENCE ══════════
+let _ppiData = null;
+
+function buildPromoProduct(){
+  _ppiData = computePPI();
+  // Populate promo dropdown (kept for modal use)
+  renderPPI();
+}
+
+function computePPI(){
+  // ── 1. Build helper maps ──
+  // promoDateSet: date → Set<promoName>
+  const promoDateSet = {};
+  // promoDateDisc: date → { promoName → totalDiscount }
+  const promoDateDisc = {};
+  PROMO_DATA.forEach(p => {
+    if(!promoDateSet[p.date])  promoDateSet[p.date]  = new Set();
+    if(!promoDateDisc[p.date]) promoDateDisc[p.date] = {};
+    promoDateSet[p.date].add(p.name);
+    promoDateDisc[p.date][p.name] = (promoDateDisc[p.date][p.name]||0) + p.discount;
+  });
+
+  // docDiscMap: doc → totalDisc (bill-level)
+  const docDiscMap = {};
+  salesRows.forEach(r => { if(r.doc) docDiscMap[r.doc] = (docDiscMap[r.doc]||0)+(r.disc||0); });
+
+  // ── 2. Per-product aggregation ──
+  // prodMap: prodKey → {
+  //   cat, totalQty, totalNet, totalGross, totalDisc,
+  //   flashQty (19-22h), normalQty, staffDiscQty,
+  //   promoQtyOnDay,  // qty sold on days with ANY promo
+  //   discBillQty,    // qty in bills that have disc>0
+  //   promoMap: { promoName → { qty, net } }
+  // }
+  const prodMap = {};
+
+  salesRows.forEach(r => {
+    if(!r.prod || !r.date) return;
+    const key  = r.prod.includes('/') ? r.prod.split('/').slice(1).join('/').trim() : r.prod;
+    const h    = parseInt((r.time||'00:00').split(':')[0])||0;
+    const isFlash    = h >= 19 && h < 22;
+    const billDisc   = docDiscMap[r.doc]||0;
+    const rowDisc    = r.disc||0;
+    const discPct    = r.gross > 0 ? rowDisc/r.gross : 0;
+    const isStaff10  = discPct >= 0.08 && discPct <= 0.12;
+    const isStaff15  = discPct >= 0.13 && discPct <= 0.17;
+    const hasAnyDisc = billDisc > 0 || rowDisc > 0;
+    const onPromoDay = promoDateSet[r.date] && promoDateSet[r.date].size > 0;
+
+    if(!prodMap[key]) prodMap[key] = {
+      cat:key, totalQty:0, totalNet:0, totalGross:0, totalDisc:0,
+      flashQty:0, normalQty:0, staffDiscQty:0, promoQtyOnDay:0, discBillQty:0,
+      promoMap:{}, dates:new Set()
+    };
+    const pm = prodMap[key];
+    pm.cat        = r.cat||'';
+    pm.totalQty   += r.qty;
+    pm.totalNet   += r.net;
+    pm.totalGross += r.gross;
+    pm.totalDisc  += rowDisc;
+    pm.dates.add(r.date);
+    if(isFlash)    pm.flashQty    += r.qty;
+    else           pm.normalQty   += r.qty;
+    if(isStaff10||isStaff15) pm.staffDiscQty += r.qty;
+    if(hasAnyDisc) pm.discBillQty += r.qty;
+    if(onPromoDay) pm.promoQtyOnDay += r.qty;
+
+    // Map promo candidates for this row: promo active same date
+    if(onPromoDay){
+      promoDateSet[r.date].forEach(pName => {
+        if(!pm.promoMap[pName]) pm.promoMap[pName] = {qty:0, net:0};
+        pm.promoMap[pName].qty += r.qty;
+        pm.promoMap[pName].net += r.net;
+      });
+    }
+  });
+
+  // ── 3. Compute scores per product ──
+  const results = Object.entries(prodMap).map(([name, pm]) => {
+    const flashPct   = pm.totalQty > 0 ? pm.flashQty / pm.totalQty * 100 : 0;
+    const staffPct   = pm.totalQty > 0 ? pm.staffDiscQty / pm.totalQty * 100 : 0;
+    const discBillPct= pm.totalQty > 0 ? pm.discBillQty / pm.totalQty * 100 : 0;
+    const promoDayPct= pm.totalQty > 0 ? pm.promoQtyOnDay / pm.totalQty * 100 : 0;
+
+    // Dependency score: weighted combination
+    // Flash Sale is strongest signal (50%), discount bill (30%), staff (20%)
+    const depScore = Math.min(100,
+      flashPct   * 0.50 +
+      discBillPct* 0.30 +
+      staffPct   * 0.20
+    );
+
+    // Top promo
+    const promoEntries = Object.entries(pm.promoMap).sort((a,b)=>b[1].qty-a[1].qty);
+    const topPromo     = promoEntries[0]?.[0] || '—';
+    const topPromoQty  = promoEntries[0]?.[1]?.qty || 0;
+
+    // Staff discount match check: compare staffDiscQty vs PROMO_DATA staff totals
+    const staffPromoTotal = PROMO_DATA
+      .filter(p => p.name.toLowerCase().includes('staff'))
+      .reduce((s,p)=>s+p.count, 0);
+    const staffMatchHint = pm.staffDiscQty > 0 && staffPromoTotal > 0;
+
+    return {
+      name, ...pm,
+      flashPct, staffPct, discBillPct, promoDayPct, depScore,
+      topPromo, topPromoQty, promoEntries, staffMatchHint
+    };
+  });
+
+  return results;
+}
+
+function getDepLevel(score){
+  if(score >= 70) return {lbl:'Critical', col:'#e53e3e', icon:'🔴'};
+  if(score >= 50) return {lbl:'High',     col:'#f59e0b', icon:'🟠'};
+  if(score >= 30) return {lbl:'Medium',   col:'#eab308', icon:'🟡'};
+  return           {lbl:'Low',      col:'#16c26a', icon:'🟢'};
+}
+
+function renderPPI(){
+  if(!_ppiData){ buildPromoProduct(); return; }
+  const CC   = {"Sushi Bento":"#e07070","Donburi":"#3b82f6","Beverage":"#16c26a","Dessert":"#8b5cf6","Appetizer":"#f0a500"};
+  const fc   = n => '฿'+Math.round(n).toLocaleString();
+  const fn2  = n => n.toLocaleString();
+
+  const q        = (document.getElementById('pp-search')?.value||'').toLowerCase().trim();
+  const catF     = document.getElementById('pp-cat-filter')?.value||'';
+  const depF     = document.getElementById('pp-dep-filter')?.value||'';
+  const sortF    = document.getElementById('pp-sort')?.value||'dep';
+
+  let rows = [..._ppiData];
+  if(q)    rows = rows.filter(r => r.name.toLowerCase().includes(q));
+  if(catF) rows = rows.filter(r => r.cat === catF);
+  if(depF){
+    rows = rows.filter(r => {
+      const s = r.depScore;
+      if(depF==='critical') return s >= 70;
+      if(depF==='high')     return s >= 50 && s < 70;
+      if(depF==='medium')   return s >= 30 && s < 50;
+      if(depF==='low')      return s < 30;
+    });
+  }
+  if(sortF==='dep')   rows.sort((a,b)=>b.depScore-a.depScore);
+  if(sortF==='net')   rows.sort((a,b)=>b.totalNet-a.totalNet);
+  if(sortF==='flash') rows.sort((a,b)=>b.flashPct-a.flashPct);
+  if(sortF==='qty')   rows.sort((a,b)=>b.totalQty-a.totalQty);
+
+  document.getElementById('pp-count').textContent = rows.length + ' สินค้า';
+
+  // ── Insight Banner ──
+  const allData = _ppiData;
+  const critical = allData.filter(r=>r.depScore>=70).sort((a,b)=>b.depScore-a.depScore);
+  const topFlash = [...allData].sort((a,b)=>b.flashPct-a.flashPct)[0];
+  const banner = document.getElementById('pp-insight-banner');
+  if(banner && critical.length){
+    banner.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+      <div style="background:rgba(229,62,62,.08);border:1px solid rgba(229,62,62,.3);border-left:4px solid #e53e3e;border-radius:var(--r);padding:14px 16px;">
+        <div style="font-family:var(--font-h);font-size:var(--ts-xs);color:#e53e3e;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">🔴 Critical Promo Dependency</div>
+        <div style="font-size:var(--ts-sm);color:var(--text);line-height:1.6;">
+          <strong>${critical.length} สินค้า</strong> พึ่งพาโปรโมชั่น >70% — ถ้าหยุด Promo ยอดขายจะหายไปมากกว่าครึ่ง<br>
+          อันดับ 1: <strong style="color:#e53e3e;">${critical[0].name.substring(0,28)}</strong> (Score ${critical[0].depScore.toFixed(0)}%)
+        </div>
+      </div>
+      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-left:4px solid #f59e0b;border-radius:var(--r);padding:14px 16px;">
+        <div style="font-family:var(--font-h);font-size:var(--ts-xs);color:#f59e0b;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">⚡ Flash Sale Champion</div>
+        <div style="font-size:var(--ts-sm);color:var(--text);line-height:1.6;">
+          <strong>${topFlash?.name?.substring(0,28)||'—'}</strong> มียอดขายผ่าน Flash Sale <strong style="color:#f59e0b;">${topFlash?.flashPct?.toFixed(0)||0}%</strong> ของยอดรวม<br>
+          ขาย ${fn2(topFlash?.flashQty||0)} ชิ้นในช่วง 19:00–22:00
+        </div>
+      </div>
+      <div style="background:rgba(22,194,106,.08);border:1px solid rgba(22,194,106,.3);border-left:4px solid #16c26a;border-radius:var(--r);padding:14px 16px;">
+        <div style="font-family:var(--font-h);font-size:var(--ts-xs);color:#16c26a;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">✅ สินค้า Full Price แท้</div>
+        <div style="font-size:var(--ts-sm);color:var(--text);line-height:1.6;">
+          <strong>${allData.filter(r=>r.depScore<30).length} สินค้า</strong> มี Dependency ต่ำกว่า 30% — ขายได้โดยไม่ต้องพึ่ง Promo<br>
+          เหมาะสำหรับ Margin Management และ Price Increase
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── Table rows ──
+  const tbody = document.getElementById('pp-tbody');
+  if(!tbody) return;
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3);">ไม่พบข้อมูล</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    const col  = CC[r.cat]||'#888';
+    const dep  = getDepLevel(r.depScore);
+    const barW = Math.min(100, r.depScore).toFixed(1);
+    const topPromoColor = getPromoColor(r.topPromo);
+    const flashBar = Math.min(100, r.flashPct).toFixed(1);
+    const staffBar = Math.min(100, r.staffPct).toFixed(1);
+
+    // Flash Sale signal
+    const flashSignal = r.flashPct >= 40
+      ? `<span style="font-size:10px;background:rgba(229,62,62,.15);color:#e53e3e;border-radius:3px;padding:1px 5px;font-weight:700;">⚡${r.flashPct.toFixed(0)}% Flash</span>`
+      : r.flashPct >= 10
+      ? `<span style="font-size:10px;background:rgba(245,158,11,.15);color:#f59e0b;border-radius:3px;padding:1px 5px;">⚡${r.flashPct.toFixed(0)}%</span>`
+      : '';
+
+    // Staff discount signal
+    const staffSignal = r.staffPct >= 5
+      ? `<span style="font-size:10px;background:rgba(139,92,246,.15);color:#8b5cf6;border-radius:3px;padding:1px 5px;">👔${r.staffPct.toFixed(0)}%</span>`
+      : '';
+
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;"
+      onclick="showPPIModal('${r.name.replace(/'/g,"\\'")}')"
+      title="คลิกเพื่อดูรายละเอียด">
+      <td style="padding:9px 10px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;margin-top:4px;"></div>
+          <div>
+            <div style="font-size:var(--ts-sm);font-weight:600;color:var(--text);">${r.name.length>36?r.name.substring(0,34)+'…':r.name}</div>
+            <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap;">
+              <span style="font-size:10px;background:${col}22;color:${col};border-radius:3px;padding:1px 5px;font-weight:700;">${r.cat}</span>
+              ${flashSignal}${staffSignal}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);">${fn2(r.totalQty)}</td>
+      <td style="padding:9px 10px;">
+        ${r.topPromo!=='—'
+          ? `<span style="display:inline-flex;align-items:center;gap:5px;background:${topPromoColor}18;color:${topPromoColor};border-radius:4px;padding:3px 8px;font-size:var(--ts-xs);font-weight:700;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.topPromo.length>24?r.topPromo.substring(0,22)+'…':r.topPromo}</span>`
+          : '<span style="color:var(--text3);font-size:var(--ts-xs);">—</span>'}
+      </td>
+      <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);color:var(--accent);font-weight:700;">${fc(r.totalNet)}</td>
+      <td style="padding:9px 8px;text-align:right;">
+        <div style="font-family:var(--font-m);font-size:var(--ts-sm);font-weight:700;color:${r.flashPct>=40?'#e53e3e':r.flashPct>=10?'#f59e0b':'var(--text2)'};">${r.flashPct.toFixed(1)}%</div>
+        <div style="background:var(--surface3);border-radius:2px;height:3px;overflow:hidden;margin-top:3px;min-width:60px;">
+          <div style="height:100%;width:${flashBar}%;background:${r.flashPct>=40?'#e53e3e':'#f59e0b'};border-radius:2px;"></div>
+        </div>
+      </td>
+      <td style="padding:9px 8px;text-align:right;">
+        <div style="font-family:var(--font-m);font-size:var(--ts-sm);color:${r.staffPct>=10?'#8b5cf6':'var(--text2)'};">${r.staffPct.toFixed(1)}%</div>
+        <div style="background:var(--surface3);border-radius:2px;height:3px;overflow:hidden;margin-top:3px;min-width:60px;">
+          <div style="height:100%;width:${staffBar}%;background:#8b5cf6;border-radius:2px;"></div>
+        </div>
+      </td>
+      <td style="padding:9px 10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:var(--surface3);border-radius:3px;height:8px;overflow:hidden;min-width:60px;">
+            <div style="height:100%;width:${barW}%;background:${dep.col};border-radius:3px;"></div>
+          </div>
+          <div style="min-width:70px;text-align:right;">
+            <span style="font-family:var(--font-m);font-size:var(--ts-sm);font-weight:700;color:${dep.col};">${r.depScore.toFixed(0)}%</span>
+            <span style="font-size:10px;background:${dep.col}22;color:${dep.col};border-radius:3px;padding:1px 5px;margin-left:4px;">${dep.lbl}</span>
+          </div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── MODAL: Product Detail ──
+function showPPIModal(name){
+  const r = _ppiData?.find(d=>d.name===name);
+  if(!r) return;
+
+  const CC  = {"Sushi Bento":"#e07070","Donburi":"#3b82f6","Beverage":"#16c26a","Dessert":"#8b5cf6","Appetizer":"#f0a500"};
+  const col = CC[r.cat]||'#888';
+  const dep = getDepLevel(r.depScore);
+  const fc  = n=>'฿'+Math.round(n).toLocaleString();
+  const fn2 = n=>n.toLocaleString();
+
+  // Daily table
+  const prodRows2 = salesRows.filter(row=>{
+    const k = row.prod?.includes('/')? row.prod.split('/').slice(1).join('/').trim(): row.prod;
+    return k===name;
+  });
+  const dateAgg2={};
+  prodRows2.forEach(row=>{
+    const h=parseInt((row.time||'00:00').split(':')[0])||0;
+    const isFlash=h>=19&&h<22;
+    if(!dateAgg2[row.date]) dateAgg2[row.date]={qty:0,net:0,disc:0,flashQty:0,normalQty:0};
+    dateAgg2[row.date].qty+=row.qty; dateAgg2[row.date].net+=row.net;
+    dateAgg2[row.date].disc+=(row.disc||0);
+    if(isFlash) dateAgg2[row.date].flashQty+=row.qty;
+    else        dateAgg2[row.date].normalQty+=row.qty;
+  });
+  // ── Build matched promo per row (not "active on same day" but "row likely sold under this promo") ──
+  // Logic:
+  // 1. Flash Sale: row sold in 19-22h → match Flash Sale promos active that day
+  // 2. Staff Discount: disc/gross ≈ 10% or 15% → match Staff Discount promos
+  // 3. Other disc: match remaining promos by discount amount proximity
+  // 4. No disc: show nothing (full price sale)
+  const promoDateMap2={};
+  PROMO_DATA.forEach(p=>{
+    if(!promoDateMap2[p.date]) promoDateMap2[p.date]=[];
+    promoDateMap2[p.date].push({name:p.name, disc:p.discount, cnt:p.count});
+  });
+
+  // Per-row matched promos
+  const rowPromoMatches={};
+  prodRows2.forEach(row=>{
+    const h       = parseInt((row.time||'00:00').split(':')[0])||0;
+    const isFlash = h>=19 && h<22;
+    const rowDisc = row.disc||0;
+    const rowGross= row.gross||0;
+    const discPct = rowGross>0 ? rowDisc/rowGross : 0;
+    const isStaff10 = discPct>=0.08 && discPct<=0.12;
+    const isStaff15 = discPct>=0.13 && discPct<=0.17;
+    const dayPromos = promoDateMap2[row.date]||[];
+    const matched   = new Set();
+
+    if(rowDisc>0 || isFlash){
+      dayPromos.forEach(p=>{
+        const pn = p.name.toLowerCase();
+        if(isFlash && (pn.includes('flash')||pn.includes('sale'))) matched.add(p.name);
+        if(isStaff15 && pn.includes('staff') && pn.includes('15')) matched.add(p.name);
+        if(isStaff10 && pn.includes('staff') && pn.includes('10')) matched.add(p.name);
+        // Catch-all: any disc row + promo with same-day disc matches
+        if(rowDisc>0 && !isFlash && !isStaff10 && !isStaff15 && p.disc>0) matched.add(p.name);
+      });
+      // Fallback: if disc>0 but nothing matched, show all same-day promos as candidates
+      if(matched.size===0 && rowDisc>0){
+        dayPromos.forEach(p=>matched.add(p.name));
+      }
+    }
+    const key = row.date+'__'+row.doc;
+    if(!rowPromoMatches[key]) rowPromoMatches[key]=new Set();
+    matched.forEach(m=>rowPromoMatches[key].add(m));
+  });
+
+  // Aggregate matched promos per date
+  const dateMatchedPromos={};
+  Object.entries(rowPromoMatches).forEach(([key,promoSet])=>{
+    const date=key.split('__')[0];
+    if(!dateMatchedPromos[date]) dateMatchedPromos[date]=new Set();
+    promoSet.forEach(p=>dateMatchedPromos[date].add(p));
+  });
+
+  const dateRows2=Object.entries(dateAgg2)
+    .sort((a,b)=>{const ts=s=>{const[d,m,y]=(s||'').split('/');return new Date(+y,+m-1,+d).getTime();};return ts(a[0])-ts(b[0]);})
+    .map(([date,v])=>{
+      const matchedPromos=[...(dateMatchedPromos[date]||new Set())];
+      const badges=matchedPromos.map(pn=>{
+        const pc=getPromoColor(pn);const sh=pn.length>22?pn.substring(0,20)+'…':pn;
+        return `<span style="background:${pc}22;color:${pc};border:1px solid ${pc}44;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:700;">${sh}</span>`;
+      }).join(' ');
+      const flashPctDay=v.qty>0?(v.flashQty/v.qty*100).toFixed(0):0;
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+        <td style="padding:6px 10px;font-family:var(--font-m);font-size:var(--ts-sm);color:var(--accent2);">${date.substring(0,5)}</td>
+        <td style="padding:6px 8px;text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);">${fn2(v.qty)}</td>
+        <td style="padding:6px 8px;text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);color:${flashPctDay>50?'#e53e3e':'#f59e0b'};">${fn2(v.flashQty)} (${flashPctDay}%)</td>
+        <td style="padding:6px 8px;text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);color:var(--accent);">${fc(v.net)}</td>
+        <td style="padding:6px 8px;text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);color:var(--red);">${v.disc>0?'-'+fc(v.disc):'—'}</td>
+        <td style="padding:6px 10px;max-width:200px;">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            ${badges||'<span style="font-size:10px;color:var(--text3);">Full Price</span>'}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+  // ── Build matchedPromoList: filter promoEntries to only promos that rows were sold under ──
+  // Collect all matched promos across all dates for this product
+  const allMatchedPromoNames = new Set();
+  Object.values(dateMatchedPromos).forEach(s=>s.forEach(p=>allMatchedPromoNames.add(p)));
+  // Filter promoEntries to only those that appear in matched set
+  // If nothing matched → product was sold full price, show empty list
+  const matchedPromoList = allMatchedPromoNames.size>0
+    ? r.promoEntries.filter(([pName])=>allMatchedPromoNames.has(pName))
+    : [];
+
+  // Promo rows
+  const maxPQty=(matchedPromoList[0]?.[1]?.qty||r.promoEntries[0]?.[1]?.qty)||1;
+  const promoRows2=matchedPromoList.map(([pName,pv])=>{
+    const pc=getPromoColor(pName);
+    const barW=(pv.qty/maxPQty*100).toFixed(1);
+    const pDisc=PROMO_DATA.filter(p=>p.name===pName).reduce((s,p)=>s+p.discount,0);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <span style="width:9px;height:9px;border-radius:50%;background:${pc};flex-shrink:0;"></span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:var(--ts-sm);font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pName}</div>
+        <div style="background:var(--surface3);border-radius:3px;height:5px;overflow:hidden;margin-top:4px;">
+          <div style="height:100%;width:${barW}%;background:${pc};border-radius:3px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-shrink:0;text-align:right;">
+        <div><div style="font-size:9px;color:var(--text3);">ชิ้น</div><div style="font-family:var(--font-m);font-size:var(--ts-sm);font-weight:700;">${fn2(pv.qty)}</div></div>
+        <div><div style="font-size:9px;color:var(--text3);">Revenue</div><div style="font-family:var(--font-m);font-size:var(--ts-sm);font-weight:700;color:var(--accent);">${fc(pv.net)}</div></div>
+        <div><div style="font-size:9px;color:var(--text3);">Promo Disc</div><div style="font-family:var(--font-m);font-size:var(--ts-sm);font-weight:700;color:var(--red);">-${fc(pDisc)}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Insight text
+  let insightTxt='';
+  if(r.depScore>=70) insightTxt=`<div style="background:rgba(229,62,62,.08);border:1px solid rgba(229,62,62,.25);border-left:3px solid #e53e3e;border-radius:6px;padding:10px 14px;font-size:var(--ts-sm);color:var(--text);line-height:1.7;"><strong style="color:#e53e3e;">⚠️ Promo Dependent Product</strong> — สินค้านี้พึ่งพาโปรโมชั่นสูงมาก (Score: ${r.depScore.toFixed(0)}%) หากหยุด Promo อาจสูญเสียยอดขายสูงสุดถึง ${Math.round(r.depScore)}% ควรทดลอง Price Reduction แทนเพื่อรักษายอดขายโดยไม่พึ่ง Flash Sale</div>`;
+  else if(r.depScore>=50) insightTxt=`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-left:3px solid #f59e0b;border-radius:6px;padding:10px 14px;font-size:var(--ts-sm);color:var(--text);line-height:1.7;"><strong style="color:#f59e0b;">📊 High Dependency</strong> — สินค้านี้ขายดีในช่วง Promo แต่ยังพอขายได้ในช่วงปกติ แนะนำทดสอบลด Flash Sale frequency ทีละ 1 วัน/สัปดาห์เพื่อวัด Elasticity</div>`;
+  else insightTxt=`<div style="background:rgba(22,194,106,.08);border:1px solid rgba(22,194,106,.25);border-left:3px solid #16c26a;border-radius:6px;padding:10px 14px;font-size:var(--ts-sm);color:var(--text);line-height:1.7;"><strong style="color:#16c26a;">✅ Healthy Independence</strong> — สินค้านี้ขายได้โดยไม่พึ่ง Promo เหมาะกับการ Price Increase เล็กน้อย (5–10%) เพื่อ Margin Improvement</div>`;
+
+  let modal=document.getElementById('pp-modal');
+  if(!modal){modal=document.createElement('div');modal.id='pp-modal';document.body.appendChild(modal);}
+  modal.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(7,9,15,.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;';
+  modal.innerHTML=`
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;
+      width:100%;max-width:780px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;
+      box-shadow:0 24px 80px rgba(0,0,0,.7);animation:fadeIn .2s ease;">
+      <!-- Header -->
+      <div style="padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+              <div style="width:9px;height:9px;border-radius:50%;background:${col};"></div>
+              <span style="font-size:10px;background:${col}22;color:${col};border-radius:4px;padding:1px 7px;font-weight:700;">${r.cat}</span>
+              <span style="font-size:10px;background:${dep.col}22;color:${dep.col};border-radius:4px;padding:1px 7px;font-weight:700;">${dep.icon} ${dep.lbl} ${r.depScore.toFixed(0)}%</span>
+            </div>
+            <div style="font-family:var(--font-h);font-size:16px;font-weight:700;color:var(--text);">${r.name}</div>
+          </div>
+          <button onclick="document.getElementById('pp-modal').style.display='none';"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text2);font-size:var(--ts-sm);cursor:pointer;flex-shrink:0;">✕ ปิด</button>
+        </div>
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px;">
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid var(--accent);">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Total Qty</div>
+            <div style="font-family:var(--font-m);font-size:17px;font-weight:700;color:var(--text);margin-top:2px;">${fn2(r.totalQty)}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid var(--green);">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Net Revenue</div>
+            <div style="font-family:var(--font-m);font-size:17px;font-weight:700;color:var(--green);margin-top:2px;">${fc(r.totalNet)}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid #e53e3e;">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Flash Sale</div>
+            <div style="font-family:var(--font-m);font-size:17px;font-weight:700;color:#e53e3e;margin-top:2px;">${r.flashPct.toFixed(1)}%</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;">${fn2(r.flashQty)} ชิ้น (19-22h)</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid #8b5cf6;">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Staff Disc</div>
+            <div style="font-family:var(--font-m);font-size:17px;font-weight:700;color:#8b5cf6;margin-top:2px;">${r.staffPct.toFixed(1)}%</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;">${r.staffMatchHint?'✅ Match Staff Promo':'—'}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid ${dep.col};">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Dep. Score</div>
+            <div style="font-family:var(--font-m);font-size:17px;font-weight:700;color:${dep.col};margin-top:2px;">${r.depScore.toFixed(0)}%</div>
+            <div style="font-size:9px;color:${dep.col};margin-top:1px;">${dep.lbl}</div>
+          </div>
+        </div>
+      </div>
+      <!-- Body -->
+      <div style="overflow-y:auto;flex:1;padding:16px 20px;">
+        <!-- Insight -->
+        <div style="margin-bottom:16px;">${insightTxt}</div>
+        <!-- Promos -->
+        ${matchedPromoList.length>0 ? `
+        <div style="font-family:var(--font-h);font-size:10px;font-weight:700;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;padding-left:8px;border-left:2px solid var(--accent);">โปรโมชั่นที่สินค้านี้ถูกขายภายใต้ (${matchedPromoList.length} โปรโมชั่น)</div>
+        <div style="margin-bottom:18px;">${promoRows2}</div>
+        ` : `
+        <div style="background:rgba(22,194,106,.07);border:1px solid rgba(22,194,106,.2);border-left:3px solid #16c26a;border-radius:6px;padding:11px 16px;margin-bottom:18px;font-size:var(--ts-sm);color:var(--text2);">
+          <strong style="color:#16c26a;">✅ ไม่พบโปรโมชั่นที่ผูกกับสินค้านี้</strong> — ยอดขายทั้งหมดเป็น Full Price ไม่มีส่วนลดในทุก transaction
+        </div>
+        `}
+        <!-- Daily -->
+        <div style="font-family:var(--font-h);font-size:10px;font-weight:700;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;padding-left:8px;border-left:2px solid var(--border2);">ยอดขายรายวัน · Flash vs Normal · Promo Active</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:var(--ts-sm);">
+            <thead><tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:5px 10px;text-align:left;font-size:9px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">วันที่</th>
+              <th style="padding:5px 8px;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ชิ้น</th>
+              <th style="padding:5px 8px;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Flash (19-22h)</th>
+              <th style="padding:5px 8px;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Net</th>
+              <th style="padding:5px 8px;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Discount</th>
+              <th style="padding:5px 10px;text-align:left;font-size:9px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">โปรโมชั่นที่โดน</th>
+            </tr></thead>
+            <tbody>${dateRows2}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+  modal.onclick=(e)=>{if(e.target===modal)modal.style.display='none';};
+}
+
+// keep legacy functions as stubs so nav() doesn't crash
+function setPPView(){}
+function renderPromoProduct(){ renderPPI(); }
+function showProductPromoModal(name){ showPPIModal(name); }
+
+// ══════════ THEME TOGGLE ══════════
+function toggleTheme(){
+  const isLight = document.documentElement.classList.toggle('light');
+  // Sync all theme toggles (topbar + modal)
+  ['theme-icon','modal-theme-icon'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=isLight?'☀️':'🌙';});
+  ['theme-label','modal-theme-label'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=isLight?'Light':'Dark';});
+  const icon  = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  // Update Chart.js defaults
+  Chart.defaults.color     = isLight ? '#475569' : '#e2e8f4';
+  Chart.defaults.borderColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
+  // Update theme-toggle button style
+  const btn = document.getElementById('theme-toggle');
+  if(btn){
+    btn.style.background = isLight ? '#fff' : 'var(--surface2)';
+    btn.style.color      = isLight ? '#475569' : 'var(--text2)';
+    btn.style.border     = isLight ? '1px solid #e2e8f0' : '1px solid var(--border)';
+  }
+  // Rebuild all active charts with new colors
+  Object.values(CHARTS).forEach(c=>{
+    try{
+      if(c.config?.options?.scales){
+        Object.values(c.config.options.scales).forEach(sc=>{
+          if(sc.grid) sc.grid.color = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
+          if(sc.ticks) sc.ticks.color = isLight ? '#475569' : '#8899b0';
+          if(sc.title) sc.title.color = isLight ? '#475569' : '#8899b0';
+        });
+      }
+      if(c.config?.options?.plugins?.legend?.labels)
+        c.config.options.plugins.legend.labels.color = isLight ? '#475569' : '#8899b0';
+      c.update();
+    }catch(e){}
+  });
+  localStorage.setItem('nigiben-theme', isLight ? 'light' : 'dark');
+}
+function initTheme(){
+  const saved = localStorage.getItem('nigiben-theme');
+  if(saved === 'light'){
+    document.documentElement.classList.add('light');
+    const icon  = document.getElementById('theme-icon');
+    const label = document.getElementById('theme-label');
+    if(icon)  icon.textContent  = '☀️';
+    if(label) label.textContent = 'Light';
+    const mi=document.getElementById('modal-theme-icon'); if(mi) mi.textContent='☀️';
+    const ml=document.getElementById('modal-theme-label'); if(ml) ml.textContent='Light';
+    Chart.defaults.color = '#475569';
+    Chart.defaults.borderColor = 'rgba(0,0,0,0.06)';
+    const btn = document.getElementById('theme-toggle');
+    if(btn){
+      btn.style.background = '#fff';
+      btn.style.color = '#475569';
+      btn.style.border = '1px solid #e2e8f0';
+    }
+  }
+}
+
 // ══════════ INIT ══════════
 window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('proc-btn').addEventListener('click',processFiles);
+  initTheme();
 });
 </script>
 </body>
