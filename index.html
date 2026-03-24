@@ -431,7 +431,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <div class="kpi ac"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Net Revenue</div><div id="kpi-net" class="kpi-val ac">฿256,740</div><div id="kpi-net-sub" class="kpi-sub">รายได้สุทธิรวม 9 วัน</div></div>
     <div class="kpi g"><div class="kpi-ico">🧾</div><div class="kpi-lbl">Total Bills</div><div id="kpi-bills" class="kpi-val gc">2,639</div><div id="kpi-bills-sub" class="kpi-sub">เฉลี่ย 293 บิล/วัน</div></div>
     <div class="kpi b"><div class="kpi-ico">📦</div><div class="kpi-lbl">Total Items Sold</div><div id="kpi-items" class="kpi-val bc">4,322</div><div id="kpi-items-sub" class="kpi-sub">เฉลี่ย 480 ชิ้น/วัน</div></div>
-    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div id="kpi-abv" class="kpi-val pc">฿88</div><div class="kpi-sub">ไม่รวม Beverage · ไม่นับ Flash Sale (19–22h)</div></div>
+    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div id="kpi-abv" class="kpi-val pc">฿88</div><div class="kpi-sub">ไม่รวม Beverage · ไม่รวมบิลที่มีส่วนลด</div></div>
   </div>
   <div class="g4 mb">
     <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Promo Discount</div><div id="kpi-disc" class="kpi-val rc">฿171,339</div><div class="kpi-sub">ส่วนลดจากโปรโมชั่นทั้งหมด</div></div>
@@ -1310,6 +1310,54 @@ function mkChart(id, config){
   }
 }
 
+// ══════════ SHARED ABV HELPER ══════════
+// สูตรกลาง: ไม่รวม Beverage + ไม่รวมบิลที่มีส่วนลด
+// คืนค่า: { abv, totalNet, totalBills, byDate, byDOW }
+function computeQualifiedABV(){
+  const billDisc={};
+  salesRows.forEach(r=>{ billDisc[r.doc]=(billDisc[r.doc]||0)+(r.disc||0); });
+
+  const billNet={};        // doc → net (excl Bev, full-price only)
+  const byDate={};         // date → { net, bills }
+  const byDOW={};          // dow  → { net, bills }
+
+  salesRows.forEach(r=>{
+    if(billDisc[r.doc]>0) return;
+    if(r.cat==='Beverage') return;
+    billNet[r.doc]=(billNet[r.doc]||0)+r.net;
+    // per-date
+    if(!byDate[r.date]) byDate[r.date]={net:0,bills:new Set()};
+    byDate[r.date].net+=r.net;
+    byDate[r.date].bills.add(r.doc);
+    // per-DOW
+    const dw=DOW_MAP[r.date]||'?';
+    if(dw!=='?'){
+      if(!byDOW[dw]) byDOW[dw]={net:0,bills:new Set()};
+      byDOW[dw].net+=r.net;
+      byDOW[dw].bills.add(r.doc);
+    }
+  });
+
+  const vals=Object.values(billNet).filter(v=>v>0);
+  const totalNet=vals.reduce((s,v)=>s+v,0);
+  const totalBills=vals.length;
+  const abv=totalBills>0?Math.round(totalNet/totalBills):0;
+
+  // collapse sets → counts
+  const byDateFinal={};
+  Object.entries(byDate).forEach(([d,v])=>{
+    byDateFinal[d]={net:v.net,bills:v.bills.size,
+      abv:v.bills.size>0?Math.round(v.net/v.bills.size):0};
+  });
+  const byDOWFinal={};
+  Object.entries(byDOW).forEach(([d,v])=>{
+    byDOWFinal[d]={net:v.net,bills:v.bills.size,
+      abv:v.bills.size>0?Math.round(v.net/v.bills.size):0};
+  });
+
+  return {abv,totalNet,totalBills,byDate:byDateFinal,byDOW:byDOWFinal};
+}
+
 // ══════════ OVERVIEW ══════════
 function buildOverview(){
   // Update KPI cards with current data
@@ -1324,24 +1372,10 @@ function buildOverview(){
   set('kpi-bills-sub')('เฉลี่ย '+Math.round(TOTAL_BILLS/days)+' บิล/วัน');
   set('kpi-items')(totalItems.toLocaleString());
   set('kpi-items-sub')('เฉลี่ย '+Math.round(totalItems/days)+' ชิ้น/วัน');
-  // ABV สูตรใหม่: ไม่รวม Beverage + ไม่นับบิลที่มาจากช่วง Flash Sale (19:00–22:00)
-  // คำนวณจาก salesRows โดยตรง:
-  //   - กรองออก: cat === 'Beverage'
-  //   - กรองออก: ชั่วโมง 19–21 (Flash Sale window)
-  //   - นับยอดสุทธิและจำนวนบิล (unique doc) ที่เหลือ
-  const _abvRows = salesRows.filter(r => {
-    const h = parseInt((r.time||'00:00').split(':')[0])||0;
-    const isFlashHour = h >= 19 && h < 22;
-    const isBeverage  = (r.cat||'').toLowerCase().includes('beverage') || r.cat === 'Beverage';
-    return !isBeverage && !isFlashHour;
-  });
-  const _abvBillNet = {};
-  _abvRows.forEach(r => { _abvBillNet[r.doc] = (_abvBillNet[r.doc]||0) + r.net; });
-  const _abvBills   = Object.keys(_abvBillNet).length;
-  const _abvNet     = Object.values(_abvBillNet).reduce((s,v)=>s+v, 0);
-  const _abvVal     = _abvBills > 0 ? Math.round(_abvNet / _abvBills) : 0;
-  set('kpi-abv')(_abvBills > 0 ? '฿' + _abvVal.toLocaleString() : '—');
-  set('kpi-disc')('฿'+Math.round(totalDisc).toLocaleString());
+  // ABV = ยอดขาย (ไม่รวม Bev + ไม่รวมบิลที่มีส่วนลด) ÷ บิลที่ผ่านเกณฑ์
+  const _qABV=computeQualifiedABV();
+  set('kpi-abv')(_qABV.abv>0?'฿'+_qABV.abv.toLocaleString():'—');
+    set('kpi-disc')('฿'+Math.round(totalDisc).toLocaleString());
   set('kpi-gross')('฿'+Math.round(totalGross).toLocaleString());
   const avgDaily=days>0?Math.round(TOTAL_NET/days):0;
   set('kpi-avg-daily')('฿'+avgDaily.toLocaleString());
@@ -1843,7 +1877,10 @@ function renderDailyTable(){
   const fromTs=fromDate?toTs(fromDate):0;
   const toTs2=toDate?toTs(toDate):Infinity;
 
-  let rows=[...DAILY].map(d=>({...d,abv:d.bills>0?Math.round(d.net/d.bills):0,dow:DOW_MAP[d.date]||''}));
+  const _qD=computeQualifiedABV();
+  const _dateAbvMap=Object.fromEntries(Object.entries(_qD.byDate).map(([d,v])=>[d,v.abv]));
+  const _dBillNetByDate=Object.fromEntries(Object.entries(_qD.byDate).map(([d,v])=>[d,{'__net':v.net,'__bills':v.bills}]));
+  let rows=[...DAILY].map(d=>({...d,abv:_dateAbvMap[d.date]||0,dow:DOW_MAP[d.date]||''}));
   if(selMonth) rows=rows.filter(d=>{const p=d.date.split('/');return (p[1]||'')+'/'+( p[2]||'')===selMonth;});
   if(fromDate||toDate) rows=rows.filter(d=>{const t=toTs(d.date);return t>=fromTs&&t<=toTs2;});
 
@@ -1881,7 +1918,14 @@ function renderDailyTable(){
         <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px"></div></div></td>
     </tr>`;
   });
-  const avgAbv=tot.bills>0?Math.round(tot.net/tot.bills):0;
+  // avgAbv TOTAL: รวม qualified bills ทุกวันที่แสดง
+  const _filteredDates=new Set(rows.map(d=>d.date));
+  let _totQNet=0,_totQBills=0;
+  Object.entries(_qD.byDate).forEach(([date,v])=>{
+    if(!_filteredDates.has(date)) return;
+    _totQNet+=v.net; _totQBills+=v.bills;
+  });
+  const avgAbv=_totQBills>0?Math.round(_totQNet/_totQBills):0;
   const totDP=tot.gross>0?(tot.discount/tot.gross*100).toFixed(1):0;
   const avgDaily=rows.length>0?Math.round(tot.net/rows.length):0;
   html.push(`<tr style="border-top:2px solid var(--accent);background:var(--surface2);font-family:var(--font-m)">
@@ -1921,7 +1965,7 @@ function renderMonthlyTable(){
   const html=months.map(m=>{
     const pct=(m.net/maxNet*100).toFixed(1);
     const discPct=m.gross>0?(m.discount/m.gross*100).toFixed(1):0;
-    const avgBill=m.bills>0?Math.round(m.net/m.bills):0;
+    const avgBill=(()=>{const _mQ=computeQualifiedABV();let n=0,b=0;Object.entries(_mQ.byDate).forEach(([d,v])=>{if(d.split('/')[1]+'/'+d.split('/')[2]===key){n+=v.net;b+=v.bills;}});return b>0?Math.round(n/b):0;})();
     const avgDay=m.days>0?Math.round(m.net/m.days):0;
     return `<tr style="border-bottom:1px solid var(--border);">
       <td style="padding:11px 12px;font-family:var(--font-m);color:var(--accent2);font-size:14px">${_mTHFull[m.mm]||m.mm} ${m.yy+543}</td>
@@ -1938,7 +1982,7 @@ function renderMonthlyTable(){
     </tr>`;
   });
   const totDP=tot.gross>0?(tot.discount/tot.gross*100).toFixed(1):0;
-  const avgBill=tot.bills>0?Math.round(tot.net/tot.bills):0;
+  const avgBill=(()=>{const _q=computeQualifiedABV();return _q.totalBills>0?_q.abv:0;})();
   const avgDay=tot.days>0?Math.round(tot.net/tot.days):0;
   html.push(`<tr style="border-top:2px solid var(--accent);background:var(--surface2);font-family:var(--font-m)">
     <td style="padding:11px 12px;color:var(--accent2)">TOTAL รวม ${months.length} เดือน</td>
@@ -2018,6 +2062,11 @@ function buildDOW(){
     agg[d].net+=r.net; agg[d].qty+=r.qty; agg[d].bills+=r.bills; agg[d].days++;
   });
 
+  // ABV per DOW: ใช้ helper เดียวกัน
+  const _qDOW=computeQualifiedABV();
+  const _dowAbvMap={};
+  weekOrder.forEach(dw=>{ _dowAbvMap[dw]=_qDOW.byDOW[dw]?.abv||0; });
+
   // KPI: เรียงตามยอดสูงสุด — ใช้ copy แยกต่างหาก ไม่แตะ weekOrder
   const kpiEl=document.getElementById('dow-kpis');
   const sortedByRev=[...weekOrder].sort((a,b)=>agg[b].net-agg[a].net);
@@ -2055,7 +2104,7 @@ function buildDOW(){
     data:{
       labels,
       datasets:[{
-        data:weekOrder.map(d=>agg[d].bills>0?Math.round(agg[d].net/agg[d].bills):0),
+        data:weekOrder.map(d=>_dowAbvMap[d]||0),
         borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,0.1)',fill:true,
         tension:.4,pointBackgroundColor:'#f0a500'
       }]
@@ -2068,7 +2117,7 @@ function buildDOW(){
 
   // ตารางสรุป — save to _dowData แล้ว render ผ่าน sortDOW (รองรับ sort)
   _dowData=weekOrder.map(d=>{
-    const v=agg[d]; const abv=v.bills>0?Math.round(v.net/v.bills):0;
+    const v=agg[d]; const abv=_dowAbvMap[d]||0;
     return {dow:d,thName:th[d],net:v.net,bills:v.bills,abv,qty:v.qty};
   });
   _dowSort={col:1,dir:-1};
@@ -3182,7 +3231,7 @@ function buildReport(){
   const totalGross  = DAILY.reduce((s,d)=>s+(d.gross||d.net),0);
   const totalBills  = TOTAL_BILLS;
   const totalItems  = PRODUCTS.reduce((s,p)=>s+p.qty,0);
-  const abv         = totalBills>0?Math.round(TOTAL_NET/totalBills):0;
+  const _qInv=computeQualifiedABV(); const abv=_qInv.abv;
   const discRate    = totalGross>0?(totalDisc/totalGross*100).toFixed(1):0;
   const netRate     = totalGross>0?(TOTAL_NET/totalGross*100).toFixed(1):0;
   const days        = DAILY.length;
@@ -3386,7 +3435,7 @@ function buildReport(){
         const isUp=diff!==null&&diff>=0;
         const cols=[C.green,C.sky,C.amber,C.purple];
         const col=cols[i%cols.length];
-        const avgBillM=m.bills>0?Math.round(m.net/m.bills):0;
+        const avgBillM=(()=>{ const _k=String(m.mm).padStart(2,'0')+'/'+m.yy; const _q=computeQualifiedABV(); let n=0,b=0; Object.entries(_q.byDate).forEach(([d,v])=>{if(d.split('/')[1]+'/'+d.split('/')[2]===_k){n+=v.net;b+=v.bills;}}); return b>0?Math.round(n/b):0; })();
         return '<div style="background:linear-gradient(160deg,'+col+'18 0%,'+col+'06 100%);border:1.5px solid '+col+'55;border-radius:10px;padding:13px 14px;border-top:4px solid '+col+';-webkit-print-color-adjust:exact;print-color-adjust:exact">'
           +'<div style="font-family:\'Chakra Petch\',sans-serif;font-size:10px;font-weight:700;color:'+col+';margin-bottom:6px">'+mTHF[m.mm]+' '+(m.yy+543)+'</div>'
           +'<div style="font-family:"JetBrains Mono",monospace;font-size:18px;font-weight:700;color:'+C.navy+';margin-bottom:4px">฿'+m.net.toLocaleString()+'</div>'
@@ -3561,7 +3610,7 @@ function buildReport(){
       ${showDisc?tHead(['วันที่','l','15%'],['วัน','l','8%'],['บิล','r','7%'],['ชิ้น','r','7%'],['Gross (฿)','r','12%'],['ส่วนลด (฿)','r','12%'],['Net (฿)','r','12%'],['ABV (฿)','r','9%'],['Disc%','r','7%'],['Performance','l','']):tHead(['วันที่','l','16%'],['วัน','l','10%'],['บิล','r','9%'],['ชิ้น','r','9%'],['Net Revenue (฿)','r','18%'],['ABV (฿)','r','12%'],['Performance','l',''])}
       <tbody>
         ${DAILY.map((d,i)=>{
-          const abvD=d.bills>0?Math.round(d.net/d.bills):0;
+          const _qID=computeQualifiedABV();const abvD=_qID.byDate[d.date]?.abv||0;
           const dr2=d.gross>0?(d.discount/d.gross*100).toFixed(1):0;
           const p=(d.net/maxDailyNet*100);
           const dw=DOW_MAP[d.date]||'';
@@ -3602,7 +3651,7 @@ function buildReport(){
         ${months.map((m,i)=>{
           const cols=[C.green,C.sky,C.amber,C.purple];
           const col=cols[i%cols.length];
-          const avbM=m.bills>0?Math.round(m.net/m.bills):0;
+          const avbM=(()=>{const _k=String(m.mm).padStart(2,'0')+'/'+m.yy;const _q=computeQualifiedABV();let n=0,b=0;Object.entries(_q.byDate).forEach(([d,v])=>{if(d.split('/')[1]+'/'+d.split('/')[2]===_k){n+=v.net;b+=v.bills;}});return b>0?Math.round(n/b):0;})();
           const drM=m.gross>0?(m.discount/m.gross*100).toFixed(1):0;
           return `<tr style="background:${i%2===0?"#ffffff":"#f0f7ff"};border-bottom:1px solid #dbeafe">
             <td style="padding:6px 10px;font-family:'Chakra Petch',sans-serif;font-weight:700;color:${col}">${mTHF[m.mm]} ${m.yy+543}</td>
@@ -3799,7 +3848,7 @@ function buildReport(){
     const col=cols[mi%cols.length];
     const mDays=DAILY.filter(d=>{const[dd,mm,yy]=d.date.split('/').map(Number);return mm===m.mm&&yy===m.yy;});
     const mMax=Math.max(...mDays.map(d=>d.net),1);
-    const mAvgB=m.bills>0?Math.round(m.net/m.bills):0;
+    const mAvgB=(()=>{const _k=String(m.mm).padStart(2,'0')+'/'+m.yy;const _q=computeQualifiedABV();let n=0,b=0;Object.entries(_q.byDate).forEach(([d,v])=>{if(d.split('/')[1]+'/'+d.split('/')[2]===_k){n+=v.net;b+=v.bills;}});return b>0?Math.round(n/b):0;})();
     const mDR=m.gross>0?(m.discount/m.gross*100).toFixed(1):0;
     return pageWrap(`
       ${sec(mi===0?'📊':'📊',`Appendix — ${mTHF[m.mm]} ${m.yy+543}`,col)}
@@ -3819,7 +3868,7 @@ function buildReport(){
             const isWE=dw==='Sat'||dw==='Sun';
             const p2=(d.net/mMax*100);
             const dr2=d.gross>0?(d.discount/d.gross*100).toFixed(1):0;
-            const mAbv=d.bills>0?Math.round(d.net/d.bills):0;
+            const mAbv=computeQualifiedABV().byDate[d.date]?.abv||0;
             return `<tr style="background:${i%2===0?"#ffffff":"#f0f7ff"};border-bottom:1px solid #dbeafe">
               <td style="padding:5px 10px;font-family:"JetBrains Mono",monospace;font-weight:700;color:#162537">${d.date.substring(0,5)}</td>
               <td style="padding:5px 8px;color:${isWE?C.amber:'#94a3b8'};font-size:9px;white-space:nowrap">${dowTH[dw]||''}</td>
@@ -4103,12 +4152,15 @@ function rebuildDashboard(salesRows, promoRows){
     if(!r.date)return;
     const h=parseInt((r.time||'00:00').split(':')[0])||0;
     dates.add(r.date);
+
+    // dateMap รวมทุก row (ใช้กับ CATS, HOURS, PRODUCTS, Heatmap ฯลฯ)
     if(!dateMap[r.date])dateMap[r.date]={net:0,gross:0,qty:0,disc:0,bills:new Set()};
     dateMap[r.date].net  +=r.net;
     dateMap[r.date].gross+=r.gross;
     dateMap[r.date].qty  +=r.qty;
     dateMap[r.date].disc +=(r.disc||0);
     dateMap[r.date].bills.add(r.doc);
+
     if(!catMap[r.cat])catMap[r.cat]={net:0,qty:0};
     catMap[r.cat].net+=r.net; catMap[r.cat].qty+=r.qty;
     if(!hourMap[h])hourMap[h]={net:0,qty:0};
@@ -4133,8 +4185,8 @@ function rebuildDashboard(salesRows, promoRows){
   promoRows.forEach(p=>{if(p.date)promoByDate[p.date]=(promoByDate[p.date]||0)+p.discount;});
 
   const newDAILY=sortedDates.map(d=>{
+    // ใช้ dateMap (รวมทุก category + ทุกช่วงเวลา) สำหรับ Daily Net Sales
     const v=dateMap[d]||{net:0,gross:0,qty:0,disc:0,bills:new Set()};
-    // Use sales per-line discount if available, otherwise fall back to promo file discount
     const disc = v.disc > 0 ? v.disc : (promoByDate[d]||0);
     const gross = v.gross > 0 ? v.gross : v.net + disc;
     const net   = gross - disc;
@@ -4897,7 +4949,7 @@ function buildBehaviorReport(){
 
   /* ── computed ── */
   const totalBills=TOTAL_BILLS;
-  const abv=totalBills>0?Math.round(TOTAL_NET/totalBills):0;
+  const _qBeh=computeQualifiedABV(); const abv=_qBeh.abv;
   const totalItems=PRODUCTS.reduce((s,p)=>s+p.qty,0);
   const avgItemsPerBill=totalBills>0?(totalItems/totalBills).toFixed(1):0;
   const totalDisc=DAILY.reduce((s,d)=>s+(d.discount||0),0);
@@ -4923,7 +4975,7 @@ function buildBehaviorReport(){
   const dowTHF={Sun:'อาทิตย์',Mon:'จันทร์',Tue:'อังคาร',Wed:'พุธ',Thu:'พฤหัสบดี',Fri:'ศุกร์',Sat:'เสาร์'};
   DAILY.forEach(d=>{const dw=DOW_MAP[d.date]||'?';if(!dowAgg[dw])dowAgg[dw]={net:0,bills:0,days:0};dowAgg[dw].net+=d.net;dowAgg[dw].bills+=d.bills;dowAgg[dw].days++;});
   const dowOrder=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const dowRows=dowOrder.filter(d=>dowAgg[d]).map(d=>({dw:d,avg:Math.round(dowAgg[d].net/dowAgg[d].days),abv:Math.round(dowAgg[d].net/dowAgg[d].bills)||0,...dowAgg[d]}));
+  const _qBD=computeQualifiedABV();const dowRows=dowOrder.filter(d=>dowAgg[d]).map(d=>({dw:d,avg:Math.round(dowAgg[d].net/dowAgg[d].days),abv:_qBD.byDOW[d]?.abv||0,...dowAgg[d]}));
   const maxDowAvg=Math.max(...dowRows.map(r=>r.avg),1);
   const bestDow=dowRows.reduce((a,b)=>b.avg>a.avg?b:a,dowRows[0]||{dw:'?',avg:0});
 
