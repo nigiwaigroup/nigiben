@@ -733,6 +733,9 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     </table></div>
   </div>
 
+  <!-- Flash Sale Discount Rate Breakdown -->
+  <div class="card mb" id="promo-flash-rates"></div>
+
   <!-- Summary charts -->
   <div class="card mb" style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
     <div>
@@ -2716,10 +2719,365 @@ function buildPromo(){
         tooltip:{callbacks:{label:ctx=>ctx.label+': '+fn(ctx.raw)+' ครั้ง ('+(ctx.raw/tc*100).toFixed(1)+'%)'}}}}
   });
 
+  // ── Flash Sale: แยกกลุ่มตาม Discount Rate จริง (70%, 60%, อื่นๆ) ──
+  const flashRows = PROMO_DATA.filter(p => p.name.toLowerCase().includes('flash'));
+  if(flashRows.length){
+
+    // Step 1: สร้าง byFlashName (per promo name รวมทุกวัน) สำหรับ showFlashPromoModal
+    const byFlashName = {};
+    flashRows.forEach(p => {
+      if(!byFlashName[p.name]) byFlashName[p.name]={name:p.name,cnt:0,disc:0,net:0,sales:0,days:new Set()};
+      byFlashName[p.name].cnt  += p.count;
+      byFlashName[p.name].disc += p.discount;
+      byFlashName[p.name].net  += p.net;
+      byFlashName[p.name].sales+= p.sales;
+      byFlashName[p.name].days.add(p.date);
+    });
+    window._flashByName = byFlashName;
+
+    // Step 2: จัดกลุ่มตาม rate รายวัน (per row) — ทำให้ Flash Sale 21:00-22:00
+    // ที่บางวันลด 70% บางวันลด 60% ถูกแยกออกมาได้ถูกต้อง
+    const rateGroups = {};   // key = "70%", "60%", ...
+    flashRows.forEach(p => {
+      if(!p.sales || p.sales <= 0) return;
+      const rate    = p.discount / p.sales * 100;
+      // 40% → รวมกับ 50% (Flash Sale BOGO), อื่นๆ floor to 10
+      const floored = Math.floor(rate / 10) * 10;
+      const merged  = floored === 40 ? 50 : floored;
+      const key     = merged + '%';
+      if(!rateGroups[key]) rateGroups[key] = {
+        label: key, rate: merged,
+        cnt:0, disc:0, net:0, sales:0, days:new Set(), promos:[]
+      };
+      rateGroups[key].cnt   += p.count;
+      rateGroups[key].disc  += p.discount;
+      rateGroups[key].net   += p.net;
+      rateGroups[key].sales += p.sales;
+      rateGroups[key].days.add(p.date);
+
+      // เก็บ sub-detail ต่อ Promotion ภายใน rate group นี้
+      let existing = rateGroups[key].promos.find(x => x.name === p.name);
+      if(!existing){
+        existing = {name:p.name, cnt:0, disc:0, net:0, sales:0, days:new Set()};
+        rateGroups[key].promos.push(existing);
+      }
+      existing.cnt   += p.count;
+      existing.disc  += p.discount;
+      existing.net   += p.net;
+      existing.sales += p.sales;
+      existing.days.add(p.date);
+    });
+    window._flashRateGroups = rateGroups;
+
+    const groups = Object.values(rateGroups).sort((a,b) => b.rate - a.rate);
+    const totalFlashDisc = groups.reduce((s,g) => s+g.disc, 0) || 1;
+
+    const flashEl = document.getElementById('promo-flash-rates');
+    if(flashEl && groups.length){
+
+      // Cards per rate group — คลิกเพื่อดูว่ามี Promotion ไหนบ้าง
+      const cards = groups.map(g => {
+        const col = g.rate>=70?'#e53e3e':g.rate>=60?'#f59e0b':g.rate>=50?'#8b5cf6':'#3b82f6';
+        const sharePct = (g.disc/totalFlashDisc*100).toFixed(1);
+        const promoNames = g.promos.map(p=>p.name).join(', ');
+        return `<div onclick="showFlashRateGroupModal('${g.label}')"
+          style="background:var(--surface2);border:1px solid ${col}55;border-radius:var(--r);
+                 padding:16px;border-left:4px solid ${col};cursor:pointer;
+                 transition:transform .15s,box-shadow .15s;"
+          onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.35)'"
+          onmouseleave="this.style.transform='';this.style.boxShadow=''">
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <div style="font-family:var(--font-m);font-size:36px;font-weight:700;color:${col};line-height:1;">${g.label}</div>
+            ${g.rate===50?'<span style="font-size:10px;background:rgba(139,92,246,.2);color:#8b5cf6;border-radius:4px;padding:1px 7px;font-weight:700;">BOGO</span>':''}
+          </div>
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">${g.rate===50?'Flash Sale BOGO (40–50%) · คลิกดูรายละเอียด':'Flash Sale Group · คลิกดูรายละเอียด'}</div>
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:var(--ts-xs);">
+            <div style="color:var(--text3);">ส่วนลดรวม</div>
+            <div style="font-family:var(--font-m);color:${col};font-weight:700;text-align:right;">-${f(g.disc)}</div>
+            <div style="color:var(--text3);">Net Revenue</div>
+            <div style="font-family:var(--font-m);color:var(--green);text-align:right;">${f(g.net)}</div>
+            <div style="color:var(--text3);">จำนวนครั้ง</div>
+            <div style="font-family:var(--font-m);text-align:right;">${g.cnt.toLocaleString()}</div>
+            <div style="color:var(--text3);">Promotions</div>
+            <div style="font-family:var(--font-m);color:var(--accent);text-align:right;">${g.promos.length} รายการ</div>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="background:var(--surface3);border-radius:3px;height:5px;overflow:hidden;">
+              <div style="height:100%;width:${sharePct}%;background:${col};border-radius:3px;"></div>
+            </div>
+            <div style="font-size:9px;color:var(--text3);margin-top:3px;text-align:right;">${sharePct}% ของส่วนลด Flash ทั้งหมด</div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${promoNames}">
+            🎟️ ${promoNames.length>45?promoNames.substring(0,43)+'…':promoNames}
+          </div>
+        </div>`;
+      }).join('');
+
+      flashEl.innerHTML = `
+        <div style="font-family:var(--font-h);font-size:var(--ts-xs);font-weight:700;color:var(--text2);
+          letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;padding-left:8px;border-left:2px solid var(--red);">
+          ⚡ Flash Sale — แยกตาม Discount Rate (คลิก Card เพื่อดู Promotion ในกลุ่ม)
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:18px;">${cards}</div>
+        <!-- Comparison table -->
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:var(--ts-sm);">
+            <thead><tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:7px 12px;text-align:left;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">กลุ่ม Rate</th>
+              <th style="padding:7px 8px;text-align:left;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Promotions</th>
+              <th style="padding:7px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ครั้ง</th>
+              <th style="padding:7px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ส่วนลด</th>
+              <th style="padding:7px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Net</th>
+              <th style="padding:7px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">วัน</th>
+              <th style="padding:7px 12px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">% ของ Flash</th>
+            </tr></thead>
+            <tbody>
+              ${groups.map(g=>{
+                const col=g.rate>=70?'#e53e3e':g.rate>=60?'#f59e0b':g.rate>=50?'#8b5cf6':'#3b82f6';
+                const sharePct=(g.disc/totalFlashDisc*100).toFixed(1);
+                const promoList=g.promos.map(p=>`<span style="background:${getPromoColor(p.name)}22;color:${getPromoColor(p.name)};border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600;white-space:nowrap;">${p.name}</span>`).join(' ');
+                return `<tr onclick="showFlashRateGroupModal('${g.label}')"
+                  style="border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;"
+                  onmouseenter="this.style.background='var(--surface2)'"
+                  onmouseleave="this.style.background=''">
+                  <td style="padding:9px 12px;">
+                    <span style="background:${col}22;color:${col};border-radius:4px;padding:3px 12px;
+                      font-family:var(--font-m);font-size:var(--ts-lg);font-weight:700;">${g.label}</span>
+                    ${g.rate===50?'<span style="font-size:10px;background:rgba(139,92,246,.2);color:#8b5cf6;border-radius:3px;padding:1px 6px;font-weight:700;margin-left:4px;">BOGO</span>':''}
+                  </td>
+                  <td style="padding:9px 8px;max-width:240px;"><div style="display:flex;flex-wrap:wrap;gap:4px;">${promoList}</div></td>
+                  <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);">${g.cnt.toLocaleString()}</td>
+                  <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);color:${col};">-${f(g.disc)}</td>
+                  <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);color:var(--green);">${f(g.net)}</td>
+                  <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);">${g.days.size}</td>
+                  <td style="padding:9px 12px;text-align:right;">
+                    <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+                      <div style="width:60px;background:var(--surface3);border-radius:3px;height:5px;overflow:hidden;">
+                        <div style="height:100%;width:${sharePct}%;background:${col};border-radius:3px;"></div>
+                      </div>
+                      <span style="font-family:var(--font-m);font-size:var(--ts-sm);color:${col};font-weight:700;">${sharePct}%</span>
+                    </div>
+                  </td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+  }
+
   // hide detail panel on fresh build
   const dp=document.getElementById('promo-detail-panel');
   if(dp) dp.style.display='none';
 }
+
+
+function showFlashRateGroupModal(rateLabel){
+  const g = window._flashRateGroups?.[rateLabel];
+  if(!g) return;
+  const col = g.rate>=70?'#e53e3e':g.rate>=60?'#f59e0b':g.rate>=50?'#8b5cf6':'#3b82f6';
+  const fc  = n => '฿'+Math.round(n).toLocaleString();
+
+  const promoRows = g.promos.sort((a,b)=>b.disc-a.disc).map(p=>{
+    const pc = getPromoColor(p.name);
+    const rate = p.sales>0?(p.disc/p.sales*100).toFixed(1):'0';
+    const bar  = (p.disc/g.disc*100).toFixed(1);
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;"
+      onclick="document.getElementById('flash-rate-group-modal').style.display='none';showFlashPromoModal('${p.name.replace(/'/g,"\'")}')">
+      <td style="padding:9px 12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:${pc};flex-shrink:0;"></span>
+          <span style="font-size:var(--ts-sm);font-weight:600;color:var(--text);">${p.name}</span>
+          <span style="font-size:10px;color:var(--text3);">↗ ดูรายวัน</span>
+        </div>
+      </td>
+      <td style="padding:9px 8px;text-align:right;">
+        <span style="background:${pc}22;color:${pc};border-radius:4px;padding:1px 8px;font-family:var(--font-m);font-weight:700;">${rate}%</span>
+      </td>
+      <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);">${p.cnt.toLocaleString()}</td>
+      <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);color:${col};">-${fc(p.disc)}</td>
+      <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);color:var(--green);">${fc(p.net)}</td>
+      <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);">${p.days.size}</td>
+      <td style="padding:9px 12px;min-width:80px;">
+        <div style="background:var(--surface3);border-radius:3px;height:6px;overflow:hidden;">
+          <div style="height:100%;width:${bar}%;background:${pc};border-radius:3px;"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  let modal = document.getElementById('flash-rate-group-modal');
+  if(!modal){modal=document.createElement('div');modal.id='flash-rate-group-modal';document.body.appendChild(modal);}
+  modal.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(7,9,15,.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;';
+  modal.innerHTML=`
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;
+      width:100%;max-width:700px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;
+      box-shadow:0 24px 80px rgba(0,0,0,.7);animation:fadeIn .2s ease;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;">
+              <div style="font-family:var(--font-m);font-size:32px;font-weight:700;color:${col};">${rateLabel}</div>
+              <span style="font-size:var(--ts-xs);background:${col}22;color:${col};border-radius:4px;padding:2px 8px;font-weight:700;">Flash Sale Group</span>
+              ${rateLabel==='50%'?'<span style="font-size:var(--ts-xs);background:rgba(139,92,246,.2);color:#8b5cf6;border-radius:4px;padding:2px 8px;font-weight:700;">BOGO (40–50%)</span>':''}
+            </div>
+            <div style="font-size:var(--ts-sm);color:var(--text2);">${g.promos.length} Promotions · ${g.cnt.toLocaleString()} ครั้ง · ${g.days.size} วัน · คลิก Promotion เพื่อดูรายวัน</div>
+          </div>
+          <button onclick="document.getElementById('flash-rate-group-modal').style.display='none';"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                   padding:5px 12px;color:var(--text2);font-size:var(--ts-sm);cursor:pointer;flex-shrink:0;">✕ ปิด</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;">
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid ${col};">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">ส่วนลดรวม</div>
+            <div style="font-family:var(--font-m);font-size:18px;font-weight:700;color:${col};margin-top:2px;">-${fc(g.disc)}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid var(--green);">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Net Revenue</div>
+            <div style="font-family:var(--font-m);font-size:18px;font-weight:700;color:var(--green);margin-top:2px;">${fc(g.net)}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid var(--blue);">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Avg Disc/ครั้ง</div>
+            <div style="font-family:var(--font-m);font-size:18px;font-weight:700;color:var(--blue);margin-top:2px;">${g.cnt>0?fc(g.disc/g.cnt):'—'}</div>
+          </div>
+        </div>
+      </div>
+      <div style="overflow-y:auto;flex:1;padding:12px 20px;">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">
+          Promotions ในกลุ่ม ${rateLabel} — คลิกแถวเพื่อดูรายวัน
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="border-bottom:1px solid var(--border);">
+            <th style="padding:6px 12px;text-align:left;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Promotion</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Disc%</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ครั้ง</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ส่วนลด</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Net</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">วัน</th>
+            <th style="padding:6px 12px;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;min-width:80px;">Bar</th>
+          </tr></thead>
+          <tbody>${promoRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  modal.onclick=e=>{if(e.target===modal)modal.style.display='none';};
+}
+
+function showFlashPromoModal(promoName){
+  const g = window._flashByName?.[promoName];
+  if(!g){ alert('ไม่พบข้อมูล: '+promoName); return; }
+
+  const col  = getPromoColor(promoName);
+  const fc   = n => '฿'+Math.round(n).toLocaleString();
+  const fn2  = n => n.toLocaleString();
+  const toTs = s => { const[d,m,y]=(s||'').split('/'); return new Date(+y,+m-1,+d).getTime(); };
+
+  // รวม PROMO_DATA รายวัน สำหรับ promo นี้
+  const dayRows = PROMO_DATA
+    .filter(p => p.name === promoName)
+    .sort((a,b) => toTs(a.date) - toTs(b.date));
+
+  const discPctOverall = g.sales > 0 ? (g.disc/g.sales*100).toFixed(1) : '0';
+
+  const rows = dayRows.map(p => {
+    const rate = p.sales > 0 ? (p.discount/p.sales*100).toFixed(1) : '0';
+    const rateNum = parseFloat(rate);
+    const rateCol = rateNum >= 65 ? '#e53e3e'
+                  : rateNum >= 55 ? '#f59e0b'
+                  : rateNum >= 45 ? '#8b5cf6'
+                  : '#3b82f6';
+    const dow = DOW_MAP[p.date] || '';
+    const thDow = {Sun:'อาทิตย์',Mon:'จันทร์',Tue:'อังคาร',Wed:'พุธ',Thu:'พฤหัส',Fri:'ศุกร์',Sat:'เสาร์'};
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);">
+      <td style="padding:8px 12px;font-family:var(--font-m);color:var(--accent2);">${p.date.substring(0,5)}</td>
+      <td style="padding:8px 8px;font-size:var(--ts-xs);color:var(--text2);">${thDow[dow]||dow}</td>
+      <td style="padding:8px 8px;text-align:right;font-family:var(--font-m);">${fn2(p.count)}</td>
+      <td style="padding:8px 8px;text-align:right;font-family:var(--font-m);color:var(--text2);">${fc(p.sales)}</td>
+      <td style="padding:8px 8px;text-align:right;font-family:var(--font-m);color:${col};">-${fc(p.discount)}</td>
+      <td style="padding:8px 8px;text-align:right;font-family:var(--font-m);color:var(--green);">${fc(p.net)}</td>
+      <td style="padding:8px 10px;text-align:center;">
+        <span style="background:${rateCol}22;color:${rateCol};border-radius:4px;
+               padding:2px 10px;font-family:var(--font-m);font-size:var(--ts-sm);font-weight:700;">
+          ${rate}%
+        </span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // min/max disc% across days
+  const rates = dayRows.filter(p=>p.sales>0).map(p=>p.discount/p.sales*100);
+  const minR  = rates.length ? Math.min(...rates).toFixed(1) : '—';
+  const maxR  = rates.length ? Math.max(...rates).toFixed(1) : '—';
+
+  let modal = document.getElementById('flash-promo-modal');
+  if(!modal){ modal = document.createElement('div'); modal.id='flash-promo-modal'; document.body.appendChild(modal); }
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(7,9,15,.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;';
+  modal.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;
+      width:100%;max-width:720px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+      box-shadow:0 24px 80px rgba(0,0,0,.7);animation:fadeIn .2s ease;">
+      <!-- Header -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <span style="width:12px;height:12px;border-radius:50%;background:${col};display:inline-block;flex-shrink:0;"></span>
+              <span style="font-family:var(--font-h);font-size:15px;font-weight:700;color:var(--text);">${promoName}</span>
+            </div>
+            <div style="font-size:var(--ts-xs);color:var(--text2);">
+              ${g.days.size} วัน · ${fn2(g.cnt)} ครั้ง · Disc% จริง: <strong style="color:${col};">${discPctOverall}%</strong>
+              &nbsp;·&nbsp; range: ${minR}% – ${maxR}%
+            </div>
+          </div>
+          <button onclick="document.getElementById('flash-promo-modal').style.display='none';"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                   padding:5px 12px;color:var(--text2);font-size:var(--ts-sm);cursor:pointer;flex-shrink:0;">✕ ปิด</button>
+        </div>
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;">
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid ${col};">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Disc% รวม</div>
+            <div style="font-family:var(--font-m);font-size:20px;font-weight:700;color:${col};margin-top:2px;">${discPctOverall}%</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid var(--red);">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">ส่วนลดรวม</div>
+            <div style="font-family:var(--font-m);font-size:20px;font-weight:700;color:var(--red);margin-top:2px;">-${fc(g.disc)}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid var(--green);">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Net Revenue</div>
+            <div style="font-family:var(--font-m);font-size:20px;font-weight:700;color:var(--green);margin-top:2px;">${fc(g.net)}</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:9px 12px;border-left:3px solid var(--blue);">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Disc% Range</div>
+            <div style="font-family:var(--font-m);font-size:16px;font-weight:700;color:var(--blue);margin-top:2px;">${minR}%–${maxR}%</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:1px;">min – max รายวัน</div>
+          </div>
+        </div>
+      </div>
+      <!-- Table -->
+      <div style="overflow-y:auto;flex:1;padding:12px 20px;">
+        <div style="font-family:var(--font-h);font-size:9px;font-weight:700;color:var(--text3);
+          letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">
+          📅 รายวัน — ดู Disc% แต่ละวันที่โปรโมชั่นนี้ถูกใช้
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="border-bottom:1px solid var(--border);">
+            <th style="padding:6px 12px;text-align:left;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">วันที่</th>
+            <th style="padding:6px 8px;text-align:left;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">วัน</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ครั้ง</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Gross</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">ส่วนลด</th>
+            <th style="padding:6px 8px;text-align:right;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Net</th>
+            <th style="padding:6px 10px;text-align:center;font-size:10px;color:var(--text3);font-family:var(--font-h);letter-spacing:1px;text-transform:uppercase;">Disc%</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  modal.onclick = e => { if(e.target === modal) modal.style.display='none'; };
+}
+
 
 function buildQuality(){
   // ใช้ discount จาก DAILY ที่คำนวณแล้ว (แม่นยำกว่า PROMO_DATA.net)
