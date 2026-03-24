@@ -1422,11 +1422,12 @@ function buildOverview(){
     type:'doughnut',
     data:{labels:CATS.map(c=>c.cat),datasets:[{data:CATS.map(c=>c.net),backgroundColor:CATS.map(c=>c.color),borderWidth:0,hoverOffset:5}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-      plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)+' ('+(ctx.raw/TOTAL_NET*100).toFixed(1)+'%)'}}}
+      plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)+' ('+(ctx.raw/CATS.reduce((s,ct)=>s+ct.net,0)*100).toFixed(1)+'%)'}}}
     }
   });
   const cl=document.getElementById('cat-leg');
-  CATS.forEach(c=>{cl.innerHTML+=`<div class="leg-item"><div class="leg-dot" style="background:${c.color}"></div>${c.cat}<span class="leg-pct">${(c.net/TOTAL_NET*100).toFixed(1)}%</span></div>`;});
+  const _catTotalLeg=CATS.reduce((s,ct)=>s+ct.net,0)||1;
+  CATS.forEach(c=>{cl.innerHTML+=`<div class="leg-item"><div class="leg-dot" style="background:${c.color}"></div>${c.cat}<span class="leg-pct">${(c.net/_catTotalLeg*100).toFixed(1)}%</span></div>`;});
 
   // ── Discount Trend Charts ──
   if(DAILY.length > 0){
@@ -1573,10 +1574,11 @@ function buildOverview(){
 
   // Cat table
   const maxN=Math.max(...CATS.map(c=>c.net));
+  const _catTotalPct = CATS.reduce((s,ct)=>s+ct.net, 0)||1;
   document.getElementById('cat-tbody').innerHTML=CATS.map(c=>`<tr>
     <td><div class="flex-r"><div style="width:8px;height:8px;border-radius:2px;background:${c.color}"></div>${c.cat}</div></td>
     <td class="num">${fn(c.net)}</td><td class="num">${fn(c.qty)}</td>
-    <td class="num" style="color:var(--accent)">${(c.net/TOTAL_NET*100).toFixed(1)}%</td>
+    <td class="num" style="color:var(--accent)">${(c.net/_catTotalPct*100).toFixed(1)}%</td>
     <td><div class="pbwrap" style="width:100px"><div class="pbfill" style="width:${c.net/maxN*100}%;background:${c.color}"></div></div></td>
   </tr>`).join('');
 }
@@ -1607,15 +1609,17 @@ function sortCat(col){
   const maxN=Math.max(...CATS.map(c=>c.net),1);
   const sorted=[...CATS];
   sorted.sort((a,b)=>{
-    const vals=[a.cat,a.net,a.qty,a.net/TOTAL_NET];
-    const valb=[b.cat,b.net,b.qty,b.net/TOTAL_NET];
+    const _ct=CATS.reduce((s,x)=>s+x.net,0)||1;
+    const vals=[a.cat,a.net,a.qty,a.net/_ct];
+    const valb=[b.cat,b.net,b.qty,b.net/_ct];
     const av=vals[idx],bv=valb[idx];
     return typeof av==='string'?av.localeCompare(bv)*_catSort.dir:(av-bv)*_catSort.dir;
   });
+  const _catTotalSort = CATS.reduce((s,ct)=>s+ct.net, 0)||1;
   document.getElementById('cat-tbody').innerHTML=sorted.map(c=>`<tr>
     <td><div class="flex-r"><div style="width:8px;height:8px;border-radius:2px;background:${c.color}"></div>${c.cat}</div></td>
     <td class="num">${fn(c.net)}</td><td class="num">${fn(c.qty)}</td>
-    <td class="num" style="color:var(--accent)">${(c.net/TOTAL_NET*100).toFixed(1)}%</td>
+    <td class="num" style="color:var(--accent)">${(c.net/_catTotalSort*100).toFixed(1)}%</td>
     <td><div class="pbwrap" style="width:100px"><div class="pbfill" style="width:${c.net/maxN*100}%;background:${c.color}"></div></div></td>
   </tr>`).join('');
   const ths=document.getElementById('cat-tbl').querySelectorAll('thead th');
@@ -2494,7 +2498,7 @@ function buildQuality(){
    +'<div class="kpi p"><div class="kpi-lbl">Recovery Rate</div><div class="kpi-val pc">'+(totalGrossQ>0?(TOTAL_NET/totalGrossQ*100).toFixed(1):0)+'%</div><div class="kpi-sub">Net/Gross — % ที่เก็บได้จริง</div></div>';
   mkChart('ch-quality-pie',{type:'doughnut',
     data:{labels:['Full Price','Promotional'],datasets:[{data:[Math.max(0,fullPriceTotal),Math.max(0,promoNetTotal)],backgroundColor:['#22d47a','#f04545'],borderWidth:0,hoverOffset:4}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)+' ('+(ctx.raw/TOTAL_NET*100).toFixed(1)+'%)'}}}}
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+f(ctx.raw)+' ('+(ctx.raw/CATS.reduce((s,ct)=>s+ct.net,0)*100).toFixed(1)+'%)'}}}}
   });
   document.getElementById('quality-leg').innerHTML=
     '<div class="leg-item"><div class="leg-dot" style="background:#22d47a"></div>Full Price<span class="leg-pct">'+(TOTAL_NET>0?(fullPriceTotal/TOTAL_NET*100).toFixed(1):0)+'%</span></div>'
