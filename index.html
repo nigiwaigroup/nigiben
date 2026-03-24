@@ -431,7 +431,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <div class="kpi ac"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Net Revenue</div><div id="kpi-net" class="kpi-val ac">฿256,740</div><div id="kpi-net-sub" class="kpi-sub">รายได้สุทธิรวม 9 วัน</div></div>
     <div class="kpi g"><div class="kpi-ico">🧾</div><div class="kpi-lbl">Total Bills</div><div id="kpi-bills" class="kpi-val gc">2,639</div><div id="kpi-bills-sub" class="kpi-sub">เฉลี่ย 293 บิล/วัน</div></div>
     <div class="kpi b"><div class="kpi-ico">📦</div><div class="kpi-lbl">Total Items Sold</div><div id="kpi-items" class="kpi-val bc">4,322</div><div id="kpi-items-sub" class="kpi-sub">เฉลี่ย 480 ชิ้น/วัน</div></div>
-    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div id="kpi-abv" class="kpi-val pc">฿88</div><div class="kpi-sub">มูลค่าเฉลี่ยต่อบิล (ไม่รวม Beverage)</div></div>
+    <div class="kpi p"><div class="kpi-ico">🛒</div><div class="kpi-lbl">Avg Basket Value</div><div id="kpi-abv" class="kpi-val pc">฿88</div><div class="kpi-sub">ไม่รวม Beverage · ไม่นับ Flash Sale (19–22h)</div></div>
   </div>
   <div class="g4 mb">
     <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">Total Promo Discount</div><div id="kpi-disc" class="kpi-val rc">฿171,339</div><div class="kpi-sub">ส่วนลดจากโปรโมชั่นทั้งหมด</div></div>
@@ -1324,8 +1324,23 @@ function buildOverview(){
   set('kpi-bills-sub')('เฉลี่ย '+Math.round(TOTAL_BILLS/days)+' บิล/วัน');
   set('kpi-items')(totalItems.toLocaleString());
   set('kpi-items-sub')('เฉลี่ย '+Math.round(totalItems/days)+' ชิ้น/วัน');
-  // BUG6 fixed: ABV = TOTAL_NET / TOTAL_BILLS (guard div-by-zero)
-  set('kpi-abv')(TOTAL_BILLS>0?'฿'+Math.round(TOTAL_NET/TOTAL_BILLS):'—');
+  // ABV สูตรใหม่: ไม่รวม Beverage + ไม่นับบิลที่มาจากช่วง Flash Sale (19:00–22:00)
+  // คำนวณจาก salesRows โดยตรง:
+  //   - กรองออก: cat === 'Beverage'
+  //   - กรองออก: ชั่วโมง 19–21 (Flash Sale window)
+  //   - นับยอดสุทธิและจำนวนบิล (unique doc) ที่เหลือ
+  const _abvRows = salesRows.filter(r => {
+    const h = parseInt((r.time||'00:00').split(':')[0])||0;
+    const isFlashHour = h >= 19 && h < 22;
+    const isBeverage  = (r.cat||'').toLowerCase().includes('beverage') || r.cat === 'Beverage';
+    return !isBeverage && !isFlashHour;
+  });
+  const _abvBillNet = {};
+  _abvRows.forEach(r => { _abvBillNet[r.doc] = (_abvBillNet[r.doc]||0) + r.net; });
+  const _abvBills   = Object.keys(_abvBillNet).length;
+  const _abvNet     = Object.values(_abvBillNet).reduce((s,v)=>s+v, 0);
+  const _abvVal     = _abvBills > 0 ? Math.round(_abvNet / _abvBills) : 0;
+  set('kpi-abv')(_abvBills > 0 ? '฿' + _abvVal.toLocaleString() : '—');
   set('kpi-disc')('฿'+Math.round(totalDisc).toLocaleString());
   set('kpi-gross')('฿'+Math.round(totalGross).toLocaleString());
   const avgDaily=days>0?Math.round(TOTAL_NET/days):0;
