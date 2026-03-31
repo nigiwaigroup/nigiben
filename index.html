@@ -358,6 +358,19 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
       </div>
     </div>
 
+    <!-- File 3: Monthly Sales -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📅 ไฟล์ยอดขายรายเดือน <span style="color:var(--text3);font-weight:400;font-size:10px">(ไม่บังคับ)</span></div>
+      <div id="modal-drop3" onclick="pickFile(3)"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handleModalDrop(event,3)"
+           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
+        <div style="font-size:20px;margin-bottom:5px">📅</div>
+        <div id="modal-f3-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
+      </div>
+    </div>
+
     <div id="modal-status" style="min-height:20px;font-size:12px;color:var(--accent);text-align:center;margin-bottom:14px"></div>
 
     <button id="modal-btn" onclick="processModalFiles()" disabled tabindex="-1" style="
@@ -377,46 +390,45 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <div class="loc">✈️ สนามบินดอนเมือง · Grab&amp;Go</div>
   </div>
   <div class="nav-sec">
-    <div class="nav-lbl">ภาพรวม</div>
-    <div class="nav-item active" data-page="overview"><span class="ic">🍱</span>Performance Overview</div>
-    <div class="nav-item" data-page="daily"><span class="ic">📋</span>Daily Net Sales</div>
-    <div class="nav-item" data-page="dow"><span class="ic">🗓️</span>Day-of-Week Analysis</div>
+    <div class="nav-lbl" data-th="ภาพรวม" data-en="Overview">ภาพรวม</div>
+    <div class="nav-item active" data-page="overview"><span class="ic">🍱</span><span data-th="ภาพรวมผลงาน" data-en="Performance Overview">Performance Overview</span></div>
+    <div class="nav-item" data-page="daily"><span class="ic">📋</span><span data-th="ยอดขายสุทธิรายวัน" data-en="Daily Net Sales">Daily Net Sales</span></div>
+    <div class="nav-item" data-page="dow"><span class="ic">🗓️</span><span data-th="วิเคราะห์ตามวันในสัปดาห์" data-en="Day-of-Week Analysis">Day-of-Week Analysis</span></div>
   </div>
   <div class="nav-sec">
-    <div class="nav-lbl">การวิเคราะห์ยอดขาย</div>
-    <div class="nav-item" data-page="visual"><span class="ic">📉</span>Visual Analytics</div>
-    <div class="nav-item" data-page="basket"><span class="ic">🍣</span>Basket Segmentation</div>
-    <div class="nav-item" data-page="hourly"><span class="ic">⏰</span>Hourly Sales Heatmap</div>
-    <div class="nav-item" data-page="cat-heatmap"><span class="ic">🍜</span>Hourly Category Heatmap</div>
+    <div class="nav-lbl" data-th="การวิเคราะห์ยอดขาย" data-en="Sales Analysis">การวิเคราะห์ยอดขาย</div>
+    <div class="nav-item" data-page="visual"><span class="ic">📉</span><span data-th="การวิเคราะห์เชิงภาพ" data-en="Visual Analytics">Visual Analytics</span></div>
+    <div class="nav-item" data-page="basket"><span class="ic">🍣</span><span data-th="การแบ่งกลุ่มตะกร้า" data-en="Basket Segmentation">Basket Segmentation</span></div>
+    <div class="nav-item" data-page="hourly"><span class="ic">⏰</span><span data-th="ฮีตแมปยอดขายรายชั่วโมง" data-en="Hourly Sales Heatmap">Hourly Sales Heatmap</span></div>
+    <div class="nav-item" data-page="cat-heatmap"><span class="ic">🍜</span><span data-th="ฮีตแมปหมวดสินค้ารายชั่วโมง" data-en="Hourly Category Heatmap">Hourly Category Heatmap</span></div>
   </div>
   <div class="nav-sec">
-    <div class="nav-lbl">โปรโมชั่น</div>
-    <div class="nav-item" data-page="disc-hm"><span class="ic">💸</span>Discount Leak Heatmap</div>
-    <div class="nav-item" data-page="promo"><span class="ic">🎫</span>Promotion Breakdown</div>
-    <div class="nav-item" data-page="promo-product"><span class="ic">🔍</span>Promo × Product</div>
-    <div class="nav-item" data-page="quality"><span class="ic">⚖️</span>Basket Quality</div>
+    <div class="nav-lbl" data-th="โปรโมชั่น" data-en="Promotions">โปรโมชั่น</div>
+    <div class="nav-item" data-page="disc-hm"><span class="ic">💸</span><span data-th="ฮีตแมปการรั่วไหลส่วนลด" data-en="Discount Leak Heatmap">Discount Leak Heatmap</span></div>
+    <div class="nav-item" data-page="promo"><span class="ic">🎫</span><span data-th="รายละเอียดโปรโมชั่น" data-en="Promotion Breakdown">Promotion Breakdown</span></div>
+    <div class="nav-item" data-page="promo-product"><span class="ic">🔍</span><span data-th="โปรโมชั่น × สินค้า" data-en="Promo × Product">Promo × Product</span></div>
+    <div class="nav-item" data-page="quality"><span class="ic">⚖️</span><span data-th="คุณภาพตะกร้า" data-en="Basket Quality">Basket Quality</span></div>
   </div>
   <div class="nav-sec">
-    <div class="nav-lbl">สินค้าและพฤติกรรม</div>
-    <div class="nav-item" data-page="market"><span class="ic">🥢</span>Market Basket Analysis</div>
-    <div class="nav-item" data-page="combo"><span class="ic">🍙</span>Combo &amp; Opportunity</div>
-    <div class="nav-item" data-page="topbot"><span class="ic">🏆</span>Top 10 / Bottom 10</div>
-    <div class="nav-item" data-page="products"><span class="ic">🍛</span>Sales by Quantity<span class="bdg" id="bdg-products">60</span></div>
-    <div class="nav-item" data-page="trial"><span class="ic">🆕</span>สินค้าทดลองขาย</div>
+    <div class="nav-lbl" data-th="สินค้าและพฤติกรรม" data-en="Products & Behaviour">สินค้าและพฤติกรรม</div>
+    <div class="nav-item" data-page="market"><span class="ic">🥢</span><span data-th="วิเคราะห์ตะกร้าตลาด" data-en="Market Basket Analysis">Market Basket Analysis</span></div>
+    <div class="nav-item" data-page="combo"><span class="ic">🍙</span><span data-th="คอมโบและโอกาส" data-en="Combo &amp; Opportunity">Combo &amp; Opportunity</span></div>
+    <div class="nav-item" data-page="topbot"><span class="ic">🏆</span><span data-th="10 อันดับแรก / ท้าย" data-en="Top 10 / Bottom 10">Top 10 / Bottom 10</span></div>
+    <div class="nav-item" data-page="products"><span class="ic">🍛</span><span data-th="ยอดขายตามจำนวน" data-en="Sales by Quantity">Sales by Quantity</span><span class="bdg" id="bdg-products">60</span></div>
+    <div class="nav-item" data-page="trial"><span class="ic">🆕</span><span data-th="สินค้าทดลองขาย" data-en="Trial Products">สินค้าทดลองขาย</span></div>
   </div>
   <div class="nav-sec">
-    <div class="nav-lbl">รายงาน</div>
-    <div class="nav-item" data-page="report"><span class="ic">📄</span>Investor Report <span class="bdg">PDF</span></div>
-    <div class="nav-item" data-page="report-hourly"><span class="ic">⏱️</span>Hourly Sales Report <span class="bdg">PDF</span></div>
-    <div class="nav-item" data-page="report-behavior"><span class="ic">🧠</span>Customer Behavior Report <span class="bdg">PDF</span></div>
+    <div class="nav-lbl" data-th="รายงาน" data-en="Reports">รายงาน</div>
+    <div class="nav-item" data-page="report"><span class="ic">📄</span><span data-th="รายงานนักลงทุน" data-en="Investor Report">Investor Report</span> <span class="bdg">PDF</span></div>
+    <div class="nav-item" data-page="report-hourly"><span class="ic">⏱️</span><span data-th="รายงานยอดขายรายชั่วโมง" data-en="Hourly Sales Report">Hourly Sales Report</span> <span class="bdg">PDF</span></div>
+    <div class="nav-item" data-page="report-behavior"><span class="ic">🧠</span><span data-th="รายงานพฤติกรรมลูกค้า" data-en="Customer Behavior Report">Customer Behavior Report</span> <span class="bdg">PDF</span></div>
   </div>
   <div class="sb-foot">
     <div class="period-box">
-      <div class="pl">Data Period</div>
+      <div class="pl" data-th="ช่วงข้อมูล" data-en="Data Period">Data Period</div>
       <div id="sidebar-period" class="pv">—</div>
     </div>
-
-    <button class="upbtn" onclick="nav('upload')">⬆ Update Data</button>
+    <button class="upbtn" onclick="nav('upload')" data-th="⬆ อัพเดทข้อมูล" data-en="⬆ Update Data">⬆ Update Data</button>
   </div>
 </nav>
 
@@ -425,6 +437,13 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <div class="tb-title" id="tb-title">Performance Overview</div>
     <div class="tb-live">LIVE DATA</div>
     <div class="tb-date" id="tb-date"></div>
+    <button id="lang-toggle" onclick="toggleLang()" title="Switch Thai / English"
+      style="display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);
+             border-radius:20px;padding:5px 13px;cursor:pointer;font-family:var(--font-b);font-size:var(--ts-sm);
+             color:var(--text2);transition:all .2s;flex-shrink:0;">
+      <span id="lang-flag">🇹🇭</span>
+      <span id="lang-label">ไทย</span>
+    </button>
     <button id="theme-toggle" onclick="toggleTheme()" title="สลับ Dark / Light"
       style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);
              border-radius:20px;padding:5px 13px;cursor:pointer;font-family:var(--font-b);font-size:var(--ts-sm);
@@ -1229,6 +1248,19 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
       </div>
       <div id="st2"></div>
+    </div>
+    <div class="upcard">
+      <h3>📅 ไฟล์ที่ 3 — ยอดขายรายเดือน <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
+      <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายสรุปรายเดือน</p>
+      <div class="drop" id="d3" onclick="pickFileUp(3)"
+           ondragover="event.preventDefault();this.classList.add('dv')"
+           ondragleave="this.classList.remove('dv')"
+           ondrop="dropFileUp(event,3)">
+        <div class="drop-ico">📅</div>
+        <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
+      </div>
+      <div id="st3"></div>
     </div>
     <button class="proc-btn" id="proc-btn" disabled>⚡ ประมวลผลและอัพเดท Dashboard</button>
     <div id="up-result" style="margin-top:10px"></div>
@@ -4543,7 +4575,7 @@ function buildReport(){
 
 // ══════════ UPLOAD ══════════
 // ══════════ UPLOAD & PARSE ══════════
-const upF={1:null,'1b':null,2:null};
+const upF={1:null,'1b':null,2:null,3:null};
 
 function handleF(ev,n){
   const file=ev.target.files[0];if(!file)return;
@@ -4664,10 +4696,45 @@ async function processFiles(){
     }
     } // end optional promo block
 
+    // ── File 3: Monthly Sales (ไม่บังคับ) ──
+    let monthlyRows=[];
+    if(upF[3]){
+      try{
+        const rows3=await readXlsx(upF[3]);
+        let hdr3=0;
+        for(let i=0;i<Math.min(10,rows3.length);i++){
+          const r=rows3[i].map(v=>String(v).trim());
+          if(r.some(v=>v.includes('เดือน')||v.includes('ยอดขาย')||v.includes('รายได้')||v.includes('Month'))){hdr3=i;break;}
+        }
+        const cols3=rows3[hdr3].map(v=>String(v).trim());
+        const ci3=(...names)=>{for(const n of names){const i=cols3.indexOf(n);if(i!==-1)return i;}return -1;};
+        const iMonth = ci3('เดือน','Month','ช่วงเวลา','วันที่');
+        const iMNet  = ci3('ยอดขายสุทธิ','Net Revenue','ยอดสุทธิ','ราคาสุทธิ','ยอดขาย');
+        const iMGross= ci3('ยอดขายก่อนหักส่วนลด','Gross Revenue','ยอดขายรวม');
+        const iMDisc = ci3('ส่วนลด','Discount','ส่วนลดรวม');
+        const iMQty  = ci3('จำนวนชิ้น','จำนวน','Qty','Quantity');
+        const iMBills= ci3('จำนวนบิล','บิล','Bills','Orders');
+        for(let i=hdr3+1;i<rows3.length;i++){
+          const r=rows3[i];
+          const month=String(r[iMonth]||'').trim();
+          if(!month) continue;
+          monthlyRows.push({
+            month,
+            net:      parseFloat(r[iMNet])  ||0,
+            gross:    parseFloat(r[iMGross])||0,
+            discount: parseFloat(r[iMDisc]) ||0,
+            qty:      parseFloat(r[iMQty])  ||0,
+            bills:    parseFloat(r[iMBills])||0
+          });
+        }
+      }catch(e){ console.warn('Monthly file parse warning:', e.message); }
+    }
+
     btn.textContent='⏳ กำลังอัพเดท Dashboard...';
     rebuildDashboard(salesRows, promoRows);
 
-    resultEl.innerHTML='<div class="fstatus ok" style="padding:14px">🎉 <strong>อัพเดทสำเร็จ</strong> — ยอดขาย '+salesRows.length.toLocaleString()+' รายการ</div>';
+    const monthlySuffix = monthlyRows.length>0 ? ` · ยอดขายรายเดือน ${monthlyRows.length} รายการ` : '';
+    resultEl.innerHTML='<div class="fstatus ok" style="padding:14px">🎉 <strong>อัพเดทสำเร็จ</strong> — ยอดขาย '+salesRows.length.toLocaleString()+' รายการ'+monthlySuffix+'</div>';
     btn.textContent='⚡ ประมวลผลและอัพเดท Dashboard'; btn.disabled=false;
 
   }catch(err){
@@ -4894,7 +4961,7 @@ function dropFileUp(e, n){
   if(file) handleF({target:{files:[file]}}, n);
 }
 
-const modalFiles={1:null,'1b':null,2:null};
+const modalFiles={1:null,'1b':null,2:null,3:null};
 function handleModalFile(input,n){
   const file=input.files[0];
   if(!file)return;
@@ -4946,6 +5013,7 @@ async function processModalFiles(){
     upF[1]=modalFiles[1]||null;
     upF['1b']=modalFiles['1b']||null;
     upF[2]=modalFiles[2]||null;
+    upF[3]=modalFiles[3]||null;
     await processFiles();
     const modal=document.getElementById('upload-modal');
     if(modal){modal.style.animation='modalOut .25s ease forwards';setTimeout(()=>modal.remove(),260);}
@@ -6268,10 +6336,48 @@ function initTheme(){
   }
 }
 
+// ══════════ LANGUAGE TOGGLE ══════════
+let LANG = 'th'; // default Thai
+
+function toggleLang(){
+  LANG = LANG === 'th' ? 'en' : 'th';
+  applyLang();
+  localStorage.setItem('nigiben-lang', LANG);
+}
+
+function applyLang(){
+  const isEn = LANG === 'en';
+
+  // Update button
+  const flag  = document.getElementById('lang-flag');
+  const lbl   = document.getElementById('lang-label');
+  if(flag) flag.textContent = isEn ? '🇬🇧' : '🇹🇭';
+  if(lbl)  lbl.textContent  = isEn ? 'EN'   : 'ไทย';
+
+  // Swap every element that has data-th / data-en attributes
+  document.querySelectorAll('[data-th][data-en]').forEach(el => {
+    const key = isEn ? 'en' : 'th';
+    // For buttons / divs whose full text is the label (no child icons to preserve)
+    if(el.tagName === 'BUTTON' || el.classList.contains('nav-lbl') || el.classList.contains('pl')){
+      el.textContent = el.dataset[key];
+    } else {
+      // <span> inside nav-item — just set textContent
+      el.textContent = el.dataset[key];
+    }
+  });
+}
+
+function initLang(){
+  const saved = localStorage.getItem('nigiben-lang');
+  if(saved) LANG = saved;
+  applyLang();
+}
+
 // ══════════ INIT ══════════
 window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('proc-btn').addEventListener('click',processFiles);
   initTheme();
+  initLang();
 });
 </script>
 </body>
