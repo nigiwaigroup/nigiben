@@ -320,16 +320,28 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
       อัพโหลดไฟล์ Excel เพื่อเริ่มต้นใช้งาน Dashboard
     </div>
 
-    <!-- File 1: Sales -->
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 ไฟล์ยอดขาย (รายงานยอดขายแยกตามสินค้า)</div>
+    <!-- File 1a: Sales Days 1-15 -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 ไฟล์ยอดขาย — รายงานยอดขายแยกตามสินค้า <span style="color:var(--accent);font-weight:700;">วันที่ 1–15</span></div>
       <div id="modal-drop1" onclick="pickFile(1)"
            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
            ondragleave="this.style.borderColor='var(--border)'"
            ondrop="handleModalDrop(event,1)"
-           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
-        <div style="font-size:24px;margin-bottom:6px">📁</div>
+           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
+        <div style="font-size:20px;margin-bottom:5px">📁</div>
         <div id="modal-f1-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
+      </div>
+    </div>
+    <!-- File 1b: Sales Days 16-31 -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 ไฟล์ยอดขาย — รายงานยอดขายแยกตามสินค้า <span style="color:var(--accent);font-weight:700;">วันที่ 16–31</span></div>
+      <div id="modal-drop1b" onclick="pickFile('1b')"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handleModalDrop(event,'1b')"
+           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
+        <div style="font-size:20px;margin-bottom:5px">📁</div>
+        <div id="modal-f1b-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </div>
     </div>
 
@@ -1180,8 +1192,8 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
   <div style="max-width:640px;margin:30px auto">
     <div class="ph"><h1>📤 Upload Data Files</h1><p>อัพโหลดไฟล์ Excel — ข้อมูลจะอัพเดทใน Dashboard ทันที · <span style="color:var(--accent);font-size:11px">v3.0 — fixed column detection</span></p></div>
     <div class="upcard">
-      <h3>📋 ไฟล์ที่ 1 — รายงานยอดขายแยกตามสินค้า</h3>
-      <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า</p>
+      <h3>📋 ไฟล์ที่ 1a — รายงานยอดขายแยกตามสินค้า <span style="color:var(--accent);font-size:13px;">วันที่ 1–15</span></h3>
+      <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า ช่วงวันที่ 1–15 ของเดือน</p>
       <div class="drop" id="d1" onclick="pickFileUp(1)"
            ondragover="event.preventDefault();this.classList.add('dv')"
            ondragleave="this.classList.remove('dv')"
@@ -1191,6 +1203,19 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
       </div>
       <div id="st1"></div>
+    </div>
+    <div class="upcard">
+      <h3>📋 ไฟล์ที่ 1b — รายงานยอดขายแยกตามสินค้า <span style="color:var(--accent);font-size:13px;">วันที่ 16–31</span></h3>
+      <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายแยกตามสินค้า ช่วงวันที่ 16–31 ของเดือน</p>
+      <div class="drop" id="d1b" onclick="pickFileUp('1b')"
+           ondragover="event.preventDefault();this.classList.add('dv')"
+           ondragleave="this.classList.remove('dv')"
+           ondrop="dropFileUp(event,'1b')">
+        <div class="drop-ico">📁</div>
+        <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
+      </div>
+      <div id="st1b"></div>
     </div>
     <div class="upcard">
       <h3>🎟️ ไฟล์ที่ 2 — รายงานสรุปการใช้โปรโมชั่น <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
@@ -4518,7 +4543,7 @@ function buildReport(){
 
 // ══════════ UPLOAD ══════════
 // ══════════ UPLOAD & PARSE ══════════
-const upF={1:null,2:null};
+const upF={1:null,'1b':null,2:null};
 
 function handleF(ev,n){
   const file=ev.target.files[0];if(!file)return;
@@ -4526,7 +4551,7 @@ function handleF(ev,n){
   const el=document.getElementById('st'+n);
   if(el) el.innerHTML=`<div class="fstatus ok">✅ <strong>${file.name}</strong> — ${(file.size/1024).toFixed(1)} KB · พร้อมประมวลผล</div>`;
   const procBtn=document.getElementById('proc-btn');
-  if(procBtn) procBtn.disabled=!upF[1];
+  if(procBtn) procBtn.disabled=!(upF[1]||upF['1b']);
 }
 
 // File wiring handled in DOMContentLoaded init block below
@@ -4552,51 +4577,52 @@ async function processFiles(){
   btn.textContent='⏳ กำลังอ่านไฟล์...'; btn.disabled=true;
   resultEl.innerHTML='';
   try{
-    // ── File 1: Sales ──
-    const rows1=await readXlsx(upF[1]);
-    // Find header row containing 'เลขที่เอกสาร'
-    let hdr1=0;
-    for(let i=0;i<Math.min(10,rows1.length);i++){
-      if(rows1[i].some(v=>String(v).trim()==='เลขที่เอกสาร')){hdr1=i;break;}
+    // ── Helper: parse one sales xlsx file → array of row objects ──
+    async function parseSalesFile(file){
+      const rows=await readXlsx(file);
+      let hdr=0;
+      for(let i=0;i<Math.min(10,rows.length);i++){
+        if(rows[i].some(v=>String(v).trim()==='เลขที่เอกสาร')){hdr=i;break;}
+      }
+      const cols=rows[hdr].map(v=>String(v).trim());
+      const ci=(...names)=>{for(const n of names){const i=cols.indexOf(n);if(i!==-1)return i;}return -1;};
+      const iDoc  = ci('เลขที่เอกสาร');
+      const iDate = ci('วันที่');
+      const iTime = ci('เวลาขาย','เวลา');
+      const iCat  = ci('ชื่อกลุ่มสินค้า');
+      const iProd = ci('ชื่อสินค้า');
+      const iQty  = ci('จำนวน');
+      const iNet  = ci('ราคาสุทธิ');
+      const iDisc = ci('ส่วนลด');
+      const result=[];
+      for(let i=hdr+1;i<rows.length;i++){
+        const r=rows[i];
+        const doc=String(r[iDoc]||'').trim();
+        if(!doc.startsWith('ABB')) continue;
+        const _net  = parseFloat(r[iNet])  ||0;
+        const _disc = parseFloat(r[iDisc]) ||0;
+        result.push({
+          doc,
+          date:  String(r[iDate]||'').trim(),
+          time:  String(r[iTime]||'').trim(),
+          cat:   String(r[iCat] ||'').trim(),
+          prod:  String(r[iProd]||'').trim(),
+          qty:   parseFloat(r[iQty]) ||0,
+          gross: _net + _disc,
+          disc:  _disc,
+          net:   _net
+        });
+      }
+      return result;
     }
-    const cols1=rows1[hdr1].map(v=>String(v).trim());
-    // Exact-match column finder with fallback
-    const ci1=(...names)=>{
-      for(const n of names){const i=cols1.indexOf(n);if(i!==-1)return i;}
-      return -1;
-    };
-    const iDoc  = ci1('เลขที่เอกสาร');
-    const iDate = ci1('วันที่');
-    const iTime = ci1('เวลาขาย','เวลา');
-    const iCat  = ci1('ชื่อกลุ่มสินค้า');
-    const iProd = ci1('ชื่อสินค้า');
-    const iQty  = ci1('จำนวน');
-    const iNet  = ci1('ราคาสุทธิ');
-    const iDisc = ci1('ส่วนลด');
-    
-    
 
+    // ── File 1: Sales — merge both halves ──
     salesRows=[];
-    for(let i=hdr1+1;i<rows1.length;i++){
-      const r=rows1[i];
-      const doc=String(r[iDoc]||'').trim();
-      if(!doc.startsWith('ABB')) continue;
-      const _net  = parseFloat(r[iNet])  ||0;
-      const _disc = parseFloat(r[iDisc]) ||0;
-      salesRows.push({
-        doc,
-        date:  String(r[iDate]||'').trim(),
-        time:  String(r[iTime]||'').trim(),
-        cat:   String(r[iCat] ||'').trim(),
-        prod:  String(r[iProd]||'').trim(),
-        qty:   parseFloat(r[iQty]) ||0,
-        gross: _net + _disc,   // gross = net before discount
-        disc:  _disc,
-        net:   _net - 0        // net = ราคาสุทธิ จากไฟล์ (หักส่วนลดแล้ว)
-      });
-    }
-    
-    if(salesRows.length===0) throw new Error('ไม่พบข้อมูลยอดขาย — cols: '+cols1.join(', '));
+    if(!upF[1]&&!upF['1b']) throw new Error('กรุณาเลือกไฟล์ยอดขายอย่างน้อย 1 ไฟล์');
+    if(upF[1])   salesRows.push(...(await parseSalesFile(upF[1])));
+    if(upF['1b']) salesRows.push(...(await parseSalesFile(upF['1b'])));
+
+    if(salesRows.length===0) throw new Error('ไม่พบข้อมูลยอดขาย — กรุณาตรวจสอบไฟล์');
 
     // ── File 2: Promo (ไม่บังคับ) ──
     let promoRows=[];
@@ -4868,7 +4894,7 @@ function dropFileUp(e, n){
   if(file) handleF({target:{files:[file]}}, n);
 }
 
-const modalFiles={1:null,2:null};
+const modalFiles={1:null,'1b':null,2:null};
 function handleModalFile(input,n){
   const file=input.files[0];
   if(!file)return;
@@ -4897,15 +4923,13 @@ function handleModalDrop(event,n){
   const drop=document.getElementById('modal-drop'+n);
   if(el) el.textContent='✅ '+file.name;
   if(drop){drop.style.borderColor='var(--accent)';drop.style.background='rgba(34,212,122,0.06)';}
-  const input=document.getElementById('modal-f'+n);
-  if(input){try{const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;}catch(e){}}
   checkModalReady();
 }
 
 function checkModalReady(){
   const btn=document.getElementById('modal-btn');
   if(btn){
-    const ready=!!(modalFiles[1]);
+    const ready=!!(modalFiles[1]||modalFiles['1b']);
     btn.disabled=!ready;
     btn.style.opacity=ready?'1':'.4';
     // ป้องกัน browser auto-focus ไปที่ปุ่มหลัง enable
@@ -4916,10 +4940,11 @@ function checkModalReady(){
 async function processModalFiles(){
   const btn=document.getElementById('modal-btn');
   const status=document.getElementById('modal-status');
-  if(!modalFiles[1]){status.textContent='❌ กรุณาเลือกไฟล์ยอดขายก่อน';return;}
+  if(!modalFiles[1]&&!modalFiles['1b']){status.textContent='❌ กรุณาเลือกไฟล์ยอดขายอย่างน้อย 1 ไฟล์';return;}
   btn.disabled=true;btn.textContent='⏳ กำลังประมวลผล...';status.textContent='';
   try{
-    upF[1]=modalFiles[1];
+    upF[1]=modalFiles[1]||null;
+    upF['1b']=modalFiles['1b']||null;
     upF[2]=modalFiles[2]||null;
     await processFiles();
     const modal=document.getElementById('upload-modal');
