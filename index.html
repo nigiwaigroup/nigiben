@@ -2016,19 +2016,35 @@ function renderMonthlyTable(){
   DAILY.forEach(d=>{
     const p=d.date.split('/'); if(p.length<3)return;
     const key=p[1]+'/'+p[2];
-    if(!monthMap[key]) monthMap[key]={mm:parseInt(p[1]),yy:parseInt(p[2]),days:0,bills:0,qty:0,gross:0,discount:0,net:0};
+    if(!monthMap[key]) monthMap[key]={mm:parseInt(p[1]),yy:parseInt(p[2]),key,days:0,bills:0,qty:0,gross:0,discount:0,net:0};
     const m=monthMap[key];
     m.days++;m.bills+=d.bills;m.qty+=d.qty;m.gross+=d.gross;m.discount+=d.discount;m.net+=d.net;
   });
   const months=Object.values(monthMap).sort((a,b)=>a.yy!==b.yy?a.yy-b.yy:a.mm-b.mm);
+  if(months.length===0){
+    document.getElementById('monthly-tbody').innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--text3)">ไม่พบข้อมูล</td></tr>`;
+    return;
+  }
   const maxNet=Math.max(...months.map(m=>m.net),1);
   const tot={days:0,bills:0,qty:0,gross:0,discount:0,net:0};
   months.forEach(m=>{tot.days+=m.days;tot.bills+=m.bills;tot.qty+=m.qty;tot.gross+=m.gross;tot.discount+=m.discount;tot.net+=m.net;});
 
+  let qualData=null;
+  try{ qualData=computeQualifiedABV(); }catch(e){}
+
   const html=months.map(m=>{
+    const mKey=m.key; // derived from the stored key — always correct
     const pct=(m.net/maxNet*100).toFixed(1);
     const discPct=m.gross>0?(m.discount/m.gross*100).toFixed(1):0;
-    const avgBill=(()=>{const _mQ=computeQualifiedABV();let n=0,b=0;Object.entries(_mQ.byDate).forEach(([d,v])=>{if(d.split('/')[1]+'/'+d.split('/')[2]===key){n+=v.net;b+=v.bills;}});return b>0?Math.round(n/b):0;})();
+    let avgBill=0;
+    if(qualData && qualData.byDate){
+      let n=0,b=0;
+      Object.entries(qualData.byDate).forEach(([d,v])=>{
+        const dp=d.split('/');
+        if(dp.length>=3 && dp[1]+'/'+dp[2]===mKey){n+=v.net;b+=v.bills;}
+      });
+      avgBill=b>0?Math.round(n/b):0;
+    }
     const avgDay=m.days>0?Math.round(m.net/m.days):0;
     return `<tr style="border-bottom:1px solid var(--border);">
       <td style="padding:11px 12px;font-family:var(--font-m);color:var(--accent2);font-size:14px">${_mTHFull[m.mm]||m.mm} ${m.yy+543}</td>
@@ -2045,7 +2061,7 @@ function renderMonthlyTable(){
     </tr>`;
   });
   const totDP=tot.gross>0?(tot.discount/tot.gross*100).toFixed(1):0;
-  const avgBill=(()=>{const _q=computeQualifiedABV();return _q.totalBills>0?_q.abv:0;})();
+  const avgBillTot=qualData&&qualData.totalBills>0?qualData.abv:0;
   const avgDay=tot.days>0?Math.round(tot.net/tot.days):0;
   html.push(`<tr style="border-top:2px solid var(--accent);background:var(--surface2);font-family:var(--font-m)">
     <td style="padding:11px 12px;color:var(--accent2)">TOTAL รวม ${months.length} เดือน</td>
@@ -2055,7 +2071,7 @@ function renderMonthlyTable(){
     <td class="num" style="padding:11px 8px">${f(tot.gross)}</td>
     <td class="num" style="padding:11px 8px;color:#f04545">-${f(tot.discount)}<span style="font-size:10px;color:var(--text3);margin-left:3px">(${totDP}%)</span></td>
     <td class="num" style="padding:11px 8px;color:var(--accent);font-size:16px">${f(tot.net)}</td>
-    <td class="num" style="padding:11px 8px">฿${fn(avgBill)}</td>
+    <td class="num" style="padding:11px 8px">฿${fn(avgBillTot)}</td>
     <td class="num" style="padding:11px 8px">฿${fn(avgDay)}</td>
     <td></td>
   </tr>`);
