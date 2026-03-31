@@ -1280,6 +1280,7 @@ const HM_SALES={};
 const CAT_HOUR={};
 const PROMO_DATA=[];
 const PRODUCTS=[];
+const MONTHLY_OVERRIDE=[]; // rows from the optional monthly summary file (upF[3])
 // Product by date (sampled data for daily view)
 const PROD_BY_DATE = {
   "01/03/2026":{"MINI001 / Salmon Sushi 7 pcs.":{net:4200,qty:20,cat:"Sushi Bento"},"DON004 / Salmon Don":{net:1560,qty:8,cat:"Donburi"},"BEV006 / Namthip Drinking Water 550ml":{net:1560,qty:150,cat:"Beverage"},"MINI014 / Sushi Moriawase Set":{net:2460,qty:11,cat:"Sushi Bento"},"DES007 / Matcha Chocolate Warabi Mochi":{net:756,qty:14,cat:"Dessert"}},
@@ -2012,14 +2013,54 @@ function renderDailyTable(){
 }
 
 function renderMonthlyTable(){
+  // ── Build month map from transaction-level DAILY data ──
   const monthMap={};
   DAILY.forEach(d=>{
     const p=d.date.split('/'); if(p.length<3)return;
-    const key=p[1]+'/'+p[2];
-    if(!monthMap[key]) monthMap[key]={mm:parseInt(p[1]),yy:parseInt(p[2]),key,days:0,bills:0,qty:0,gross:0,discount:0,net:0};
+    const key=p[1]+'/'+p[2]; // MM/YYYY
+    if(!monthMap[key]) monthMap[key]={mm:parseInt(p[1]),yy:parseInt(p[2]),key,days:0,bills:0,qty:0,gross:0,discount:0,net:0,fromFile:false};
     const m=monthMap[key];
     m.days++;m.bills+=d.bills;m.qty+=d.qty;m.gross+=d.gross;m.discount+=d.discount;m.net+=d.net;
   });
+
+  // ── Merge with MONTHLY_OVERRIDE (upF[3]) ──
+  // Months already covered by transaction data keep that data (more granular).
+  // Months only in the monthly file get added as-is, flagged fromFile:true.
+  if(MONTHLY_OVERRIDE.length>0){
+    const thName=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+    const enName=['','january','february','march','april','may','june','july','august','september','october','november','december'];
+    const thShort=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    MONTHLY_OVERRIDE.forEach(r=>{
+      let mm=0, yy=0;
+      const raw=String(r.month||'').trim();
+      const slashFull=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      const slashMY  =raw.match(/^(\d{1,2})\/(\d{4})$/);
+      const iso      =raw.match(/^(\d{4})-(\d{2})/);
+      if(slashFull){ mm=parseInt(slashFull[2]); yy=parseInt(slashFull[3]); }
+      else if(slashMY){ mm=parseInt(slashMY[1]); yy=parseInt(slashMY[2]); }
+      else if(iso){ yy=parseInt(iso[1]); mm=parseInt(iso[2]); }
+      else {
+        const yearMatch=raw.match(/(\d{4})/);
+        if(yearMatch){
+          yy=parseInt(yearMatch[1]);
+          if(yy>2400) yy-=543;
+          const lower=raw.toLowerCase();
+          for(let i=1;i<=12;i++){
+            if(lower.includes(thName[i])||lower.includes(enName[i])||lower.includes(thShort[i])){mm=i;break;}
+          }
+        }
+      }
+      if(yy>2400) yy-=543;
+      if(!mm||!yy||mm<1||mm>12||yy<2000) return;
+      const key=String(mm).padStart(2,'0')+'/'+yy;
+      if(!monthMap[key]){
+        monthMap[key]={mm,yy,key,days:r.days||0,bills:r.bills||0,qty:r.qty||0,
+          gross:r.gross||0,discount:r.discount||0,net:r.net||0,fromFile:true};
+      }
+      // existing DAILY-derived months take precedence — do not overwrite
+    });
+  }
+
   const months=Object.values(monthMap).sort((a,b)=>a.yy!==b.yy?a.yy-b.yy:a.mm-b.mm);
   if(months.length===0){
     document.getElementById('monthly-tbody').innerHTML=`<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--text3)">ไม่พบข้อมูล</td></tr>`;
@@ -2033,31 +2074,36 @@ function renderMonthlyTable(){
   try{ qualData=computeQualifiedABV(); }catch(e){}
 
   const html=months.map(m=>{
-    const mKey=m.key; // derived from the stored key — always correct
+    const mKey=m.key;
     const pct=(m.net/maxNet*100).toFixed(1);
     const discPct=m.gross>0?(m.discount/m.gross*100).toFixed(1):0;
     let avgBill=0;
-    if(qualData && qualData.byDate){
+    if(!m.fromFile && qualData && qualData.byDate){
       let n=0,b=0;
       Object.entries(qualData.byDate).forEach(([d,v])=>{
         const dp=d.split('/');
         if(dp.length>=3 && dp[1]+'/'+dp[2]===mKey){n+=v.net;b+=v.bills;}
       });
       avgBill=b>0?Math.round(n/b):0;
+    } else if(m.fromFile && m.bills>0){
+      avgBill=Math.round(m.net/m.bills);
     }
     const avgDay=m.days>0?Math.round(m.net/m.days):0;
+    const sourceTag=m.fromFile
+      ?`<span style="font-size:9px;color:var(--blue);margin-left:6px;background:rgba(59,130,246,.1);border-radius:3px;padding:1px 5px;">ไฟล์รายเดือน</span>`
+      :'';
     return `<tr style="border-bottom:1px solid var(--border);">
-      <td style="padding:11px 12px;font-family:var(--font-m);color:var(--accent2);font-size:14px">${_mTHFull[m.mm]||m.mm} ${m.yy+543}</td>
-      <td class="num" style="padding:11px 8px;color:var(--text3)">${m.days}</td>
-      <td class="num" style="padding:11px 8px">${fn(m.bills)}</td>
-      <td class="num" style="padding:11px 8px">${fn(m.qty)}</td>
-      <td class="num" style="padding:11px 8px;color:var(--text2)">${f(m.gross)}</td>
-      <td class="num" style="padding:11px 8px;color:#f04545">-${f(m.discount)}<span style="font-size:10px;color:var(--text3);margin-left:3px">(${discPct}%)</span></td>
+      <td style="padding:11px 12px;font-family:var(--font-m);color:var(--accent2);font-size:14px">${_mTHFull[m.mm]||m.mm} ${m.yy+543}${sourceTag}</td>
+      <td class="num" style="padding:11px 8px;color:var(--text3)">${m.days||'—'}</td>
+      <td class="num" style="padding:11px 8px">${m.bills?fn(m.bills):'—'}</td>
+      <td class="num" style="padding:11px 8px">${m.qty?fn(m.qty):'—'}</td>
+      <td class="num" style="padding:11px 8px;color:var(--text2)">${m.gross?f(m.gross):'—'}</td>
+      <td class="num" style="padding:11px 8px;color:#f04545">${m.discount?'-'+f(m.discount)+'<span style="font-size:10px;color:var(--text3);margin-left:3px">('+discPct+'%)</span>':'—'}</td>
       <td class="num" style="padding:11px 8px;color:var(--accent);font-family:var(--font-m);font-size:15px">${f(m.net)}</td>
-      <td class="num" style="padding:11px 8px">฿${fn(avgBill)}</td>
-      <td class="num" style="padding:11px 8px;color:var(--text2)">฿${fn(avgDay)}</td>
+      <td class="num" style="padding:11px 8px">${avgBill?'฿'+fn(avgBill):'—'}</td>
+      <td class="num" style="padding:11px 8px;color:var(--text2)">${avgDay?'฿'+fn(avgDay):'—'}</td>
       <td style="padding:11px 8px"><div style="background:var(--surface3);border-radius:3px;height:10px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px"></div></div></td>
+        <div style="height:100%;width:${pct}%;background:${m.fromFile?'var(--blue)':'var(--accent)'};border-radius:3px"></div></div></td>
     </tr>`;
   });
   const totDP=tot.gross>0?(tot.discount/tot.gross*100).toFixed(1):0;
@@ -4747,7 +4793,7 @@ async function processFiles(){
     }
 
     btn.textContent='⏳ กำลังอัพเดท Dashboard...';
-    rebuildDashboard(salesRows, promoRows);
+    rebuildDashboard(salesRows, promoRows, monthlyRows);
 
     const monthlySuffix = monthlyRows.length>0 ? ` · ยอดขายรายเดือน ${monthlyRows.length} รายการ` : '';
     resultEl.innerHTML='<div class="fstatus ok" style="padding:14px">🎉 <strong>อัพเดทสำเร็จ</strong> — ยอดขาย '+salesRows.length.toLocaleString()+' รายการ'+monthlySuffix+'</div>';
@@ -4803,10 +4849,14 @@ function getDOW(dateStr){
   return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]||'?';
 }
 
-function rebuildDashboard(salesRows, promoRows){
+function rebuildDashboard(salesRows, promoRows, monthlyRows=[]){
   
   salesRows.forEach(r=>{r.date=normDate(r.date);});
   promoRows.forEach(p=>{p.date=normDate(p.date);});
+
+  // Store monthly override rows globally so renderMonthlyTable can access them
+  MONTHLY_OVERRIDE.length=0;
+  monthlyRows.forEach(r=>MONTHLY_OVERRIDE.push(r));
   
 
   const dateMap={},catMap={},hourMap={},prodMap={},catHourMap={};
