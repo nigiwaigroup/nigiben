@@ -237,11 +237,12 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
 @media print {
   /* ซ่อนทุกอย่างในหน้า — แสดงเฉพาะ report pages */
   #sb, #topbar, #upload-modal,
-  #content > .page:not(#page-report):not(#page-report-hourly):not(#page-report-behavior) { display:none!important; }
+  #content > .page:not(#page-report):not(#page-report-hourly):not(#page-report-behavior):not(#page-report-cancel) { display:none!important; }
   /* ซ่อนทุกอย่างใน page-report ยกเว้น report-preview */
   #page-report > *:not(#report-preview),
   #page-report-hourly > *:not(#report-hourly-preview),
-  #page-report-behavior > *:not(#report-behavior-preview) { display:none!important; }
+  #page-report-behavior > *:not(#report-behavior-preview),
+  #page-report-cancel > *:not(#report-cancel-preview) { display:none!important; }
   /* reset layout */
   html,body { margin:0!important; padding:0!important; background:#fff!important; }
   #main { margin-left:0!important; width:100%!important; min-height:0!important; }
@@ -434,6 +435,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <div class="nav-item" data-page="report"><span class="ic">📄</span><span data-th="รายงานนักลงทุน" data-en="Investor Report">Investor Report</span> <span class="bdg">PDF</span></div>
     <div class="nav-item" data-page="report-hourly"><span class="ic">⏱️</span><span data-th="รายงานยอดขายรายชั่วโมง" data-en="Hourly Sales Report">Hourly Sales Report</span> <span class="bdg">PDF</span></div>
     <div class="nav-item" data-page="report-behavior"><span class="ic">🧠</span><span data-th="รายงานพฤติกรรมลูกค้า" data-en="Customer Behavior Report">Customer Behavior Report</span> <span class="bdg">PDF</span></div>
+    <div class="nav-item" data-page="report-cancel"><span class="ic">🚫</span><span data-th="รายงานยกเลิกบิล" data-en="Bill Cancellation Report">รายงานยกเลิกบิล</span> <span class="bdg">PDF</span></div>
   </div>
   <div class="sb-foot">
     <div class="period-box">
@@ -582,8 +584,8 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
           <th onclick="sortDaily('bills')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนบิล" data-en="Bills">จำนวนบิล</span> <span id="sort-bills">↕</span></th>
           <th onclick="sortDaily('qty')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนชิ้น" data-en="Items">จำนวนชิ้น</span> <span id="sort-qty">↕</span></th>
           <th onclick="sortDaily('gross')" title="Gross Revenue = ยอดขายรวมก่อนหักส่วนลดและยกเลิกบิล&#10;= Σ (จำนวน × ราคาขาย) ของทุก transaction ในวันนั้น" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Gross Revenue <span id="sort-gross">↕</span></th>
-          <th onclick="sortDaily('cancel')" title="ยกเลิกบิล = ยอดเงินรวมของบิลที่ถูกยกเลิกในวันนั้น&#10;(หักออกจาก Gross Revenue)&#10;สูตร: Σ จำนวนเงินสุทธิ ของบิลที่ยกเลิก" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--red);"><span data-th="ยกเลิกบิล (฿)" data-en="Cancelled (฿)">ยกเลิกบิล (฿)</span> <span id="sort-cancel">↕</span></th>
-          <th title="จำนวนบิลที่ถูกยกเลิกในวันนั้น&#10;(นับจากไฟล์สรุปการยกเลิกบิล)" style="padding:10px 8px;text-align:right;white-space:nowrap;color:var(--red);">ยกเลิก (บิล)</th>
+          <th onclick="sortDaily('cancel')" title="ยกเลิกบิล = ยอดรวมของบิลที่ถูกยกเลิกในวันนั้น&#10;⚠️ แสดงเพื่อให้ข้อมูลเท่านั้น — ไม่ได้หักออกจากยอดขาย&#10;เนื่องจาก POS ไม่รวมบิลที่ยกเลิกใน Export ไฟล์อยู่แล้ว" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--text3);"><span data-th="ยกเลิกบิล (฿)" data-en="Cancelled (฿)">ยกเลิกบิล (฿)</span> <span id="sort-cancel">↕</span></th>
+          <th title="จำนวนบิลที่ถูกยกเลิกในวันนั้น (ข้อมูลเพิ่มเติม)" style="padding:10px 8px;text-align:right;white-space:nowrap;color:var(--text3);">ยกเลิก (บิล)</th>
           <th onclick="sortDaily('preVat')" title="ฐานภาษี (Tax Base) ตามหลักสรรพากร&#10;= ยอดขายสุทธิ × 100/107&#10;= Net Revenue × 100 ÷ 107&#10;(คำนวณจาก Net หลังหักส่วนลดและยกเลิกบิลแล้ว)" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="ฐานภาษี (Pre-VAT)" data-en="Tax Base (Pre-VAT)">ฐานภาษี</span> <span id="sort-preVat">↕</span></th>
           <th onclick="sortDaily('vat')" title="ภาษีมูลค่าเพิ่ม (VAT 7%) ตามหลักสรรพากร&#10;= ยอดขายสุทธิ × 7/107&#10;= Net Revenue × 7 ÷ 107&#10;ตรวจสอบ: ฐานภาษี + VAT = Net Revenue ✓&#10;(ราคาสินค้า VAT รวมใน — VAT inclusive)" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="VAT 7%" data-en="VAT 7%">VAT 7%</span> <span id="sort-vat">↕</span></th>
           <th onclick="sortDaily('discount')" title="ส่วนลดโปรโมชั่น = ส่วนลดรวมทุกโปรโมชั่นในวันนั้น&#10;(มาจากไฟล์รายงานสรุปการใช้โปรโมชั่น)" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="ส่วนลด" data-en="Discount">ส่วนลด</span> <span id="sort-discount">↕</span></th>
@@ -1226,6 +1228,17 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
   <div id="report-behavior-preview" style="padding:0;"></div>
 </div>
 
+<!-- ══════════ BILL CANCELLATION REPORT ══════════ -->
+<div id="page-report-cancel" class="page">
+  <div class="ph"><h1>🚫 รายงานยกเลิกบิล</h1><p>สรุปรายการบิลที่ถูกยกเลิก · Nigiben Grab&amp;Go · สนามบินดอนเมือง</p></div>
+  <div id="rpt-cancel-toolbar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+    <div style="font-size:12px;color:var(--text2)">🚫 แสดงรายการเลขที่ใบเสร็จและมูลค่าบิลที่ยกเลิก · เรียงตามวันที่</div>
+    <button onclick="printCancelReport()" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:9px 20px;font-family:var(--font-h);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px">🖨️ PRINT / SAVE PDF</button>
+  </div>
+  <div style="font-size:10px;color:var(--text3);margin-bottom:16px">⚙️ ตั้งค่าตอน Print: <strong style="color:var(--text2)">Paper = A4 · Margins = None · Background graphics = ✅</strong></div>
+  <div id="report-cancel-preview" style="padding:0;"></div>
+</div>
+
 <div id="page-upload" class="page">
   <div style="max-width:640px;margin:30px auto">
     <div class="ph"><h1>📤 Upload Data Files</h1><p>อัพโหลดไฟล์ Excel — ข้อมูลจะอัพเดทใน Dashboard ทันที · <span style="color:var(--accent);font-size:11px">v3.0 — fixed column detection</span></p></div>
@@ -1360,6 +1373,7 @@ var BASKET_DIST=[0,0,0,0,0]; // bill count per range <50,50-99,100-149...
 // ══════════ UTILS ══════════
 const f=n=>'฿'+Math.round(n).toLocaleString();
 const fn=n=>Math.round(n).toLocaleString();
+const fd2=n=>'฿'+(+n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
 Chart.defaults.color='#e2e8f4';
 Chart.defaults.font.family="'Prompt',sans-serif";
 Chart.defaults.font.size=12;
@@ -1381,6 +1395,7 @@ const sn=s=>(s.split('/')[1]||s).trim().substring(0,22);
 
 // ══════════ NAV ══════════
 function nav(p){
+  if(p==='report-cancel' && CANCEL_DATA.length>0) buildCancelReport();
   if(p==='trial' && salesRows.length>0 && document.getElementById('trial-daily-tbody').innerHTML==='') buildTrial();
   if(p==='report' && salesRows.length>0) buildReport();
   if(p==='report-hourly' && salesRows.length>0) buildHourlyReport();
@@ -1502,10 +1517,10 @@ function buildOverview(){
   const vatBreakEl=document.getElementById('kpi-vat-breakdown');
   if(vatBreakEl){
     let html='';
-    if(TOTAL_CANCEL>0) html+='🚫 ยกเลิกบิล: <strong style="color:var(--red)">-฿'+Math.round(TOTAL_CANCEL).toLocaleString()+'</strong><br>';
+    if(TOTAL_CANCEL>0) html+='🚫 ยกเลิกบิล: <strong style="color:var(--text2)">฿'+Math.round(TOTAL_CANCEL).toLocaleString()+'</strong> <span style="font-size:9px;color:var(--text3)">(ข้อมูลเพิ่มเติม — POS หักไว้แล้ว)</span><br>';
     if(TOTAL_PREVAT>0){
-      html+='🏷️ ก่อน VAT: <strong style="color:var(--accent2)">฿'+Math.round(TOTAL_PREVAT).toLocaleString()+'</strong><br>';
-      html+='🧾 VAT 7%: <strong style="color:var(--text)">฿'+Math.round(TOTAL_VAT).toLocaleString()+'</strong>';
+      html+='🏷️ ก่อน VAT: <strong style="color:var(--accent2)">'+fd2(TOTAL_PREVAT)+'</strong><br>';
+      html+='🧾 VAT 7%: <strong style="color:var(--text)">'+fd2(TOTAL_VAT)+'</strong>';
     }
     vatBreakEl.innerHTML=html;
   }
@@ -2054,14 +2069,14 @@ function renderDailyTable(){
       <td style="padding:9px 8px;font-size:12px;color:${isWE?'var(--accent)':'var(--text2)'}">${_thDOW[d.dow]||d.dow}</td>
       <td class="num" style="padding:9px 8px">${fn(d.bills)}</td>
       <td class="num" style="padding:9px 8px">${fn(d.qty)}</td>
-      <td class="num" style="padding:9px 8px;color:var(--text2)">${f(d.gross)}</td>
-      <td class="num" style="padding:9px 8px;color:var(--red)">${hasCancelDay?'-'+f(d.cancel):'—'}</td>
-      <td class="num" style="padding:9px 8px;color:var(--red)">${cancelCnt>0?cancelCnt+' บิล':'—'}</td>
-      <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?f(d.preVat):'—'}</td>
-      <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?f(d.vat):'—'}</td>
-      <td class="num" style="padding:9px 8px;color:var(--red)">${d.discount>0?'-'+f(d.discount):'—'}</td>
+      <td class="num" style="padding:9px 8px;color:var(--text2)">${fd2(d.gross)}</td>
+      <td class="num" style="padding:9px 8px;color:var(--text3)">${hasCancelDay?f(d.cancel):'—'}</td>
+      <td class="num" style="padding:9px 8px;color:var(--text3)">${cancelCnt>0?cancelCnt+' บิล':'—'}</td>
+      <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?fd2(d.preVat):'—'}</td>
+      <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?fd2(d.vat):'—'}</td>
+      <td class="num" style="padding:9px 8px;color:var(--red)">${d.discount>0?'-'+fd2(d.discount):'—'}</td>
       <td class="num" style="padding:9px 8px;color:${parseFloat(discPct)>30?'var(--red)':'var(--text2)'};">${d.gross>0?discPct+'%':'—'}</td>
-      <td class="num" style="padding:9px 8px;color:var(--accent);font-family:var(--font-m)">${f(d.net)}</td>
+      <td class="num" style="padding:9px 8px;color:var(--accent);font-family:var(--font-m)">${fd2(d.net)}</td>
       <td class="num" style="padding:9px 8px">฿${fn(d.abv)}</td>
       <td style="padding:9px 8px"><div style="background:var(--surface3);border-radius:3px;height:8px;overflow:hidden">
         <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px"></div></div></td>
@@ -2084,14 +2099,14 @@ function renderDailyTable(){
     <td style="padding:10px 8px;font-size:11px;color:var(--text3)">${rows.length} วัน · เฉลี่ย ฿${avgDaily.toLocaleString()}/วัน</td>
     <td class="num" style="padding:10px 8px;color:var(--accent2)">${fn(tot.bills)}</td>
     <td class="num" style="padding:10px 8px;color:var(--accent2)">${fn(tot.qty)}</td>
-    <td class="num" style="padding:10px 8px">${f(tot.gross)}</td>
-    <td class="num" style="padding:10px 8px;color:var(--red)">${totHasCancel?'-'+f(tot.cancel):'—'}</td>
-    <td class="num" style="padding:10px 8px;color:var(--red)">${tot.cancelCount>0?tot.cancelCount+' บิล':'—'}</td>
-    <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?f(tot.preVat):'—'}</td>
-    <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?f(tot.vat):'—'}</td>
-    <td class="num" style="padding:10px 8px;color:var(--red)">${tot.discount>0?'-'+f(tot.discount):'—'}</td>
+    <td class="num" style="padding:10px 8px">${fd2(tot.gross)}</td>
+    <td class="num" style="padding:10px 8px;color:var(--text3)">${totHasCancel?f(tot.cancel):'—'}</td>
+    <td class="num" style="padding:10px 8px;color:var(--text3)">${tot.cancelCount>0?tot.cancelCount+' บิล':'—'}</td>
+    <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?fd2(tot.preVat):'—'}</td>
+    <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?fd2(tot.vat):'—'}</td>
+    <td class="num" style="padding:10px 8px;color:var(--red)">${tot.discount>0?'-'+fd2(tot.discount):'—'}</td>
     <td class="num" style="padding:10px 8px;color:${parseFloat(totDP)>30?'var(--red)':'var(--text2)'};">${tot.gross>0?totDP+'%':'—'}</td>
-    <td class="num" style="padding:10px 8px;color:var(--accent);font-size:15px">${f(tot.net)}</td>
+    <td class="num" style="padding:10px 8px;color:var(--accent);font-size:15px">${fd2(tot.net)}</td>
     <td class="num" style="padding:10px 8px">฿${fn(avgAbv)}</td>
     <td></td>
   </tr>`);
@@ -5107,30 +5122,30 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[]){
 
   const newDAILY=sortedDates.map(d=>{
     const v=dateMap[d]||{net:0,gross:0,qty:0,disc:0,preVat:0,vat:0,bills:new Set()};
-    const disc   = v.disc > 0 ? v.disc : (promoByDate[d]||0);
-    const gross  = v.gross > 0 ? v.gross : v.net + disc;
-    const netBeforeCancel = gross - disc;
+    const disc  = v.disc > 0 ? v.disc : (promoByDate[d]||0);
+    const gross = v.gross > 0 ? v.gross : v.net + disc;
+    const net   = Math.max(0, gross - disc);
 
-    // Deduct cancellations from net and gross
+    // NOTE: Cancelled bills are ALREADY excluded from the POS sales export.
+    // The cancel file is INFORMATIONAL ONLY — display cancelled amount & count per day.
+    // Do NOT deduct again — it would double-count and give wrong net revenue.
     const cancelAmt   = cancelByDate[d]||0;
     const cancelCount = cancelCountByDate[d]||0;
-    const net   = Math.max(0, netBeforeCancel - cancelAmt);
-    const grossAfterCancel = Math.max(0, gross - cancelAmt);
 
-    // Recalculate pre-VAT and VAT from net after cancel & discount
-    // Thai Revenue Dept standard (VAT inclusive 7%):
-    //   ฐานภาษี (Pre-VAT)  = Net × 100/107
+    // Thai Revenue Dept standard — VAT inclusive 7%:
+    //   ฐานภาษี (Pre-VAT)     = Net × 100/107
     //   ภาษีมูลค่าเพิ่ม (VAT) = Net × 7/107
-    //   Pre-VAT + VAT = Net (ตรวจสอบ: 100/107 + 7/107 = 107/107 = 1 ✓)
-    const preVatAfter = net > 0 ? Math.round((net * 100 / 107) * 100) / 100 : 0;
-    const vatAfter    = net > 0 ? Math.round((net * 7   / 107) * 100) / 100 : 0;
+    //   Pre-VAT + VAT = Net ✓  (100/107 + 7/107 = 107/107 = 1)
+    // No rounding applied — full decimal precision retained
+    const preVatAfter = net > 0 ? (net * 100 / 107) : 0;
+    const vatAfter    = net > 0 ? (net * 7   / 107) : 0;
 
     return {
       date: d,
       net:  net,
       qty:  v.qty,
       bills:[...v.bills].length,
-      gross: grossAfterCancel,
+      gross: gross,
       discount: disc,
       cancel: cancelAmt,
       cancelCount: cancelCount,
@@ -6582,6 +6597,233 @@ function showPPIModal(name){
 function setPPView(){}
 function renderPromoProduct(){ renderPPI(); }
 function showProductPromoModal(name){ showPPIModal(name); }
+
+// ══════════ BILL CANCELLATION REPORT ══════════
+function buildCancelReport(){
+  const el=document.getElementById('report-cancel-preview');
+  if(!el) return;
+
+  if(CANCEL_DATA.length===0){
+    el.innerHTML='<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px;">⚠️ ไม่พบข้อมูลการยกเลิกบิล — กรุณาอัพโหลดไฟล์สรุปการยกเลิกบิลก่อน</div>';
+    return;
+  }
+
+  // ── helpers ──
+  const mTHF=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const dowTH={Sun:'อาทิตย์',Mon:'จันทร์',Tue:'อังคาร',Wed:'พุธ',Thu:'พฤหัสบดี',Fri:'ศุกร์',Sat:'เสาร์'};
+  const fmt=n=>n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtInt=n=>Math.round(n).toLocaleString('th-TH');
+  const now=new Date();
+  const genDate=`${now.getDate()} ${mTHF[now.getMonth()+1]} ${now.getFullYear()+543}`;
+  const genTime=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+
+  // ── group by date ──
+  const byDate={};
+  CANCEL_DATA.forEach(r=>{
+    if(!byDate[r.date]) byDate[r.date]=[];
+    byDate[r.date].push(r);
+  });
+  const sortedDates=Object.keys(byDate).sort((a,b)=>{
+    const [da,ma,ya]=a.split('/').map(Number);
+    const [db,mb,yb]=b.split('/').map(Number);
+    return new Date(ya,ma-1,da)-new Date(yb,mb-1,db);
+  });
+
+  // ── overall stats ──
+  const totalAmt   = CANCEL_DATA.reduce((s,r)=>s+r.amount,0);
+  const totalBills = CANCEL_DATA.length;
+  const totalDays  = sortedDates.length;
+  const avgPerDay  = totalDays>0 ? totalAmt/totalDays : 0;
+  const maxDay     = sortedDates.reduce((mx,d)=>{
+    const s=byDate[d].reduce((a,r)=>a+r.amount,0);
+    return s>mx.amt?{date:d,amt:s}:mx;
+  },{date:'',amt:0});
+
+  // ── first/last date for period label ──
+  const [fd,fm,fy]=sortedDates[0].split('/').map(Number);
+  const [ld,lm,ly]=sortedDates[sortedDates.length-1].split('/').map(Number);
+  const periodTH= fm===lm&&fy===ly
+    ? `${String(fd).padStart(2,'0')}–${String(ld).padStart(2,'0')} ${mTHF[fm]} ${fy+543}`
+    : `${String(fd).padStart(2,'0')} ${mTHF[fm]} – ${String(ld).padStart(2,'0')} ${mTHF[lm]} ${ly+543}`;
+
+  // ── colour palette (matches existing reports) ──
+  const C={
+    ink:'#0f1923',navy:'#162537',white:'#ffffff',bg:'#f8fafc',
+    amber:'#f0a500',amber2:'#fbbf24',
+    red:'#f04545',pink:'#fecaca',
+    green:'#22d47a',
+    t1:'#0f172a',t2:'#334155',t3:'#64748b',t4:'#94a3b8',
+    border:'#e2e8f0'
+  };
+
+  const pageStyle=`width:210mm;background:#fff;font-family:'Prompt',sans-serif;color:#0f1923;box-sizing:border-box;margin:0 auto 28px;border-radius:4px;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.35);-webkit-print-color-adjust:exact;print-color-adjust:exact;`;
+
+  // ── page header (same gradient stripe as other reports) ──
+  const pageHeader=`
+    <div style="height:6px;background:linear-gradient(90deg,#f04545 0%,#f0a500 35%,#22d47a 65%,#3d9be0 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>
+    <div style="background:#0f1923;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <div style="display:flex;align-items:center;gap:18px">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:#f04545;letter-spacing:4px">NIGIBEN</div>
+          <div style="font-size:8px;color:#f0a500;letter-spacing:1.5px;margin-top:1px;font-weight:600">BILL CANCELLATION REPORT · DON MUEANG AIRPORT</div>
+        </div>
+        <div style="width:1px;height:30px;background:#334155"></div>
+        <div>
+          <div style="font-size:8px;color:#64748b;letter-spacing:1px">PERIOD</div>
+          <div style="font-size:12px;color:#f0a500;font-weight:700;margin-top:1px">${periodTH}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:8px;color:#64748b;letter-spacing:1px">GENERATED</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:1px">${genDate} · ${genTime}</div>
+      </div>
+    </div>`;
+
+  const pageFooter=(pg,total)=>`
+    <div style="height:3px;background:linear-gradient(90deg,#f04545 0%,#f0a500 50%,#22d47a 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>
+    <div style="background:#0f1923;padding:7px 26px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <div style="font-size:8px;color:#475569">NIGIBEN · สนามบินดอนเมือง · CONFIDENTIAL</div>
+      <div style="font-size:8px;color:#475569">หน้า ${pg}/${total}</div>
+    </div>`;
+
+  // ── KPI summary section ──
+  const kpiBox=(label,val,sub,col)=>`
+    <div style="background:linear-gradient(135deg,${col}18 0%,${col}06 100%);border:1.5px solid ${col}55;border-radius:10px;padding:11px 14px;border-top:3px solid ${col};-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <div style="font-size:7.5px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;margin-bottom:6px">${label}</div>
+      <div style="font-size:22px;font-weight:700;color:${col};line-height:1.1;margin-bottom:4px">${val}</div>
+      <div style="font-size:8.5px;color:#334155;border-top:1px solid ${col}30;padding-top:4px">${sub}</div>
+    </div>`;
+
+  const kpiSection=`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;padding:0 26px">
+      ${kpiBox('จำนวนบิลยกเลิกทั้งหมด',fmtInt(totalBills)+' บิล',`ใน ${totalDays} วัน · เฉลี่ย ${(totalBills/totalDays).toFixed(1)} บิล/วัน`,C.red)}
+      ${kpiBox('มูลค่ายกเลิกรวม','฿'+fmt(totalAmt),`เฉลี่ย ฿${fmt(avgPerDay)}/วัน`,C.red)}
+      ${kpiBox('วันที่ยกเลิกสูงสุด',maxDay.date.substring(0,5),`฿${fmt(maxDay.amt)} · ${byDate[maxDay.date]?.length||0} บิล`,C.amber)}
+      ${kpiBox('บิลยกเลิกสูงสุด','฿'+fmt(Math.max(...CANCEL_DATA.map(r=>r.amount))),`เลขที่: ${CANCEL_DATA.reduce((mx,r)=>r.amount>mx.amount?r:mx,CANCEL_DATA[0]).doc.split('/').pop()}`,C.amber)}
+    </div>`;
+
+  // ── main table rows ──
+  const thStyle=`padding:9px 10px;text-align:`;
+  const thead=`
+    <thead>
+      <tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <th style="${thStyle}center;font-size:9px;color:#f0a500;font-weight:800;letter-spacing:1px;width:36px">#</th>
+        <th style="${thStyle}left;font-size:9px;color:#f0a500;font-weight:800;letter-spacing:1px;width:90px">วันที่</th>
+        <th style="${thStyle}left;font-size:9px;color:#f0a500;font-weight:800;letter-spacing:1px;width:60px">วัน</th>
+        <th style="${thStyle}left;font-size:9px;color:#f0a500;font-weight:800;letter-spacing:1px;width:60px">เวลา</th>
+        <th style="${thStyle}left;font-size:9px;color:#f0a500;font-weight:800;letter-spacing:1px">เลขที่ใบเสร็จ</th>
+        <th style="${thStyle}left;font-size:9px;color:#f0a500;font-weight:800;letter-spacing:1px">ผู้ยกเลิก</th>
+        <th style="${thStyle}right;font-size:9px;color:#f0a500;font-weight:800;letter-spacing:1px;width:90px">มูลค่า (฿)</th>
+      </tr>
+    </thead>`;
+
+  let allRows='';
+  let seq=0;
+  let prevDate='';
+  sortedDates.forEach(date=>{
+    const bills=byDate[date];
+    const dayTotal=bills.reduce((s,r)=>s+r.amount,0);
+    const [d,m,y]=date.split('/').map(Number);
+    const dow=new Date(y,m-1,d);
+    const dowStr=dowTH[['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dow.getDay()]]||'';
+    const isWE=dow.getDay()===0||dow.getDay()===6;
+
+    bills.forEach((r,bi)=>{
+      seq++;
+      const isFirst=bi===0;
+      const isLast=bi===bills.length-1;
+      allRows+=`
+        <tr style="border-bottom:1px solid ${isLast?'#cbd5e1':'#e2e8f0'};background:${seq%2===0?'#f8fafc':'#ffffff'};-webkit-print-color-adjust:exact;print-color-adjust:exact">
+          <td style="padding:7px 10px;text-align:center;font-size:9px;color:#94a3b8">${seq}</td>
+          <td style="padding:7px 10px;font-size:10px;font-weight:${isFirst?700:400};color:${isFirst?(isWE?'#d97706':'#0f1923'):'#64748b'}">${isFirst?date.substring(0,5):''}</td>
+          <td style="padding:7px 10px;font-size:9px;color:${isWE?'#d97706':'#64748b'}">${isFirst?dowStr:''}</td>
+          <td style="padding:7px 10px;font-size:9.5px;color:#334155;font-family:'Prompt',monospace">${r.time||''}</td>
+          <td style="padding:7px 10px;font-size:9.5px;color:#0f1923;font-weight:600">${r.doc}</td>
+          <td style="padding:7px 10px;font-size:9px;color:#64748b">${r.person||'—'}</td>
+          <td style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#f04545">฿${fmt(r.amount)}</td>
+        </tr>`;
+      if(isLast){
+        // day subtotal row
+        allRows+=`
+        <tr style="background:linear-gradient(90deg,#fef2f2 0%,#fff5f5 100%);border-bottom:2px solid #fca5a5;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+          <td colspan="5" style="padding:5px 10px;font-size:8.5px;color:#b91c1c;font-weight:700;letter-spacing:.5px">รวมยกเลิก ${date.substring(0,5)} · ${bills.length} บิล</td>
+          <td></td>
+          <td style="padding:5px 10px;text-align:right;font-size:10px;font-weight:800;color:#b91c1c">฿${fmt(dayTotal)}</td>
+        </tr>`;
+      }
+    });
+  });
+
+  // grand total row
+  const grandTotal=`
+    <tr style="background:linear-gradient(90deg,#0f1923 0%,#1d3248 100%);-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <td colspan="5" style="padding:10px 10px;font-size:10px;color:#f0a500;font-weight:800;letter-spacing:1px">ยอดรวมทั้งหมด · ${totalBills} บิล · ${totalDays} วัน</td>
+      <td></td>
+      <td style="padding:10px 10px;text-align:right;font-size:13px;font-weight:800;color:#22d47a">฿${fmt(totalAmt)}</td>
+    </tr>`;
+
+  // ── build pages ──
+  const totalPages=2;
+
+  const p1=`<div class="rpt-page" style="${pageStyle}">
+    ${pageHeader}
+    <!-- KPI section -->
+    <div style="padding:18px 26px 0">
+      <div style="font-size:9px;font-weight:800;color:#64748b;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding-left:8px;border-left:3px solid #f04545">📊 สรุปภาพรวม</div>
+    </div>
+    ${kpiSection}
+    <!-- daily chart bars -->
+    <div style="padding:0 26px 16px">
+      <div style="font-size:9px;font-weight:800;color:#64748b;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-left:8px;border-left:3px solid #f04545">📅 มูลค่ายกเลิกรายวัน</div>
+      <div style="display:flex;align-items:flex-end;gap:3px;height:80px;background:#f8fafc;border-radius:8px;padding:8px 12px;border:1px solid #e2e8f0">
+        ${(()=>{
+          const maxAmt=Math.max(...sortedDates.map(d=>byDate[d].reduce((s,r)=>s+r.amount,0)),1);
+          return sortedDates.map(date=>{
+            const dayAmt=byDate[date].reduce((s,r)=>s+r.amount,0);
+            const pct=(dayAmt/maxAmt*100).toFixed(1);
+            const [d,m,y]=date.split('/').map(Number);
+            const isWE=new Date(y,m-1,d).getDay()===0||new Date(y,m-1,d).getDay()===6;
+            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div style="font-size:6px;color:#94a3b8;text-align:center;writing-mode:initial">${dayAmt>=100?'฿'+(dayAmt/1000).toFixed(1)+'K':''}</div>
+              <div style="width:100%;background:${isWE?'#f97316':'#f04545'};border-radius:2px 2px 0 0;flex:none" title="${date}: ฿${dayAmt}" data-height="${pct}" style="height:${Math.max(pct*0.6,1)}px;background:${isWE?'#f97316':'#f04545'};border-radius:2px 2px 0 0;"></div>
+              <div style="font-size:6px;color:#94a3b8;text-align:center;transform:rotate(-45deg);transform-origin:top center;white-space:nowrap;margin-top:2px">${date.substring(0,5)}</div>
+            </div>`;
+          }).join('');
+        })()}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:6px;font-size:8px;color:#64748b">
+        <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:8px;background:#f04545;border-radius:2px"></div>วันธรรมดา</div>
+        <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:8px;background:#f97316;border-radius:2px"></div>วันหยุด</div>
+      </div>
+    </div>
+    ${pageFooter(1,totalPages)}
+  </div>`;
+
+  const p2=`<div class="rpt-page" style="${pageStyle}">
+    ${pageHeader}
+    <div style="padding:16px 26px">
+      <div style="font-size:9px;font-weight:800;color:#64748b;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding-left:8px;border-left:3px solid #f04545">📋 รายการบิลที่ยกเลิกทั้งหมด</div>
+      <table style="width:100%;border-collapse:collapse;font-size:9.5px">
+        ${thead}
+        <tbody>${allRows}</tbody>
+        ${grandTotal}
+      </table>
+      <div style="margin-top:16px;background:linear-gradient(135deg,#fff7ed 0%,#fffbeb 100%);border:1.5px solid #fbbf24;border-left:4px solid #f0a500;border-radius:8px;padding:10px 14px;font-size:8.5px;color:#334155;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <strong style="color:#0f1923;display:block;margin-bottom:4px;">📌 หมายเหตุ:</strong>
+        บิลที่ถูกยกเลิกจะ<strong>ไม่ถูกนับ</strong>ในยอดขายสุทธิ (Net Revenue) เนื่องจาก POS ไม่รวมบิลที่ยกเลิกในรายงานยอดขาย · รายงานนี้จัดทำเพื่อการตรวจสอบภายใน
+      </div>
+    </div>
+    ${pageFooter(2,totalPages)}
+  </div>`;
+
+  el.innerHTML=[p1,p2].join('');
+}
+
+function printCancelReport(){
+  if(CANCEL_DATA.length===0){alert('กรุณาอัพโหลดไฟล์สรุปการยกเลิกบิลก่อน');return;}
+  buildCancelReport();
+  setTimeout(()=>window.print(),300);
+}
 
 // ══════════ THEME TOGGLE ══════════
 function toggleTheme(){
