@@ -345,8 +345,21 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
       </div>
     </div>
 
+    <!-- File 1c: Previous Month Sales (optional) -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📊 ไฟล์ยอดขาย — <span style="color:var(--blue,#3b82f6);font-weight:700;">เดือนก่อนหน้า</span> <span style="color:var(--text3);font-weight:400;font-size:10px">(ไม่บังคับ — รวมข้อมูลข้ามเดือน)</span></div>
+      <div id="modal-drop1c" onclick="pickFile('1c')"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handleModalDrop(event,'1c')"
+           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
+        <div style="font-size:20px;margin-bottom:5px">📁</div>
+        <div id="modal-f1c-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
+      </div>
+    </div>
+
     <!-- File 2: Promo -->
-    <div style="margin-bottom:24px">
+    <div style="margin-bottom:12px">
       <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น (รายงานสรุปการใช้โปรโมชั่น)</div>
       <div id="modal-drop2" onclick="pickFile(2)"
            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
@@ -355,6 +368,18 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
            style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
         <div style="font-size:24px;margin-bottom:6px">🎟️</div>
         <div id="modal-f2-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
+      </div>
+    </div>
+    <!-- File 2b: Previous Month Promo -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น — <span style="color:var(--blue,#3b82f6);font-weight:700;">เดือนก่อนหน้า</span> <span style="color:var(--text3);font-weight:400;font-size:10px">(ไม่บังคับ)</span></div>
+      <div id="modal-drop2b" onclick="pickFile('2b')"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handleModalDrop(event,'2b')"
+           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
+        <div style="font-size:20px;margin-bottom:5px">🎟️</div>
+        <div id="modal-f2b-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </div>
     </div>
 
@@ -434,7 +459,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
 
 <div id="main">
   <div id="topbar">
-    <div class="tb-title" id="tb-title">Performance Overview</div>
+    <div class="tb-title" id="tb-title" data-th="ภาพรวมผลงาน" data-en="Performance Overview">Performance Overview</div>
     <div class="tb-live">LIVE DATA</div>
     <div class="tb-date" id="tb-date"></div>
     <button id="lang-toggle" onclick="toggleLang()" title="Switch Thai / English"
@@ -530,29 +555,32 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <!-- View toggle -->
     <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--rs);overflow:hidden;">
       <button id="daily-view-day" onclick="setDailyView('day')"
-        style="padding:7px 16px;font-size:12px;font-family:var(--font-h);border:none;cursor:pointer;background:var(--accent);color:#000;font-weight:700;">📋 รายวัน</button>
+        style="padding:7px 16px;font-size:12px;font-family:var(--font-h);border:none;cursor:pointer;background:var(--accent);color:#000;font-weight:700;"
+        data-th="📋 รายวัน" data-en="📋 Daily">📋 รายวัน</button>
       <button id="daily-view-month" onclick="setDailyView('month')"
-        style="padding:7px 16px;font-size:12px;font-family:var(--font-h);border:none;cursor:pointer;background:var(--surface2);color:var(--text2);">📅 รายเดือน</button>
+        style="padding:7px 16px;font-size:12px;font-family:var(--font-h);border:none;cursor:pointer;background:var(--surface2);color:var(--text2);"
+        data-th="📅 รายเดือน" data-en="📅 Monthly">📅 รายเดือน</button>
     </div>
     <!-- Month filter (daily view only) -->
     <select id="daily-month-filter" onchange="renderDailyTable()"
       style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;color:var(--text);font-size:12px;font-family:var(--font-b);outline:none;display:none;">
-      <option value="">ทุกเดือน</option>
+      <option value="" data-th="ทุกเดือน" data-en="All Months">ทุกเดือน</option>
     </select>
     <!-- Date range filter -->
     <div id="daily-range-wrap" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-      <span style="font-size:11px;color:var(--text3);">📅 ช่วงวันที่:</span>
+      <span id="daily-range-label" style="font-size:11px;color:var(--text3);" data-th="📅 ช่วงวันที่:" data-en="📅 Date Range:">📅 ช่วงวันที่:</span>
       <select id="daily-date-from" onchange="renderDailyTable()"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;">
-        <option value="">ตั้งแต่วันแรก</option>
+        <option value="" data-th="ตั้งแต่วันแรก" data-en="From Start">ตั้งแต่วันแรก</option>
       </select>
       <span style="color:var(--text3);font-size:12px;">—</span>
       <select id="daily-date-to" onchange="renderDailyTable()"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;">
-        <option value="">ถึงวันสุดท้าย</option>
+        <option value="" data-th="ถึงวันสุดท้าย" data-en="To End">ถึงวันสุดท้าย</option>
       </select>
       <button onclick="clearDailyRange()" title="ล้าง filter"
-        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b);">✕ ล้าง</button>
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b);"
+        data-th="✕ ล้าง" data-en="✕ Clear">✕ ล้าง</button>
     </div>
     <span id="daily-cnt" style="font-size:11px;color:var(--text3);margin-left:auto;"></span>
   </div>
@@ -562,16 +590,16 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <table style="width:100%;border-collapse:collapse;font-size:13px">
       <thead>
         <tr id="daily-thead" style="border-bottom:2px solid var(--accent);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px">
-          <th onclick="sortDaily('date')" style="padding:10px 12px;text-align:left;cursor:pointer;user-select:none;white-space:nowrap;">วันที่ <span id="sort-date">↕</span></th>
-          <th style="padding:10px 12px;text-align:left;">วัน</th>
-          <th onclick="sortDaily('bills')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">จำนวนบิล <span id="sort-bills">↕</span></th>
-          <th onclick="sortDaily('qty')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">จำนวนชิ้น <span id="sort-qty">↕</span></th>
+          <th onclick="sortDaily('date')" style="padding:10px 12px;text-align:left;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="วันที่" data-en="Date">วันที่</span> <span id="sort-date">↕</span></th>
+          <th style="padding:10px 12px;text-align:left;" data-th="วัน" data-en="Day">วัน</th>
+          <th onclick="sortDaily('bills')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนบิล" data-en="Bills">จำนวนบิล</span> <span id="sort-bills">↕</span></th>
+          <th onclick="sortDaily('qty')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนชิ้น" data-en="Items">จำนวนชิ้น</span> <span id="sort-qty">↕</span></th>
           <th onclick="sortDaily('gross')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Gross Revenue <span id="sort-gross">↕</span></th>
-          <th onclick="sortDaily('discount')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">ส่วนลด <span id="sort-discount">↕</span></th>
+          <th onclick="sortDaily('discount')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="ส่วนลด" data-en="Discount">ส่วนลด</span> <span id="sort-discount">↕</span></th>
           <th style="padding:10px 8px;text-align:right;white-space:nowrap;color:var(--red);">Disc%</th>
           <th onclick="sortDaily('net')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Net Revenue <span id="sort-net">↕</span></th>
-          <th onclick="sortDaily('abv')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Avg/Bill <span id="sort-abv">↕</span></th>
-          <th style="padding:10px 8px;text-align:left;width:110px;">Bar</th>
+          <th onclick="sortDaily('abv')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="เฉลี่ย/บิล" data-en="Avg/Bill">Avg/Bill</span> <span id="sort-abv">↕</span></th>
+          <th style="padding:10px 8px;text-align:left;width:110px;" data-th="แท่ง" data-en="Bar">Bar</th>
         </tr>
       </thead>
       <tbody id="daily-tbody"></tbody>
@@ -583,16 +611,16 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <table style="width:100%;border-collapse:collapse;font-size:13px">
       <thead>
         <tr style="border-bottom:2px solid var(--accent);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px">
-          <th style="padding:10px 12px;text-align:left;">เดือน</th>
-          <th style="padding:10px 8px;text-align:right;">วัน</th>
-          <th style="padding:10px 8px;text-align:right;">จำนวนบิล</th>
-          <th style="padding:10px 8px;text-align:right;">จำนวนชิ้น</th>
+          <th style="padding:10px 12px;text-align:left;" data-th="เดือน" data-en="Month">เดือน</th>
+          <th style="padding:10px 8px;text-align:right;" data-th="วัน" data-en="Days">วัน</th>
+          <th style="padding:10px 8px;text-align:right;" data-th="จำนวนบิล" data-en="Bills">จำนวนบิล</th>
+          <th style="padding:10px 8px;text-align:right;" data-th="จำนวนชิ้น" data-en="Items">จำนวนชิ้น</th>
           <th style="padding:10px 8px;text-align:right;">Gross Revenue</th>
-          <th style="padding:10px 8px;text-align:right;">ส่วนลด</th>
+          <th style="padding:10px 8px;text-align:right;" data-th="ส่วนลด" data-en="Discount">ส่วนลด</th>
           <th style="padding:10px 8px;text-align:right;">Net Revenue</th>
-          <th style="padding:10px 8px;text-align:right;">Avg/Bill</th>
-          <th style="padding:10px 8px;text-align:right;">Avg/วัน</th>
-          <th style="padding:10px 8px;text-align:left;width:110px;">Bar</th>
+          <th style="padding:10px 8px;text-align:right;" data-th="เฉลี่ย/บิล" data-en="Avg/Bill">Avg/Bill</th>
+          <th style="padding:10px 8px;text-align:right;" data-th="เฉลี่ย/วัน" data-en="Avg/Day">Avg/วัน</th>
+          <th style="padding:10px 8px;text-align:left;width:110px;" data-th="แท่ง" data-en="Bar">Bar</th>
         </tr>
       </thead>
       <tbody id="monthly-tbody"></tbody>
@@ -1236,6 +1264,19 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
       </div>
       <div id="st1b"></div>
     </div>
+    <div class="upcard" style="border-color:var(--blue,#3b82f6);border-width:1.5px;">
+      <h3>📋 ไฟล์ที่ 1c — รายงานยอดขายแยกตามสินค้า <span style="color:var(--blue,#3b82f6);font-size:13px;">เดือนก่อนหน้า</span> <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
+      <p>อัพโหลดไฟล์ยอดขายเดือนก่อนหน้า (เช่น กุมภาพันธ์) เพื่อแสดงข้อมูลข้ามเดือนใน Monthly View</p>
+      <div class="drop" id="d1c" onclick="pickFileUp('1c')"
+           ondragover="event.preventDefault();this.classList.add('dv')"
+           ondragleave="this.classList.remove('dv')"
+           ondrop="dropFileUp(event,'1c')">
+        <div class="drop-ico">📁</div>
+        <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
+      </div>
+      <div id="st1c"></div>
+    </div>
     <div class="upcard">
       <h3>🎟️ ไฟล์ที่ 2 — รายงานสรุปการใช้โปรโมชั่น <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานสรุปการใช้โปรโมชั่น</p>
@@ -1248,6 +1289,19 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
         <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
       </div>
       <div id="st2"></div>
+    </div>
+    <div class="upcard" style="border-color:var(--blue,#3b82f6);border-width:1.5px;">
+      <h3>🎟️ ไฟล์ที่ 2b — รายงานสรุปการใช้โปรโมชั่น <span style="color:var(--blue,#3b82f6);font-size:13px;">เดือนก่อนหน้า</span> <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
+      <p>อัพโหลดไฟล์โปรโมชั่นเดือนก่อนหน้า (เช่น กุมภาพันธ์) เพื่อให้ส่วนลดแสดงครบถ้วนเมื่อดูข้อมูลข้ามเดือน</p>
+      <div class="drop" id="d2b" onclick="pickFileUp('2b')"
+           ondragover="event.preventDefault();this.classList.add('dv')"
+           ondragleave="this.classList.remove('dv')"
+           ondrop="dropFileUp(event,'2b')">
+        <div class="drop-ico">🎟️</div>
+        <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
+      </div>
+      <div id="st2b"></div>
     </div>
     <div class="upcard">
       <h3>📅 ไฟล์ที่ 3 — ยอดขายรายเดือน <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
@@ -1339,7 +1393,16 @@ function nav(p){
       Object.values(CHARTS).forEach(c=>{try{c.resize();}catch(e){}});
     });
   }
-  document.getElementById('tb-title').textContent=document.querySelector(`[data-page="${p}"]`)?.textContent?.trim()||p;
+  // Set topbar title from the active nav item's language-aware label
+  const activeSpan = document.querySelector(`[data-page="${p}"] [data-th][data-en]`);
+  const tbTitle = document.getElementById('tb-title');
+  if(tbTitle){
+    if(activeSpan){
+      tbTitle.textContent = activeSpan.dataset[LANG==='en'?'en':'th'] || activeSpan.textContent.trim();
+    } else {
+      tbTitle.textContent = document.querySelector(`[data-page="${p}"]`)?.textContent?.trim()||p;
+    }
+  }
 }
 document.querySelectorAll('.nav-item[data-page]').forEach(e=>e.addEventListener('click',()=>nav(e.dataset.page)));
 document.getElementById('tb-date').textContent=new Date().toLocaleDateString('th-TH',{dateStyle:'long'});
@@ -2027,30 +2090,33 @@ function renderMonthlyTable(){
   // Months already covered by transaction data keep that data (more granular).
   // Months only in the monthly file get added as-is, flagged fromFile:true.
   if(MONTHLY_OVERRIDE.length>0){
-    const thName=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-    const enName=['','january','february','march','april','may','june','july','august','september','october','november','december'];
-    const thShort=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
     MONTHLY_OVERRIDE.forEach(r=>{
-      let mm=0, yy=0;
-      const raw=String(r.month||'').trim();
-      const slashFull=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      const slashMY  =raw.match(/^(\d{1,2})\/(\d{4})$/);
-      const iso      =raw.match(/^(\d{4})-(\d{2})/);
-      if(slashFull){ mm=parseInt(slashFull[2]); yy=parseInt(slashFull[3]); }
-      else if(slashMY){ mm=parseInt(slashMY[1]); yy=parseInt(slashMY[2]); }
-      else if(iso){ yy=parseInt(iso[1]); mm=parseInt(iso[2]); }
-      else {
-        const yearMatch=raw.match(/(\d{4})/);
-        if(yearMatch){
-          yy=parseInt(yearMatch[1]);
-          if(yy>2400) yy-=543;
-          const lower=raw.toLowerCase();
-          for(let i=1;i<=12;i++){
-            if(lower.includes(thName[i])||lower.includes(enName[i])||lower.includes(thShort[i])){mm=i;break;}
+      // Use pre-parsed mm/yy if available (set by new parser), else fall back to re-parsing
+      let mm=r.mm||0, yy=r.yy||0;
+      if(!mm||!yy){
+        const thName=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+        const enName=['','january','february','march','april','may','june','july','august','september','october','november','december'];
+        const thShort=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+        const raw=String(r.month||'').trim();
+        const slashFull=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        const slashMY  =raw.match(/^(\d{1,2})\/(\d{4})$/);
+        const iso      =raw.match(/^(\d{4})-(\d{2})/);
+        if(slashFull){ mm=parseInt(slashFull[2]); yy=parseInt(slashFull[3]); }
+        else if(slashMY){ mm=parseInt(slashMY[1]); yy=parseInt(slashMY[2]); }
+        else if(iso){ yy=parseInt(iso[1]); mm=parseInt(iso[2]); }
+        else {
+          const yearMatch=raw.match(/(\d{4})/);
+          if(yearMatch){
+            yy=parseInt(yearMatch[1]);
+            if(yy>2400) yy-=543;
+            const lower=raw.toLowerCase();
+            for(let i=1;i<=12;i++){
+              if(lower.includes(thName[i])||lower.includes(enName[i])||lower.includes(thShort[i])){mm=i;break;}
+            }
           }
         }
+        if(yy>2400) yy-=543;
       }
-      if(yy>2400) yy-=543;
       if(!mm||!yy||mm<1||mm>12||yy<2000) return;
       const key=String(mm).padStart(2,'0')+'/'+yy;
       if(!monthMap[key]){
@@ -4054,11 +4120,14 @@ function buildReport(){
             <div style="font-size:8px;color:#64748b;margin-top:3px">${mEN[last.mm]} vs ${mEN[prev.mm]}</div>
           </div>`;
         } else {
-          // ข้อมูลเดือนเดียว — แสดง Recovery Rate แทน
+          // Single month — show Best Day (highest revenue day)
+          const _best=[...DAILY].sort((a,b)=>b.net-a.net)[0];
+          const _bestDow=_best?DOW_MAP[_best.date]||'':'';
+          const _dowTHs={Sun:'อาทิตย์',Mon:'จันทร์',Tue:'อังคาร',Wed:'พุธ',Thu:'พฤหัสบดี',Fri:'ศุกร์',Sat:'เสาร์'};
           momHtml=`<div style="text-align:center;padding:0 8px;border-left:1px solid #1e3a5f">
-            <div style="font-size:8px;color:#22d47a;letter-spacing:1px;margin-bottom:4px;font-weight:800">RECOVERY RATE</div>
-            <div style="font-family:'Prompt',sans-serif;font-size:26px;font-weight:700;color:${parseFloat(netRate)>=70?'#22d47a':'#f0a500'};line-height:1">${netRate}%</div>
-            <div style="font-size:8px;color:#64748b;margin-top:3px">Net / Gross</div>
+            <div style="font-size:8px;color:#22d47a;letter-spacing:1px;margin-bottom:4px;font-weight:800">BEST DAY</div>
+            <div style="font-family:'Prompt',sans-serif;font-size:22px;font-weight:700;color:#f0a500;line-height:1">${_best?_best.date.substring(0,5):'—'}</div>
+            <div style="font-size:8px;color:#64748b;margin-top:3px">${_best?'฿'+Math.round(_best.net).toLocaleString()+' · วัน'+(_dowTHs[_bestDow]||''):'—'}</div>
           </div>`;
         }
         return momHtml;
@@ -4082,7 +4151,10 @@ function buildReport(){
           const isUp=diff>=0;
           return kpi('MoM Growth',(isUp?'▲':'▼')+(pct?Math.abs(pct)+'%':'—'),`${mEN[last.mm]} vs ${mEN[prev.mm]} · ${isUp?'+':''}฿${Math.abs(Math.round(diff)).toLocaleString()}`,isUp?C.green:C.red,'📈');
         }
-        return kpi('Recovery Rate',netRate+'%','Net / Gross — % ที่เก็บได้จริง',parseFloat(netRate)>=70?C.green:C.amber,'📊');
+        // Single month — show Items per Bill (basket depth)
+        const ipb = totalBills>0?(totalItems/totalBills).toFixed(1):0;
+        const ipbCol = parseFloat(ipb)>=2?C.green:parseFloat(ipb)>=1.5?C.amber:C.red;
+        return kpi('Items / Bill',ipb+' ชิ้น',`${totalItems.toLocaleString()} ชิ้น ÷ ${totalBills.toLocaleString()} บิล · ความลึกของตะกร้า`,ipbCol,'🛍️');
       })():''}
       ${kpi('Total Bills',totalBills.toLocaleString(),`เฉลี่ย ${avgDailyB} บิล/วัน`,C.blue,'🧾')}
       ${kpi('Avg Bill Value','฿'+abv.toLocaleString(),'มูลค่าเฉลี่ยต่อบิล',C.amber,'🛒')}
@@ -4110,17 +4182,17 @@ function buildReport(){
         const avgBillM=(()=>{ const _k=String(m.mm).padStart(2,'0')+'/'+m.yy; const _q=computeQualifiedABV(); let n=0,b=0; Object.entries(_q.byDate).forEach(([d,v])=>{if(d.split('/')[1]+'/'+d.split('/')[2]===_k){n+=v.net;b+=v.bills;}}); return b>0?Math.round(n/b):0; })();
         return '<div style="background:linear-gradient(160deg,'+col+'18 0%,'+col+'06 100%);border:1.5px solid '+col+'55;border-radius:10px;padding:13px 14px;border-top:4px solid '+col+';-webkit-print-color-adjust:exact;print-color-adjust:exact">'
           +'<div style="font-family:\'Prompt\',sans-serif;font-size:10px;font-weight:700;color:'+col+';margin-bottom:6px">'+mTHF[m.mm]+' '+(m.yy+543)+'</div>'
-          +'<div style="font-family:"Prompt",sans-serif;font-size:18px;font-weight:700;color:'+C.navy+';margin-bottom:4px">฿'+m.net.toLocaleString()+'</div>'
+          +'<div style="font-family:"Prompt",sans-serif;font-size:22px;font-weight:800;color:'+C.navy+';margin-bottom:5px;letter-spacing:-0.5px">฿'+m.net.toLocaleString()+'</div>'
           +(diff!==null?'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
-            +'<span style="font-size:11px">'+(isUp?'▲':'▼')+'</span>'
-            +'<span style="font-family:"Prompt",sans-serif;font-size:12px;font-weight:700;color:'+(isUp?C.green:C.red)+'">'+(isUp?'+':'')+diff.toLocaleString()+'</span>'
-            +'<span style="font-size:9px;background:'+(isUp?C.green:C.red)+'22;color:'+(isUp?C.green:C.red)+';border-radius:4px;padding:2px 6px;font-weight:700">'+(isUp?'+':'')+diffPct.toFixed(1)+'%</span>'
+            +'<span style="font-size:13px;font-weight:800">'+(isUp?'▲':'▼')+'</span>'
+            +'<span style="font-family:"Prompt",sans-serif;font-size:14px;font-weight:800;color:'+(isUp?C.green:C.red)+'">'+(isUp?'+':'')+diff.toLocaleString()+'</span>'
+            +'<span style="font-size:10px;background:'+(isUp?C.green:C.red)+'22;color:'+(isUp?C.green:C.red)+';border-radius:4px;padding:2px 7px;font-weight:800">'+(isUp?'+':'')+diffPct.toFixed(1)+'%</span>'
             +'<span style="font-size:8px;color:'+C.t3+';margin-left:2px">vs เดือนก่อน</span>'
             +'</div>'
           :'<div style="font-size:8.5px;color:'+C.t3+';margin-bottom:6px">เดือนแรกในช่วงข้อมูล</div>')
-          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:8.5px;color:'+C.t4+';">'
-          +'<div>🧾 '+m.bills.toLocaleString()+' บิล</div><div>📦 '+m.qty.toLocaleString()+' ชิ้น</div>'
-          +'<div>฿'+avgBillM.toLocaleString()+' ABV</div><div>📋 '+m.days+' วัน</div>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:9px;color:'+C.t4+';font-weight:700;">'
+          +'<div>🧾 <strong style="font-size:10px;color:'+C.t2+'">'+m.bills.toLocaleString()+'</strong> บิล</div><div>📦 <strong style="font-size:10px;color:'+C.t2+'">'+m.qty.toLocaleString()+'</strong> ชิ้น</div>'
+          +'<div>฿<strong style="font-size:10px;color:'+C.t2+'">'+avgBillM.toLocaleString()+'</strong> ABV</div><div>📋 <strong style="font-size:10px;color:'+C.t2+'">'+m.days+'</strong> วัน</div>'
           +'</div>'
           +'</div>';
       });
@@ -4637,7 +4709,7 @@ function buildReport(){
 
 // ══════════ UPLOAD ══════════
 // ══════════ UPLOAD & PARSE ══════════
-const upF={1:null,'1b':null,2:null,3:null};
+const upF={1:null,'1b':null,'1c':null,2:null,'2b':null,3:null};
 
 function handleF(ev,n){
   const file=ev.target.files[0];if(!file)return;
@@ -4645,7 +4717,7 @@ function handleF(ev,n){
   const el=document.getElementById('st'+n);
   if(el) el.innerHTML=`<div class="fstatus ok">✅ <strong>${file.name}</strong> — ${(file.size/1024).toFixed(1)} KB · พร้อมประมวลผล</div>`;
   const procBtn=document.getElementById('proc-btn');
-  if(procBtn) procBtn.disabled=!(upF[1]||upF['1b']);
+  if(procBtn) procBtn.disabled=!(upF[1]||upF['1b']||upF['1c']);
 }
 
 // File wiring handled in DOMContentLoaded init block below
@@ -4675,7 +4747,7 @@ async function processFiles(){
     async function parseSalesFile(file){
       const rows=await readXlsx(file);
       let hdr=0;
-      for(let i=0;i<Math.min(10,rows.length);i++){
+      for(let i=0;i<Math.min(25,rows.length);i++){
         if(rows[i].some(v=>String(v).trim()==='เลขที่เอกสาร')){hdr=i;break;}
       }
       const cols=rows[hdr].map(v=>String(v).trim());
@@ -4710,83 +4782,136 @@ async function processFiles(){
       return result;
     }
 
-    // ── File 1: Sales — merge both halves ──
+    // ── File 1: Sales — merge all available halves + previous month ──
     salesRows=[];
-    if(!upF[1]&&!upF['1b']) throw new Error('กรุณาเลือกไฟล์ยอดขายอย่างน้อย 1 ไฟล์');
-    if(upF[1])   salesRows.push(...(await parseSalesFile(upF[1])));
+    if(!upF[1]&&!upF['1b']&&!upF['1c']) throw new Error('กรุณาเลือกไฟล์ยอดขายอย่างน้อย 1 ไฟล์');
+    if(upF[1])    salesRows.push(...(await parseSalesFile(upF[1])));
     if(upF['1b']) salesRows.push(...(await parseSalesFile(upF['1b'])));
+    if(upF['1c']) salesRows.push(...(await parseSalesFile(upF['1c'])));
 
     if(salesRows.length===0) throw new Error('ไม่พบข้อมูลยอดขาย — กรุณาตรวจสอบไฟล์');
 
-    // ── File 2: Promo (ไม่บังคับ) ──
+    // ── File 2 & 2b: Promo — parse current month + previous month ──
+    async function parsePromoFile(file){
+      const rows2=await readXlsx(file);
+      let hdr2=0;
+      for(let i=0;i<Math.min(25,rows2.length);i++){
+        const r=rows2[i].map(v=>String(v).trim());
+        if(r.includes('รหัสโปรโมชั่น')||r.includes('ชื่อโปรโมชั่น')||r.includes('โปรโมชั่น')){hdr2=i;break;}
+      }
+      const cols2=rows2[hdr2].map(v=>String(v).trim());
+      const ci2=(...names)=>{for(const n of names){const i=cols2.indexOf(n);if(i!==-1)return i;}return -1;};
+      const iCode  = ci2('รหัสโปรโมชั่น','รหัส');
+      const iPN    = ci2('โปรโมชั่น','ชื่อโปรโมชั่น');
+      const iPD    = ci2('วันที่ใช้บริการ','วันที่');
+      const iPC    = ci2('จำนวนครั้งที่ใช้โปรโมชั่น','จำนวนครั้ง');
+      const iPS    = ci2('ยอดขายโปรโมชั่น','ยอดขาย');
+      const iPDisc = ci2('ส่วนลดโปรโมชั่น','ส่วนลด');
+      const iPNet  = ci2('ยอดขายสุทธิ','ราคาสุทธิ');
+      const result=[];
+      for(let i=hdr2+1;i<rows2.length;i++){
+        const r=rows2[i];
+        const code=String(r[iCode]||'').trim();
+        if(!code.startsWith('PM')) continue;
+        result.push({
+          name:     String(r[iPN]   ||'').trim(),
+          date:     String(r[iPD]   ||'').trim(),
+          count:    parseFloat(r[iPC]   )||0,
+          sales:    parseFloat(r[iPS]   )||0,
+          discount: parseFloat(r[iPDisc])||0,
+          net:      parseFloat(r[iPNet])||0 || Math.max(0,(parseFloat(r[iPS])||0)-(parseFloat(r[iPDisc])||0))
+        });
+      }
+      return result;
+    }
     let promoRows=[];
-    if(upF[2]){
-    const rows2=await readXlsx(upF[2]);
-    let hdr2=0;
-    for(let i=0;i<Math.min(10,rows2.length);i++){
-      const r=rows2[i].map(v=>String(v).trim());
-      if(r.includes('รหัสโปรโมชั่น')||r.includes('ชื่อโปรโมชั่น')||r.includes('โปรโมชั่น')){hdr2=i;break;}
-    }
-    const cols2=rows2[hdr2].map(v=>String(v).trim());
-    const ci2=(...names)=>{
-      for(const n of names){const i=cols2.indexOf(n);if(i!==-1)return i;}
-      return -1;
-    };
-    // รหัสโปรโมชั่น = code (col for PM check), ชื่อ/โปรโมชั่น = name
-    const iCode  = ci2('รหัสโปรโมชั่น','รหัส');
-    const iPN    = ci2('โปรโมชั่น','ชื่อโปรโมชั่น');  // exact 'โปรโมชั่น' before 'รหัสโปรโมชั่น'
-    const iPD    = ci2('วันที่ใช้บริการ','วันที่');
-    const iPC    = ci2('จำนวนครั้งที่ใช้โปรโมชั่น','จำนวนครั้ง');
-    const iPS    = ci2('ยอดขายโปรโมชั่น','ยอดขาย');
-    const iPDisc = ci2('ส่วนลดโปรโมชั่น','ส่วนลด');
-    const iPNet  = ci2('ยอดขายสุทธิ','ราคาสุทธิ');
-    
-    
-
-    for(let i=hdr2+1;i<rows2.length;i++){
-      const r=rows2[i];
-      const code=String(r[iCode]||'').trim();
-      if(!code.startsWith('PM')) continue;
-      promoRows.push({
-        name:     String(r[iPN]   ||'').trim(),
-        date:     String(r[iPD]   ||'').trim(),
-        count:    parseFloat(r[iPC]   )||0,
-        sales:    parseFloat(r[iPS]   )||0,
-        discount: parseFloat(r[iPDisc])||0,
-        net:      parseFloat(r[iPNet])||0 || Math.max(0,(parseFloat(r[iPS])||0)-(parseFloat(r[iPDisc])||0))
-      });
-    }
-    } // end optional promo block
+    if(upF[2])    promoRows.push(...(await parsePromoFile(upF[2])));
+    if(upF['2b']) promoRows.push(...(await parsePromoFile(upF['2b'])));
 
     // ── File 3: Monthly Sales (ไม่บังคับ) ──
     let monthlyRows=[];
     if(upF[3]){
       try{
         const rows3=await readXlsx(upF[3]);
-        let hdr3=0;
-        for(let i=0;i<Math.min(10,rows3.length);i++){
+
+        // Safety: if this looks like a transaction file (has เลขที่เอกสาร), skip it
+        const isTransactionFile=rows3.slice(0,25).some(row=>row.some(v=>String(v).trim()==='เลขที่เอกสาร'));
+        if(isTransactionFile) throw new Error('ไฟล์รายเดือนดูเหมือนไฟล์ transaction — กรุณาอัพโหลดไฟล์สรุปรายเดือนแทน');
+
+        // Find header row: must contain a month/date column AND a revenue column
+        let hdr3=-1;
+        const monthKeywords=['เดือน','Month','ช่วงเวลา'];
+        const revenueKeywords=['ยอดขายสุทธิ','Net Revenue','ยอดสุทธิ','ราคาสุทธิ','ยอดขายรวม','Gross Revenue'];
+        for(let i=0;i<Math.min(25,rows3.length);i++){
           const r=rows3[i].map(v=>String(v).trim());
-          if(r.some(v=>v.includes('เดือน')||v.includes('ยอดขาย')||v.includes('รายได้')||v.includes('Month'))){hdr3=i;break;}
+          const hasMonth=r.some(v=>monthKeywords.some(k=>v===k||v.includes(k)));
+          const hasRev=r.some(v=>revenueKeywords.some(k=>v===k||v.includes(k)));
+          if(hasMonth&&hasRev){hdr3=i;break;}
         }
+        if(hdr3===-1) throw new Error('ไม่พบแถว Header ในไฟล์รายเดือน (ต้องมีคอลัมน์ เดือน/Month และ ยอดขายสุทธิ/Net Revenue)');
+
         const cols3=rows3[hdr3].map(v=>String(v).trim());
-        const ci3=(...names)=>{for(const n of names){const i=cols3.indexOf(n);if(i!==-1)return i;}return -1;};
-        const iMonth = ci3('เดือน','Month','ช่วงเวลา','วันที่');
-        const iMNet  = ci3('ยอดขายสุทธิ','Net Revenue','ยอดสุทธิ','ราคาสุทธิ','ยอดขาย');
-        const iMGross= ci3('ยอดขายก่อนหักส่วนลด','Gross Revenue','ยอดขายรวม');
-        const iMDisc = ci3('ส่วนลด','Discount','ส่วนลดรวม');
-        const iMQty  = ci3('จำนวนชิ้น','จำนวน','Qty','Quantity');
-        const iMBills= ci3('จำนวนบิล','บิล','Bills','Orders');
+        const ci3=(...names)=>{for(const n of names){const i=cols3.findIndex(c=>names.some(k=>c===k||c.includes(k)));if(i!==-1)return i;}return cols3.findIndex(c=>names.some(k=>c===k||c.includes(k)));};
+        const iMonth = cols3.findIndex(c=>monthKeywords.some(k=>c===k||c.includes(k)));
+        const iMNet  = cols3.findIndex(c=>['ยอดขายสุทธิ','Net Revenue','ยอดสุทธิ','ราคาสุทธิ'].some(k=>c===k||c.includes(k)));
+        const iMGross= cols3.findIndex(c=>['ยอดขายก่อนหักส่วนลด','Gross Revenue','ยอดขายรวม'].some(k=>c===k||c.includes(k)));
+        const iMDisc = cols3.findIndex(c=>['ส่วนลดรวม','Discount Total','ส่วนลด'].some(k=>c===k||c.includes(k)));
+        const iMQty  = cols3.findIndex(c=>['จำนวนชิ้น','จำนวนสินค้า','Qty','Quantity'].some(k=>c===k||c.includes(k)));
+        const iMBills= cols3.findIndex(c=>['จำนวนบิล','จำนวนรายการ','Bills','Orders'].some(k=>c===k||c.includes(k)));
+        const iMDays = cols3.findIndex(c=>['จำนวนวัน','วัน','Days'].some(k=>c===k||c.includes(k)));
+
+        const thNames=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+        const enNames=['','january','february','march','april','may','june','july','august','september','october','november','december'];
+        const thShort=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
         for(let i=hdr3+1;i<rows3.length;i++){
           const r=rows3[i];
-          const month=String(r[iMonth]||'').trim();
-          if(!month) continue;
+          const monthRaw=String(r[iMonth]||'').trim();
+          if(!monthRaw) continue;
+
+          const netVal  = parseFloat(r[iMNet])  ||0;
+          const grossVal= parseFloat(r[iMGross])||0;
+          const discVal = parseFloat(r[iMDisc]) ||0;
+          const qtyVal  = parseFloat(r[iMQty])  ||0;
+          const billsVal= parseFloat(r[iMBills])||0;
+          const daysVal = parseFloat(r[iMDays]) ||0;
+
+          // Validate: net revenue must be > 100 to be a meaningful monthly row
+          // (rules out stray product rows, totals labels, empty rows)
+          if(netVal < 100 && grossVal < 100) continue;
+
+          // Try to parse month+year from monthRaw
+          let mm=0, yy=0;
+          const slashFull=monthRaw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+          const slashMY  =monthRaw.match(/^(\d{1,2})\/(\d{4})$/);
+          const iso      =monthRaw.match(/^(\d{4})-(\d{2})/);
+          if(slashFull){ mm=parseInt(slashFull[2]); yy=parseInt(slashFull[3]); }
+          else if(slashMY){ mm=parseInt(slashMY[1]); yy=parseInt(slashMY[2]); }
+          else if(iso){ yy=parseInt(iso[1]); mm=parseInt(iso[2]); }
+          else {
+            const yearMatch=monthRaw.match(/(\d{4})/);
+            if(yearMatch){
+              yy=parseInt(yearMatch[1]);
+              if(yy>2400) yy-=543;
+              const lower=monthRaw.toLowerCase();
+              for(let mi=1;mi<=12;mi++){
+                if(lower.includes(thNames[mi])||lower.includes(enNames[mi])||lower.includes(thShort[mi])){mm=mi;break;}
+              }
+            }
+          }
+          if(yy>2400) yy-=543;
+          // Must be a valid CE year (2020–2040) and valid month
+          if(!mm||!yy||mm<1||mm>12||yy<2020||yy>2040) continue;
+
           monthlyRows.push({
-            month,
-            net:      parseFloat(r[iMNet])  ||0,
-            gross:    parseFloat(r[iMGross])||0,
-            discount: parseFloat(r[iMDisc]) ||0,
-            qty:      parseFloat(r[iMQty])  ||0,
-            bills:    parseFloat(r[iMBills])||0
+            month: monthRaw,
+            mm, yy,
+            net:      netVal,
+            gross:    grossVal,
+            discount: discVal,
+            qty:      qtyVal,
+            bills:    billsVal,
+            days:     daysVal
           });
         }
       }catch(e){ console.warn('Monthly file parse warning:', e.message); }
@@ -5027,7 +5152,7 @@ function dropFileUp(e, n){
   if(file) handleF({target:{files:[file]}}, n);
 }
 
-const modalFiles={1:null,'1b':null,2:null,3:null};
+const modalFiles={1:null,'1b':null,'1c':null,2:null,'2b':null,3:null};
 function handleModalFile(input,n){
   const file=input.files[0];
   if(!file)return;
@@ -5062,10 +5187,9 @@ function handleModalDrop(event,n){
 function checkModalReady(){
   const btn=document.getElementById('modal-btn');
   if(btn){
-    const ready=!!(modalFiles[1]||modalFiles['1b']);
+    const ready=!!(modalFiles[1]||modalFiles['1b']||modalFiles['1c']);
     btn.disabled=!ready;
     btn.style.opacity=ready?'1':'.4';
-    // ป้องกัน browser auto-focus ไปที่ปุ่มหลัง enable
     if(ready && document.activeElement) document.activeElement.blur();
   }
 }
@@ -5073,12 +5197,14 @@ function checkModalReady(){
 async function processModalFiles(){
   const btn=document.getElementById('modal-btn');
   const status=document.getElementById('modal-status');
-  if(!modalFiles[1]&&!modalFiles['1b']){status.textContent='❌ กรุณาเลือกไฟล์ยอดขายอย่างน้อย 1 ไฟล์';return;}
+  if(!modalFiles[1]&&!modalFiles['1b']&&!modalFiles['1c']){status.textContent='❌ กรุณาเลือกไฟล์ยอดขายอย่างน้อย 1 ไฟล์';return;}
   btn.disabled=true;btn.textContent='⏳ กำลังประมวลผล...';status.textContent='';
   try{
     upF[1]=modalFiles[1]||null;
     upF['1b']=modalFiles['1b']||null;
+    upF['1c']=modalFiles['1c']||null;
     upF[2]=modalFiles[2]||null;
+    upF['2b']=modalFiles['2b']||null;
     upF[3]=modalFiles[3]||null;
     await processFiles();
     const modal=document.getElementById('upload-modal');
@@ -6422,15 +6548,36 @@ function applyLang(){
 
   // Swap every element that has data-th / data-en attributes
   document.querySelectorAll('[data-th][data-en]').forEach(el => {
-    const key = isEn ? 'en' : 'th';
-    // For buttons / divs whose full text is the label (no child icons to preserve)
-    if(el.tagName === 'BUTTON' || el.classList.contains('nav-lbl') || el.classList.contains('pl')){
-      el.textContent = el.dataset[key];
-    } else {
-      // <span> inside nav-item — just set textContent
-      el.textContent = el.dataset[key];
-    }
+    const val = el.dataset[isEn ? 'en' : 'th'];
+    el.textContent = val;
   });
+
+  // Sync default <option> labels in month filter and date dropdowns
+  const mf = document.getElementById('daily-month-filter');
+  if(mf && mf.options[0] && mf.options[0].value === ''){
+    mf.options[0].textContent = isEn ? 'All Months' : 'ทุกเดือน';
+  }
+  const df = document.getElementById('daily-date-from');
+  if(df && df.options[0] && df.options[0].value === ''){
+    df.options[0].textContent = isEn ? 'From Start' : 'ตั้งแต่วันแรก';
+  }
+  const dt = document.getElementById('daily-date-to');
+  if(dt && dt.options[0] && dt.options[0].value === ''){
+    dt.options[0].textContent = isEn ? 'To End' : 'ถึงวันสุดท้าย';
+  }
+
+  // Re-sync topbar title to match the active nav item's current language label
+  const activeNav = document.querySelector('.nav-item.active [data-th][data-en]');
+  const tbTitle   = document.getElementById('tb-title');
+  if(activeNav && tbTitle){
+    tbTitle.textContent = activeNav.dataset[isEn ? 'en' : 'th'];
+  }
+
+  // Proc button
+  const procBtn = document.getElementById('proc-btn');
+  if(procBtn && !procBtn.disabled){
+    procBtn.textContent = isEn ? '⚡ Process & Update Dashboard' : '⚡ ประมวลผลและอัพเดท Dashboard';
+  }
 }
 
 function initLang(){
