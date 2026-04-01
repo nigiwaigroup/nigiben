@@ -237,8 +237,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
 @media print {
   /* ซ่อนทุกอย่างในหน้า — แสดงเฉพาะ report pages */
   #sb, #topbar, #upload-modal,
-  #content > .page:not(#page-report):not(#page-report-hourly):not(#page-report-behavior):not(#page-report-cancel) { display:none!important; }
-  /* ซ่อนทุกอย่างใน page-report ยกเว้น report-preview */
+  #content > .page:not(#page-report):not(#page-report-hourly):not(#page-report-behavior):not(#page-report-cancel) { display:none!important; }  /* ซ่อนทุกอย่างใน page-report ยกเว้น report-preview */
   #page-report > *:not(#report-preview),
   #page-report-hourly > *:not(#report-hourly-preview),
   #page-report-behavior > *:not(#report-behavior-preview),
@@ -407,6 +406,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
     <div class="nav-item active" data-page="overview"><span class="ic">🍱</span><span data-th="ภาพรวมผลงาน" data-en="Performance Overview">Performance Overview</span></div>
     <div class="nav-item" data-page="daily"><span class="ic">📋</span><span data-th="ยอดขายสุทธิรายวัน" data-en="Daily Net Sales">Daily Net Sales</span></div>
     <div class="nav-item" data-page="dow"><span class="ic">🗓️</span><span data-th="วิเคราะห์ตามวันในสัปดาห์" data-en="Day-of-Week Analysis">Day-of-Week Analysis</span></div>
+    <div class="nav-item" data-page="cancel-view"><span class="ic">🚫</span><span data-th="รายการยกเลิกบิล" data-en="Bill Cancellations">รายการยกเลิกบิล</span></div>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl" data-th="การวิเคราะห์ยอดขาย" data-en="Sales Analysis">การวิเคราะห์ยอดขาย</div>
@@ -1239,6 +1239,71 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
   <div id="report-cancel-preview" style="padding:0;"></div>
 </div>
 
+<!-- ══════════ CANCEL VIEW (interactive) ══════════ -->
+<div id="page-cancel-view" class="page">
+  <div class="ph"><h1>🚫 รายการยกเลิกบิล</h1><p>ข้อมูลการยกเลิกบิล · <span id="cancel-view-period">—</span></p></div>
+
+  <!-- KPI row -->
+  <div class="g4 mb" id="cancel-kpi-row">
+    <div class="kpi r"><div class="kpi-ico">🚫</div><div class="kpi-lbl">จำนวนบิลยกเลิก</div><div id="cv-kpi-count" class="kpi-val rc">—</div><div id="cv-kpi-count-sub" class="kpi-sub">—</div></div>
+    <div class="kpi r"><div class="kpi-ico">💸</div><div class="kpi-lbl">มูลค่ายกเลิกรวม</div><div id="cv-kpi-total" class="kpi-val rc">—</div><div id="cv-kpi-total-sub" class="kpi-sub">—</div></div>
+    <div class="kpi"><div class="kpi-ico">📅</div><div class="kpi-lbl">วันที่ยกเลิกสูงสุด</div><div id="cv-kpi-peak-day" class="kpi-val ac">—</div><div id="cv-kpi-peak-day-sub" class="kpi-sub">—</div></div>
+    <div class="kpi"><div class="kpi-ico">🧾</div><div class="kpi-lbl">บิลมูลค่าสูงสุด</div><div id="cv-kpi-peak-bill" class="kpi-val ac">—</div><div id="cv-kpi-peak-bill-sub" class="kpi-sub">—</div></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card mb">
+    <div class="ct">มูลค่ายกเลิกรายวัน (฿)</div>
+    <div id="ch-cancel-daily-wrap" style="height:320px"><canvas id="ch-cancel-daily"></canvas></div>
+    <div class="cs">📌 แท่งสีแดง = วันธรรมดา · แท่งสีส้ม = วันหยุด</div>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+    <span style="font-size:11px;color:var(--text3);">🔍 เลขที่ใบเสร็จ:</span>
+    <input id="cv-doc-search" type="text" placeholder="ค้นหา เช่น 00765" oninput="renderCancelTable()"
+      style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;width:150px;">
+    <span style="font-size:11px;color:var(--text3);">📅 ช่วงวันที่:</span>
+    <select id="cv-date-from" onchange="renderCancelTable()"
+      style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;">
+      <option value="">ตั้งแต่วันแรก</option>
+    </select>
+    <span style="color:var(--text3);">—</span>
+    <select id="cv-date-to" onchange="renderCancelTable()"
+      style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;">
+      <option value="">ถึงวันสุดท้าย</option>
+    </select>
+    <span style="font-size:11px;color:var(--text3);margin-left:4px;">💰 มูลค่า ≥</span>
+    <input id="cv-min-amt" type="number" min="0" step="1" placeholder="0" onchange="renderCancelTable()"
+      style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-m);outline:none;width:90px;">
+    <span style="font-size:11px;color:var(--text3);">👤 ผู้ยกเลิก:</span>
+    <select id="cv-person-filter" onchange="renderCancelTable()"
+      style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font-b);outline:none;">
+      <option value="">ทุกคน</option>
+    </select>
+    <button onclick="clearCancelFilters()"
+      style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-b);">✕ ล้าง</button>
+    <span id="cv-cnt" style="font-size:11px;color:var(--text3);margin-left:auto;"></span>
+  </div>
+
+  <!-- Table -->
+  <div class="card" style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--accent);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px;">
+          <th onclick="sortCancelTable('date')" style="padding:10px 12px;text-align:left;cursor:pointer;user-select:none;white-space:nowrap;">วันที่ <span id="cv-sort-date">↕</span></th>
+          <th style="padding:10px 8px;text-align:left;">วัน</th>
+          <th onclick="sortCancelTable('time')" style="padding:10px 8px;text-align:left;cursor:pointer;user-select:none;white-space:nowrap;">เวลา <span id="cv-sort-time">↕</span></th>
+          <th onclick="sortCancelTable('doc')" style="padding:10px 8px;text-align:left;cursor:pointer;user-select:none;white-space:nowrap;">เลขที่ใบเสร็จ <span id="cv-sort-doc">↕</span></th>
+          <th style="padding:10px 8px;text-align:left;">ผู้ยกเลิก</th>
+          <th onclick="sortCancelTable('amount')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">มูลค่า (฿) <span id="cv-sort-amount">↕</span></th>
+        </tr>
+      </thead>
+      <tbody id="cv-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
 <div id="page-upload" class="page">
   <div style="max-width:640px;margin:30px auto">
     <div class="ph"><h1>📤 Upload Data Files</h1><p>อัพโหลดไฟล์ Excel — ข้อมูลจะอัพเดทใน Dashboard ทันที · <span style="color:var(--accent);font-size:11px">v3.0 — fixed column detection</span></p></div>
@@ -1395,6 +1460,7 @@ const sn=s=>(s.split('/')[1]||s).trim().substring(0,22);
 
 // ══════════ NAV ══════════
 function nav(p){
+  if(p==='cancel-view') buildCancelView();
   if(p==='report-cancel' && CANCEL_DATA.length>0) buildCancelReport();
   if(p==='trial' && salesRows.length>0 && document.getElementById('trial-daily-tbody').innerHTML==='') buildTrial();
   if(p==='report' && salesRows.length>0) buildReport();
@@ -4982,18 +5048,21 @@ async function processFiles(){
         }
         const cols4=rows4[hdr4].map(v=>String(v).trim());
         const ci4=(...names)=>{for(const n of names){const i=cols4.indexOf(n);if(i!==-1)return i;}return -1;};
-        const iCDate = ci4('วันที่');
-        const iCDoc  = ci4('เลขที่เอกสาร');
-        const iCAmt  = ci4('จำนวนเงินสุทธิ','จำนวนเงิน','ยอดเงิน');
+        const iCDate   = ci4('วันที่');
+        const iCDoc    = ci4('เลขที่เอกสาร');
+        const iCAmt    = ci4('จำนวนเงินสุทธิ','จำนวนเงิน','ยอดเงิน');
+        const iCPerson = ci4('คนยกเลิกบิล','ผู้ยกเลิก','ยกเลิกโดย');
+        const iCTime   = ci4('เวลายกเลิก','เวลา');
         for(let i=hdr4+1;i<rows4.length;i++){
           const r=rows4[i];
-          const dateRaw=String(r[iCDate]||'').trim();
-          const doc    =String(r[iCDoc] ||'').trim();
+          const dateRaw=String(r[iCDate]  ||'').trim();
+          const doc    =String(r[iCDoc]   ||'').trim();
           const amt    =parseFloat(r[iCAmt])||0;
+          const person =iCPerson>=0?String(r[iCPerson]||'').trim():'';
+          const time   =iCTime  >=0?String(r[iCTime]  ||'').trim():'';
           if(!dateRaw||amt===0) continue;
-          // skip summary rows (date doesn't look like DD/MM/YYYY)
           if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateRaw)) continue;
-          cancelRows.push({date:normDate(dateRaw), doc, amount:amt});
+          cancelRows.push({date:normDate(dateRaw), doc, amount:amt, person, time});
         }
       }catch(e){ console.warn('Cancel file parse warning:', e.message); }
     }
@@ -6597,6 +6666,238 @@ function showPPIModal(name){
 function setPPView(){}
 function renderPromoProduct(){ renderPPI(); }
 function showProductPromoModal(name){ showPPIModal(name); }
+
+// ══════════ CANCEL VIEW (interactive) ══════════
+let _cvSortCol='date', _cvSortDir=1;
+
+function buildCancelView(){
+  if(CANCEL_DATA.length===0){
+    document.getElementById('cv-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3)">⚠️ ไม่พบข้อมูล — กรุณาอัพโหลดไฟล์สรุปการยกเลิกบิลก่อน</td></tr>';
+    return;
+  }
+
+  const mTHF=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const mTH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const toTs=s=>{const p=(s||'').split('/');return p.length>=3?new Date(+p[2],+p[1]-1,+p[0]).getTime():0;};
+
+  // period label
+  const sorted=[...CANCEL_DATA].sort((a,b)=>toTs(a.date)-toTs(b.date));
+  const first=sorted[0].date, last=sorted[sorted.length-1].date;
+  const [fd,fm,fy]=first.split('/').map(Number);
+  const [ld,lm,ly]=last.split('/').map(Number);
+  const periodTxt=fm===lm&&fy===ly
+    ? `${String(fd).padStart(2,'0')}–${String(ld).padStart(2,'0')} ${mTHF[fm]} ${fy+543}`
+    : `${String(fd).padStart(2,'0')} ${mTH[fm]} – ${String(ld).padStart(2,'0')} ${mTH[lm]} ${ly+543}`;
+  const el=document.getElementById('cancel-view-period');
+  if(el) el.textContent=periodTxt;
+
+  // populate date dropdowns
+  const uniqueDates=[...new Set(CANCEL_DATA.map(r=>r.date))].sort((a,b)=>toTs(a)-toTs(b));
+  const dateOpts=uniqueDates.map(d=>`<option value="${d}">${d.substring(0,5)}</option>`).join('');
+  const fromSel=document.getElementById('cv-date-from');
+  const toSel=document.getElementById('cv-date-to');
+  if(fromSel) fromSel.innerHTML='<option value="">ตั้งแต่วันแรก</option>'+dateOpts;
+  if(toSel)   toSel.innerHTML  ='<option value="">ถึงวันสุดท้าย</option>'+dateOpts;
+
+  // populate person dropdown
+  const uniquePersons=[...new Set(CANCEL_DATA.map(r=>r.person||'').filter(Boolean))].sort();
+  const pSel=document.getElementById('cv-person-filter');
+  if(pSel) pSel.innerHTML='<option value="">ทุกคน</option>'+uniquePersons.map(p=>`<option value="${p}">${p}</option>`).join('');
+
+  // build daily chart — horizontal bars
+  const byDate={};
+  CANCEL_DATA.forEach(r=>{ byDate[r.date]=(byDate[r.date]||0)+r.amount; });
+  const chartDates=Object.keys(byDate).sort((a,b)=>toTs(a)-toTs(b));
+  const chartAmts=chartDates.map(d=>byDate[d]);
+  const dowOf=s=>{const[d,m,y]=s.split('/').map(Number);return new Date(y,m-1,d).getDay();};
+  const bgColors=chartDates.map(d=>{const dw=dowOf(d);return(dw===0||dw===6)?'rgba(249,115,22,0.85)':'rgba(240,69,69,0.85)';});
+
+  // auto-height: 28px per bar
+  const chartH=Math.max(260, chartDates.length*28);
+  const wrap=document.getElementById('ch-cancel-daily-wrap');
+  if(wrap) wrap.style.height=chartH+'px';
+
+  mkChart('ch-cancel-daily',{
+    type:'bar',
+    data:{
+      labels:chartDates.map(d=>d.substring(0,5)),
+      datasets:[{
+        data:chartAmts,
+        backgroundColor:bgColors,
+        borderRadius:4,
+        borderSkipped:false,
+        barThickness:18
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>'฿'+ctx.raw.toLocaleString('th-TH',{minimumFractionDigits:2})}},
+        datalabels:{
+          anchor:'end',
+          align:'end',
+          color:'var(--text2)',
+          font:{size:11,weight:'bold'},
+          formatter:v=>'฿'+v.toLocaleString('th-TH',{minimumFractionDigits:2})
+        }
+      },
+      layout:{padding:{right:90}},
+      scales:{
+        x:{
+          display:false,
+          grid:{display:false}
+        },
+        y:{
+          grid:{color:'rgba(128,128,128,0.08)'},
+          ticks:{color:'#8899b0',font:{size:11}}
+        }
+      }
+    }
+  });
+
+  renderCancelTable();
+}
+
+function renderCancelTable(){
+  const toTs=s=>{const p=(s||'').split('/');return p.length>=3?new Date(+p[2],+p[1]-1,+p[0]).getTime():0;};
+  const dowTH={0:'อาทิตย์',1:'จันทร์',2:'อังคาร',3:'พุธ',4:'พฤหัสบดี',5:'ศุกร์',6:'เสาร์'};
+  const fd2=n=>'฿'+(+n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  const docSearch=(document.getElementById('cv-doc-search')?.value||'').trim().toLowerCase();
+  const fromVal  = document.getElementById('cv-date-from')?.value||'';
+  const toVal    = document.getElementById('cv-date-to')?.value||'';
+  const minAmt   = parseFloat(document.getElementById('cv-min-amt')?.value)||0;
+  const person   = document.getElementById('cv-person-filter')?.value||'';
+
+  let rows=[...CANCEL_DATA];
+  if(docSearch) rows=rows.filter(r=>(r.doc||'').toLowerCase().includes(docSearch));
+  if(fromVal)   rows=rows.filter(r=>toTs(r.date)>=toTs(fromVal));
+  if(toVal)     rows=rows.filter(r=>toTs(r.date)<=toTs(toVal));
+  if(minAmt>0)  rows=rows.filter(r=>r.amount>=minAmt);
+  if(person)    rows=rows.filter(r=>(r.person||'')=== person);
+
+  // sort
+  rows.sort((a,b)=>{
+    let av,bv;
+    if(_cvSortCol==='date')       { av=toTs(a.date); bv=toTs(b.date); }
+    else if(_cvSortCol==='amount'){ av=a.amount;      bv=b.amount; }
+    else if(_cvSortCol==='time')  { av=a.time||'';    bv=b.time||''; }
+    else if(_cvSortCol==='doc')   { av=a.doc||'';     bv=b.doc||''; }
+    else { av=0; bv=0; }
+    return (av>bv?1:av<bv?-1:0)*_cvSortDir;
+  });
+
+  // update sort arrows
+  ['date','time','doc','amount'].forEach(c=>{
+    const el=document.getElementById('cv-sort-'+c);
+    if(el) el.textContent=_cvSortCol===c?(_cvSortDir>0?'↑':'↓'):'↕';
+  });
+
+  // KPI (filtered)
+  const totAmt=rows.reduce((s,r)=>s+r.amount,0);
+  const byDateFiltered={};
+  rows.forEach(r=>{ byDateFiltered[r.date]=(byDateFiltered[r.date]||0)+r.amount; });
+  const peakDay=Object.entries(byDateFiltered).sort((a,b)=>b[1]-a[1])[0];
+  const peakBill=rows.length?rows.reduce((mx,r)=>r.amount>mx.amount?r:mx,rows[0]):null;
+  const days=Object.keys(byDateFiltered).length||1;
+
+  const set=id=>val=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+  set('cv-kpi-count')(rows.length.toLocaleString()+' บิล');
+  set('cv-kpi-count-sub')(`ใน ${days} วัน · เฉลี่ย ${(rows.length/days).toFixed(1)} บิล/วัน`);
+  set('cv-kpi-total')(fd2(totAmt));
+  set('cv-kpi-total-sub')(`เฉลี่ย ${fd2(totAmt/days)}/วัน`);
+  set('cv-kpi-peak-day')(peakDay?peakDay[0].substring(0,5):'—');
+  set('cv-kpi-peak-day-sub')(peakDay?fd2(peakDay[1])+' · '+(byDateFiltered[peakDay[0]]||0)+' บิล':'—');
+  set('cv-kpi-peak-bill')(peakBill?fd2(peakBill.amount):'—');
+  set('cv-kpi-peak-bill-sub')(peakBill?peakBill.doc.split('/').pop()||peakBill.doc:'—');
+
+  // cnt label
+  const cntEl=document.getElementById('cv-cnt');
+  if(cntEl) cntEl.textContent=`แสดง ${rows.length} รายการ · รวม ${fd2(totAmt)}`;
+
+  // table rows
+  const tbody=document.getElementById('cv-tbody');
+  if(!tbody) return;
+  if(rows.length===0){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+    return;
+  }
+
+  // highlight search term in doc
+  const hlDoc=doc=>{
+    if(!docSearch) return doc;
+    const idx=doc.toLowerCase().indexOf(docSearch);
+    if(idx<0) return doc;
+    return doc.substring(0,idx)+'<mark style="background:#f0a50044;color:var(--accent);border-radius:2px;padding:0 2px">'+doc.substring(idx,idx+docSearch.length)+'</mark>'+doc.substring(idx+docSearch.length);
+  };
+
+  const html=rows.map((r,i)=>{
+    const [d,m,y]=r.date.split('/').map(Number);
+    const dw=new Date(y,m-1,d).getDay();
+    const isWE=dw===0||dw===6;
+    return `<tr style="border-bottom:1px solid var(--border);${isWE?'background:rgba(240,165,0,0.04)':''}">
+      <td style="padding:9px 12px;font-family:var(--font-m);color:var(--accent2)">${r.date.substring(0,5)}</td>
+      <td style="padding:9px 8px;font-size:12px;color:${isWE?'var(--accent)':'var(--text2)'}">${dowTH[dw]||''}</td>
+      <td style="padding:9px 8px;font-size:12px;color:var(--text2);font-family:var(--font-m)">${r.time||'—'}</td>
+      <td style="padding:9px 8px;font-size:12px;color:var(--text);font-family:var(--font-m)">${hlDoc(r.doc)}</td>
+      <td style="padding:9px 8px;font-size:12px;color:var(--text2)">${r.person||'—'}</td>
+      <td style="padding:9px 8px;text-align:right;font-family:var(--font-m);font-weight:700;color:var(--red)">${fd2(r.amount)}</td>
+    </tr>`;
+  });
+
+  // build final rows: data rows + per-date subtotal (AFTER each group)
+  const finalHtml=[];
+  let prevDate='';
+
+  // subtotal row template — bold, strong red bg, top+bottom border
+  const subtotalRow=(date,dayRows)=>{
+    const dayTot=dayRows.reduce((s,x)=>s+x.amount,0);
+    return `<tr style="border-top:2px solid #f04545;border-bottom:3px solid #f04545;background:linear-gradient(90deg,rgba(240,69,69,0.18) 0%,rgba(240,69,69,0.08) 100%);">
+      <td colspan="5" style="padding:7px 12px;font-size:11.5px;font-weight:800;color:#f04545;letter-spacing:.3px;">
+        📋 รวม ${date.substring(0,5)} &nbsp;·&nbsp; <span style="font-weight:700">${dayRows.length} บิล</span>
+      </td>
+      <td style="padding:7px 10px;text-align:right;font-size:13px;font-weight:800;color:#f04545;font-family:var(--font-m);">${fd2(dayTot)}</td>
+    </tr>`;
+  };
+
+  rows.forEach((r,i)=>{
+    // flush previous group before starting new date
+    if(r.date!==prevDate && prevDate){
+      const dayRows=rows.filter(x=>x.date===prevDate);
+      finalHtml.push(subtotalRow(prevDate,dayRows));
+    }
+    finalHtml.push(html[i]);
+    prevDate=r.date;
+  });
+  // flush last group
+  if(prevDate){
+    const dayRows=rows.filter(x=>x.date===prevDate);
+    finalHtml.push(subtotalRow(prevDate,dayRows));
+  }
+
+  // grand total
+  finalHtml.push(`<tr style="border-top:3px solid var(--accent);background:var(--surface2);font-family:var(--font-m);">
+    <td colspan="5" style="padding:11px 12px;font-weight:800;font-size:13px;color:var(--accent2);">TOTAL &nbsp;·&nbsp; ${rows.length} บิล</td>
+    <td style="padding:11px 10px;text-align:right;font-size:16px;font-weight:800;color:var(--red);">${fd2(totAmt)}</td>
+  </tr>`);
+
+  tbody.innerHTML=finalHtml.join('');
+}
+
+function sortCancelTable(col){
+  _cvSortDir=(_cvSortCol===col)?-_cvSortDir:-1;
+  _cvSortCol=col;
+  renderCancelTable();
+}
+
+function clearCancelFilters(){
+  const ids=['cv-doc-search','cv-date-from','cv-date-to','cv-min-amt','cv-person-filter'];
+  ids.forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderCancelTable();
+}
 
 // ══════════ BILL CANCELLATION REPORT ══════════
 function buildCancelReport(){
