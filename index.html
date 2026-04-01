@@ -581,13 +581,14 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
           <th style="padding:10px 12px;text-align:left;" data-th="วัน" data-en="Day">วัน</th>
           <th onclick="sortDaily('bills')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนบิล" data-en="Bills">จำนวนบิล</span> <span id="sort-bills">↕</span></th>
           <th onclick="sortDaily('qty')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนชิ้น" data-en="Items">จำนวนชิ้น</span> <span id="sort-qty">↕</span></th>
-          <th onclick="sortDaily('gross')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Gross Revenue <span id="sort-gross">↕</span></th>
-          <th onclick="sortDaily('cancel')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--red);"><span data-th="ยกเลิกบิล" data-en="Cancelled">ยกเลิกบิล</span> <span id="sort-cancel">↕</span></th>
-          <th onclick="sortDaily('preVat')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="ก่อน VAT" data-en="Pre-VAT">ก่อน VAT</span> <span id="sort-preVat">↕</span></th>
-          <th onclick="sortDaily('vat')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="VAT 7%" data-en="VAT 7%">VAT 7%</span> <span id="sort-vat">↕</span></th>
-          <th onclick="sortDaily('discount')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="ส่วนลด" data-en="Discount">ส่วนลด</span> <span id="sort-discount">↕</span></th>
-          <th style="padding:10px 8px;text-align:right;white-space:nowrap;color:var(--red);">Disc%</th>
-          <th onclick="sortDaily('net')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Net Revenue <span id="sort-net">↕</span></th>
+          <th onclick="sortDaily('gross')" title="Gross Revenue = ยอดขายรวมก่อนหักส่วนลดและยกเลิกบิล&#10;= Σ (จำนวน × ราคาขาย) ของทุก transaction ในวันนั้น" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Gross Revenue <span id="sort-gross">↕</span></th>
+          <th onclick="sortDaily('cancel')" title="ยกเลิกบิล = ยอดเงินรวมของบิลที่ถูกยกเลิกในวันนั้น&#10;(หักออกจาก Gross Revenue)&#10;สูตร: Σ จำนวนเงินสุทธิ ของบิลที่ยกเลิก" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--red);"><span data-th="ยกเลิกบิล (฿)" data-en="Cancelled (฿)">ยกเลิกบิล (฿)</span> <span id="sort-cancel">↕</span></th>
+          <th title="จำนวนบิลที่ถูกยกเลิกในวันนั้น&#10;(นับจากไฟล์สรุปการยกเลิกบิล)" style="padding:10px 8px;text-align:right;white-space:nowrap;color:var(--red);">ยกเลิก (บิล)</th>
+          <th onclick="sortDaily('preVat')" title="ฐานภาษี (Tax Base) ตามหลักสรรพากร&#10;= ยอดขายสุทธิ × 100/107&#10;= Net Revenue × 100 ÷ 107&#10;(คำนวณจาก Net หลังหักส่วนลดและยกเลิกบิลแล้ว)" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="ฐานภาษี (Pre-VAT)" data-en="Tax Base (Pre-VAT)">ฐานภาษี</span> <span id="sort-preVat">↕</span></th>
+          <th onclick="sortDaily('vat')" title="ภาษีมูลค่าเพิ่ม (VAT 7%) ตามหลักสรรพากร&#10;= ยอดขายสุทธิ × 7/107&#10;= Net Revenue × 7 ÷ 107&#10;ตรวจสอบ: ฐานภาษี + VAT = Net Revenue ✓&#10;(ราคาสินค้า VAT รวมใน — VAT inclusive)" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="VAT 7%" data-en="VAT 7%">VAT 7%</span> <span id="sort-vat">↕</span></th>
+          <th onclick="sortDaily('discount')" title="ส่วนลดโปรโมชั่น = ส่วนลดรวมทุกโปรโมชั่นในวันนั้น&#10;(มาจากไฟล์รายงานสรุปการใช้โปรโมชั่น)" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="ส่วนลด" data-en="Discount">ส่วนลด</span> <span id="sort-discount">↕</span></th>
+          <th title="Disc% = ส่วนลด ÷ Gross Revenue × 100" style="padding:10px 8px;text-align:right;white-space:nowrap;color:var(--red);">Disc%</th>
+          <th onclick="sortDaily('net')" title="Net Revenue (ยอดขายสุทธิ)&#10;= Gross Revenue − ยกเลิกบิล − ส่วนลด&#10;= ฐานภาษี + VAT&#10;(ยอดรายได้จริงที่ร้านเก็บได้)" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Net Revenue <span id="sort-net">↕</span></th>
           <th onclick="sortDaily('abv')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="เฉลี่ย/บิล" data-en="Avg/Bill">Avg/Bill</span> <span id="sort-abv">↕</span></th>
           <th style="padding:10px 8px;text-align:left;width:110px;" data-th="แท่ง" data-en="Bar">Bar</th>
         </tr>
@@ -2038,8 +2039,8 @@ function renderDailyTable(){
   });
 
   const maxNet=Math.max(...rows.map(d=>d.net),1);
-  const tot={bills:0,qty:0,gross:0,discount:0,net:0,preVat:0,vat:0,cancel:0};
-  rows.forEach(d=>{tot.bills+=d.bills;tot.qty+=d.qty;tot.gross+=d.gross;tot.discount+=d.discount;tot.net+=d.net;tot.preVat+=(d.preVat||0);tot.vat+=(d.vat||0);tot.cancel+=(d.cancel||0);});
+  const tot={bills:0,qty:0,gross:0,discount:0,net:0,preVat:0,vat:0,cancel:0,cancelCount:0};
+  rows.forEach(d=>{tot.bills+=d.bills;tot.qty+=d.qty;tot.gross+=d.gross;tot.discount+=d.discount;tot.net+=d.net;tot.preVat+=(d.preVat||0);tot.vat+=(d.vat||0);tot.cancel+=(d.cancel||0);tot.cancelCount+=(d.cancelCount||0);});
 
   const html=rows.map(d=>{
     const isWE=d.dow==='Sat'||d.dow==='Sun';
@@ -2047,6 +2048,7 @@ function renderDailyTable(){
     const discPct=d.gross>0?(d.discount/d.gross*100).toFixed(1):0;
     const hasVat=(d.preVat||0)>0;
     const hasCancelDay=(d.cancel||0)>0;
+    const cancelCnt=d.cancelCount||0;
     return `<tr style="border-bottom:1px solid var(--border);${isWE?'background:rgba(240,165,0,0.04)':''}">
       <td style="padding:9px 12px;font-family:var(--font-m);color:var(--accent2)">${d.date.substring(0,5)}</td>
       <td style="padding:9px 8px;font-size:12px;color:${isWE?'var(--accent)':'var(--text2)'}">${_thDOW[d.dow]||d.dow}</td>
@@ -2054,6 +2056,7 @@ function renderDailyTable(){
       <td class="num" style="padding:9px 8px">${fn(d.qty)}</td>
       <td class="num" style="padding:9px 8px;color:var(--text2)">${f(d.gross)}</td>
       <td class="num" style="padding:9px 8px;color:var(--red)">${hasCancelDay?'-'+f(d.cancel):'—'}</td>
+      <td class="num" style="padding:9px 8px;color:var(--red)">${cancelCnt>0?cancelCnt+' บิล':'—'}</td>
       <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?f(d.preVat):'—'}</td>
       <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?f(d.vat):'—'}</td>
       <td class="num" style="padding:9px 8px;color:var(--red)">${d.discount>0?'-'+f(d.discount):'—'}</td>
@@ -2083,6 +2086,7 @@ function renderDailyTable(){
     <td class="num" style="padding:10px 8px;color:var(--accent2)">${fn(tot.qty)}</td>
     <td class="num" style="padding:10px 8px">${f(tot.gross)}</td>
     <td class="num" style="padding:10px 8px;color:var(--red)">${totHasCancel?'-'+f(tot.cancel):'—'}</td>
+    <td class="num" style="padding:10px 8px;color:var(--red)">${tot.cancelCount>0?tot.cancelCount+' บิล':'—'}</td>
     <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?f(tot.preVat):'—'}</td>
     <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?f(tot.vat):'—'}</td>
     <td class="num" style="padding:10px 8px;color:var(--red)">${tot.discount>0?'-'+f(tot.discount):'—'}</td>
@@ -5047,8 +5051,12 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[]){
 
   // Build cancel amount per date for quick lookup
   const cancelByDate={};
+  const cancelCountByDate={};
   cancelRows.forEach(r=>{
-    if(r.date) cancelByDate[r.date]=(cancelByDate[r.date]||0)+r.amount;
+    if(r.date){
+      cancelByDate[r.date]      = (cancelByDate[r.date]||0)      + r.amount;
+      cancelCountByDate[r.date] = (cancelCountByDate[r.date]||0) + 1;
+    }
   });
 
   // Store monthly override rows globally so renderMonthlyTable can access them
@@ -5104,14 +5112,18 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[]){
     const netBeforeCancel = gross - disc;
 
     // Deduct cancellations from net and gross
-    const cancelAmt = cancelByDate[d]||0;
+    const cancelAmt   = cancelByDate[d]||0;
+    const cancelCount = cancelCountByDate[d]||0;
     const net   = Math.max(0, netBeforeCancel - cancelAmt);
     const grossAfterCancel = Math.max(0, gross - cancelAmt);
 
     // Recalculate pre-VAT and VAT from net after cancel & discount
-    // VAT rate 7% (inclusive): preVat = net / 1.07, vat = net - preVat
-    const preVatAfter = net > 0 ? Math.round((net / 1.07) * 100) / 100 : 0;
-    const vatAfter    = net > 0 ? Math.round((net - preVatAfter) * 100) / 100 : 0;
+    // Thai Revenue Dept standard (VAT inclusive 7%):
+    //   ฐานภาษี (Pre-VAT)  = Net × 100/107
+    //   ภาษีมูลค่าเพิ่ม (VAT) = Net × 7/107
+    //   Pre-VAT + VAT = Net (ตรวจสอบ: 100/107 + 7/107 = 107/107 = 1 ✓)
+    const preVatAfter = net > 0 ? Math.round((net * 100 / 107) * 100) / 100 : 0;
+    const vatAfter    = net > 0 ? Math.round((net * 7   / 107) * 100) / 100 : 0;
 
     return {
       date: d,
@@ -5121,6 +5133,7 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[]){
       gross: grossAfterCancel,
       discount: disc,
       cancel: cancelAmt,
+      cancelCount: cancelCount,
       preVat: preVatAfter,
       vat:    vatAfter
     };
