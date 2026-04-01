@@ -370,29 +370,16 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
         <div id="modal-f2-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </div>
     </div>
-    <!-- File 2b: Previous Month Promo -->
-    <div style="margin-bottom:24px">
-      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🎟️ ไฟล์โปรโมชั่น — <span style="color:var(--blue,#3b82f6);font-weight:700;">เดือนก่อนหน้า</span> <span style="color:var(--text3);font-weight:400;font-size:10px">(ไม่บังคับ)</span></div>
-      <div id="modal-drop2b" onclick="pickFile('2b')"
+    <!-- File 4: Bill Cancellation -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🚫 ไฟล์ยกเลิกบิล (สรุปการยกเลิกบิล) <span style="color:var(--text3);font-weight:400;font-size:10px">(ไม่บังคับ)</span></div>
+      <div id="modal-drop4" onclick="pickFile(4)"
            ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
            ondragleave="this.style.borderColor='var(--border)'"
-           ondrop="handleModalDrop(event,'2b')"
+           ondrop="handleModalDrop(event,4)"
            style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
-        <div style="font-size:20px;margin-bottom:5px">🎟️</div>
-        <div id="modal-f2b-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
-      </div>
-    </div>
-
-    <!-- File 3: Monthly Sales -->
-    <div style="margin-bottom:24px">
-      <div style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📅 ไฟล์ยอดขายรายเดือน <span style="color:var(--text3);font-weight:400;font-size:10px">(ไม่บังคับ)</span></div>
-      <div id="modal-drop3" onclick="pickFile(3)"
-           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-           ondragleave="this.style.borderColor='var(--border)'"
-           ondrop="handleModalDrop(event,3)"
-           style="display:block;border:1.5px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);font-size:12px;transition:all .2s;background:var(--surface2)">
-        <div style="font-size:20px;margin-bottom:5px">📅</div>
-        <div id="modal-f3-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
+        <div style="font-size:20px;margin-bottom:5px">🚫</div>
+        <div id="modal-f4-name">คลิกหรือลากไฟล์มาวางที่นี่</div>
       </div>
     </div>
 
@@ -595,6 +582,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
           <th onclick="sortDaily('bills')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนบิล" data-en="Bills">จำนวนบิล</span> <span id="sort-bills">↕</span></th>
           <th onclick="sortDaily('qty')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="จำนวนชิ้น" data-en="Items">จำนวนชิ้น</span> <span id="sort-qty">↕</span></th>
           <th onclick="sortDaily('gross')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;">Gross Revenue <span id="sort-gross">↕</span></th>
+          <th onclick="sortDaily('cancel')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--red);"><span data-th="ยกเลิกบิล" data-en="Cancelled">ยกเลิกบิล</span> <span id="sort-cancel">↕</span></th>
           <th onclick="sortDaily('preVat')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="ก่อน VAT" data-en="Pre-VAT">ก่อน VAT</span> <span id="sort-preVat">↕</span></th>
           <th onclick="sortDaily('vat')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;color:var(--cyan);"><span data-th="VAT 7%" data-en="VAT 7%">VAT 7%</span> <span id="sort-vat">↕</span></th>
           <th onclick="sortDaily('discount')" style="padding:10px 8px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap;"><span data-th="ส่วนลด" data-en="Discount">ส่วนลด</span> <span id="sort-discount">↕</span></th>
@@ -1305,6 +1293,19 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
       </div>
       <div id="st2b"></div>
     </div>
+    <div class="upcard" style="border-color:#e53e3e;border-width:1.5px;">
+      <h3>🚫 ไฟล์ที่ 4 — สรุปการยกเลิกบิล <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
+      <p>อัพโหลดไฟล์ Excel สรุปการยกเลิกบิล — ยอดยกเลิกจะถูกหักออกจากยอดขายรายวันโดยอัตโนมัติ</p>
+      <div class="drop" id="d4" onclick="pickFileUp(4)"
+           ondragover="event.preventDefault();this.classList.add('dv')"
+           ondragleave="this.classList.remove('dv')"
+           ondrop="dropFileUp(event,4)">
+        <div class="drop-ico">🚫</div>
+        <div class="drop-txt">คลิกหรือลากไฟล์มาวางที่นี่</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">.xlsx เท่านั้น</div>
+      </div>
+      <div id="st4"></div>
+    </div>
     <div class="upcard">
       <h3>📅 ไฟล์ที่ 3 — ยอดขายรายเดือน <span style="font-size:11px;color:var(--text3);font-weight:400">(ไม่บังคับ)</span></h3>
       <p>รองรับไฟล์ Excel (.xlsx) รายงานยอดขายสรุปรายเดือน</p>
@@ -1350,7 +1351,8 @@ const PROD_BY_DATE = {
   "09/03/2026":{"MINI001 / Salmon Sushi 7 pcs.":{net:4200,qty:20,cat:"Sushi Bento"},"DON002 / Gyu Don":{net:1320,qty:8,cat:"Donburi"},"BEV006 / Namthip Drinking Water 550ml":{net:1820,qty:175,cat:"Beverage"},"MINI004 / Salmon Varity Set S":{net:2200,qty:11,cat:"Sushi Bento"},"DES007 / Matcha Chocolate Warabi Mochi":{net:432,qty:8,cat:"Dessert"}}
 };
 const DOW_MAP={};
-var TOTAL_NET=0,TOTAL_BILLS=0,TOTAL_PREVAT=0,TOTAL_VAT=0;
+const CANCEL_DATA=[];  // rows from cancel file: {date, doc, amount}
+var TOTAL_NET=0,TOTAL_BILLS=0,TOTAL_PREVAT=0,TOTAL_VAT=0,TOTAL_CANCEL=0;
 var salesRows=[];
 var BASKET_DIST=[0,0,0,0,0]; // bill count per range <50,50-99,100-149...
 
@@ -1495,14 +1497,16 @@ function buildOverview(){
   const set=el=>v=>{ const e=document.getElementById(el); if(e) e.textContent=v; };
   set('kpi-net')('฿'+TOTAL_NET.toLocaleString());
   set('kpi-net-sub')(('รายได้สุทธิรวม '+days+' วัน'));
-  // VAT breakdown
+  // VAT + Cancel breakdown
   const vatBreakEl=document.getElementById('kpi-vat-breakdown');
-  if(vatBreakEl&&TOTAL_PREVAT>0){
-    vatBreakEl.innerHTML=
-      '🏷️ ก่อน VAT: <strong style="color:var(--accent2)">฿'+Math.round(TOTAL_PREVAT).toLocaleString()+'</strong><br>'
-     +'🧾 VAT 7%: <strong style="color:var(--text)">฿'+Math.round(TOTAL_VAT).toLocaleString()+'</strong>';
-  } else if(vatBreakEl){
-    vatBreakEl.innerHTML='';
+  if(vatBreakEl){
+    let html='';
+    if(TOTAL_CANCEL>0) html+='🚫 ยกเลิกบิล: <strong style="color:var(--red)">-฿'+Math.round(TOTAL_CANCEL).toLocaleString()+'</strong><br>';
+    if(TOTAL_PREVAT>0){
+      html+='🏷️ ก่อน VAT: <strong style="color:var(--accent2)">฿'+Math.round(TOTAL_PREVAT).toLocaleString()+'</strong><br>';
+      html+='🧾 VAT 7%: <strong style="color:var(--text)">฿'+Math.round(TOTAL_VAT).toLocaleString()+'</strong>';
+    }
+    vatBreakEl.innerHTML=html;
   }
   set('kpi-bills')(TOTAL_BILLS.toLocaleString());
   set('kpi-bills-sub')('เฉลี่ย '+Math.round(TOTAL_BILLS/days)+' บิล/วัน');
@@ -2028,26 +2032,28 @@ function renderDailyTable(){
   });
 
   // update header arrows
-  ['date','bills','qty','gross','preVat','vat','discount','net','abv'].forEach(c=>{
+  ['date','bills','qty','gross','cancel','preVat','vat','discount','net','abv'].forEach(c=>{
     const el=document.getElementById('sort-'+c);
     if(el) el.textContent=_dailySortCol===c?(_dailySortDir>0?'↑':'↓'):'↕';
   });
 
   const maxNet=Math.max(...rows.map(d=>d.net),1);
-  const tot={bills:0,qty:0,gross:0,discount:0,net:0,preVat:0,vat:0};
-  rows.forEach(d=>{tot.bills+=d.bills;tot.qty+=d.qty;tot.gross+=d.gross;tot.discount+=d.discount;tot.net+=d.net;tot.preVat+=(d.preVat||0);tot.vat+=(d.vat||0);});
+  const tot={bills:0,qty:0,gross:0,discount:0,net:0,preVat:0,vat:0,cancel:0};
+  rows.forEach(d=>{tot.bills+=d.bills;tot.qty+=d.qty;tot.gross+=d.gross;tot.discount+=d.discount;tot.net+=d.net;tot.preVat+=(d.preVat||0);tot.vat+=(d.vat||0);tot.cancel+=(d.cancel||0);});
 
   const html=rows.map(d=>{
     const isWE=d.dow==='Sat'||d.dow==='Sun';
     const pct=(d.net/maxNet*100).toFixed(1);
     const discPct=d.gross>0?(d.discount/d.gross*100).toFixed(1):0;
     const hasVat=(d.preVat||0)>0;
+    const hasCancelDay=(d.cancel||0)>0;
     return `<tr style="border-bottom:1px solid var(--border);${isWE?'background:rgba(240,165,0,0.04)':''}">
       <td style="padding:9px 12px;font-family:var(--font-m);color:var(--accent2)">${d.date.substring(0,5)}</td>
       <td style="padding:9px 8px;font-size:12px;color:${isWE?'var(--accent)':'var(--text2)'}">${_thDOW[d.dow]||d.dow}</td>
       <td class="num" style="padding:9px 8px">${fn(d.bills)}</td>
       <td class="num" style="padding:9px 8px">${fn(d.qty)}</td>
       <td class="num" style="padding:9px 8px;color:var(--text2)">${f(d.gross)}</td>
+      <td class="num" style="padding:9px 8px;color:var(--red)">${hasCancelDay?'-'+f(d.cancel):'—'}</td>
       <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?f(d.preVat):'—'}</td>
       <td class="num" style="padding:9px 8px;color:var(--cyan)">${hasVat?f(d.vat):'—'}</td>
       <td class="num" style="padding:9px 8px;color:var(--red)">${d.discount>0?'-'+f(d.discount):'—'}</td>
@@ -2069,12 +2075,14 @@ function renderDailyTable(){
   const totDP=tot.gross>0?(tot.discount/tot.gross*100).toFixed(1):0;
   const avgDaily=rows.length>0?Math.round(tot.net/rows.length):0;
   const totHasVat=tot.preVat>0;
+  const totHasCancel=tot.cancel>0;
   html.push(`<tr style="border-top:2px solid var(--accent);background:var(--surface2);font-family:var(--font-m)">
     <td style="padding:10px 12px;color:var(--accent2)">TOTAL</td>
     <td style="padding:10px 8px;font-size:11px;color:var(--text3)">${rows.length} วัน · เฉลี่ย ฿${avgDaily.toLocaleString()}/วัน</td>
     <td class="num" style="padding:10px 8px;color:var(--accent2)">${fn(tot.bills)}</td>
     <td class="num" style="padding:10px 8px;color:var(--accent2)">${fn(tot.qty)}</td>
     <td class="num" style="padding:10px 8px">${f(tot.gross)}</td>
+    <td class="num" style="padding:10px 8px;color:var(--red)">${totHasCancel?'-'+f(tot.cancel):'—'}</td>
     <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?f(tot.preVat):'—'}</td>
     <td class="num" style="padding:10px 8px;color:var(--cyan)">${totHasVat?f(tot.vat):'—'}</td>
     <td class="num" style="padding:10px 8px;color:var(--red)">${tot.discount>0?'-'+f(tot.discount):'—'}</td>
@@ -4726,7 +4734,7 @@ function buildReport(){
 
 // ══════════ UPLOAD ══════════
 // ══════════ UPLOAD & PARSE ══════════
-const upF={1:null,'1b':null,'1c':null,2:null,'2b':null,3:null};
+const upF={1:null,'1b':null,'1c':null,2:null,'2b':null,3:null,4:null};
 
 function handleF(ev,n){
   const file=ev.target.files[0];if(!file)return;
@@ -4941,10 +4949,41 @@ async function processFiles(){
     }
 
     btn.textContent='⏳ กำลังอัพเดท Dashboard...';
-    rebuildDashboard(salesRows, promoRows, monthlyRows);
+
+    // ── File 4: Bill Cancellations (ไม่บังคับ) ──
+    let cancelRows=[];
+    if(upF[4]){
+      try{
+        const rows4=await readXlsx(upF[4]);
+        // Header: สาขา, วันที่, เลขที่เอกสาร, จำนวนเงินสุทธิ, คนยกเลิกบิล, เวลายกเลิก
+        let hdr4=0;
+        for(let i=0;i<Math.min(10,rows4.length);i++){
+          const r=rows4[i].map(v=>String(v).trim());
+          if(r.includes('วันที่')&&(r.includes('เลขที่เอกสาร')||r.includes('จำนวนเงินสุทธิ'))){hdr4=i;break;}
+        }
+        const cols4=rows4[hdr4].map(v=>String(v).trim());
+        const ci4=(...names)=>{for(const n of names){const i=cols4.indexOf(n);if(i!==-1)return i;}return -1;};
+        const iCDate = ci4('วันที่');
+        const iCDoc  = ci4('เลขที่เอกสาร');
+        const iCAmt  = ci4('จำนวนเงินสุทธิ','จำนวนเงิน','ยอดเงิน');
+        for(let i=hdr4+1;i<rows4.length;i++){
+          const r=rows4[i];
+          const dateRaw=String(r[iCDate]||'').trim();
+          const doc    =String(r[iCDoc] ||'').trim();
+          const amt    =parseFloat(r[iCAmt])||0;
+          if(!dateRaw||amt===0) continue;
+          // skip summary rows (date doesn't look like DD/MM/YYYY)
+          if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateRaw)) continue;
+          cancelRows.push({date:normDate(dateRaw), doc, amount:amt});
+        }
+      }catch(e){ console.warn('Cancel file parse warning:', e.message); }
+    }
+
+    rebuildDashboard(salesRows, promoRows, monthlyRows, cancelRows);
 
     const monthlySuffix = monthlyRows.length>0 ? ` · ยอดขายรายเดือน ${monthlyRows.length} รายการ` : '';
-    resultEl.innerHTML='<div class="fstatus ok" style="padding:14px">🎉 <strong>อัพเดทสำเร็จ</strong> — ยอดขาย '+salesRows.length.toLocaleString()+' รายการ'+monthlySuffix+'</div>';
+    const cancelSuffix  = cancelRows.length>0   ? ` · ยกเลิกบิล ${cancelRows.length} รายการ`       : '';
+    resultEl.innerHTML='<div class="fstatus ok" style="padding:14px">🎉 <strong>อัพเดทสำเร็จ</strong> — ยอดขาย '+salesRows.length.toLocaleString()+' รายการ'+monthlySuffix+cancelSuffix+'</div>';
     btn.textContent='⚡ ประมวลผลและอัพเดท Dashboard'; btn.disabled=false;
 
   }catch(err){
@@ -4997,10 +5036,20 @@ function getDOW(dateStr){
   return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]||'?';
 }
 
-function rebuildDashboard(salesRows, promoRows, monthlyRows=[]){
+function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[]){
   
   salesRows.forEach(r=>{r.date=normDate(r.date);});
   promoRows.forEach(p=>{p.date=normDate(p.date);});
+
+  // Store cancel data globally
+  CANCEL_DATA.length=0;
+  cancelRows.forEach(r=>CANCEL_DATA.push(r));
+
+  // Build cancel amount per date for quick lookup
+  const cancelByDate={};
+  cancelRows.forEach(r=>{
+    if(r.date) cancelByDate[r.date]=(cancelByDate[r.date]||0)+r.amount;
+  });
 
   // Store monthly override rows globally so renderMonthlyTable can access them
   MONTHLY_OVERRIDE.length=0;
@@ -5049,12 +5098,32 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[]){
   promoRows.forEach(p=>{if(p.date)promoByDate[p.date]=(promoByDate[p.date]||0)+p.discount;});
 
   const newDAILY=sortedDates.map(d=>{
-    // ใช้ dateMap (รวมทุก category + ทุกช่วงเวลา) สำหรับ Daily Net Sales
     const v=dateMap[d]||{net:0,gross:0,qty:0,disc:0,preVat:0,vat:0,bills:new Set()};
-    const disc = v.disc > 0 ? v.disc : (promoByDate[d]||0);
-    const gross = v.gross > 0 ? v.gross : v.net + disc;
-    const net   = gross - disc;
-    return {date:d,net:net,qty:v.qty,bills:[...v.bills].length,gross:gross,discount:disc,preVat:v.preVat,vat:v.vat};
+    const disc   = v.disc > 0 ? v.disc : (promoByDate[d]||0);
+    const gross  = v.gross > 0 ? v.gross : v.net + disc;
+    const netBeforeCancel = gross - disc;
+
+    // Deduct cancellations from net and gross
+    const cancelAmt = cancelByDate[d]||0;
+    const net   = Math.max(0, netBeforeCancel - cancelAmt);
+    const grossAfterCancel = Math.max(0, gross - cancelAmt);
+
+    // Recalculate pre-VAT and VAT from net after cancel & discount
+    // VAT rate 7% (inclusive): preVat = net / 1.07, vat = net - preVat
+    const preVatAfter = net > 0 ? Math.round((net / 1.07) * 100) / 100 : 0;
+    const vatAfter    = net > 0 ? Math.round((net - preVatAfter) * 100) / 100 : 0;
+
+    return {
+      date: d,
+      net:  net,
+      qty:  v.qty,
+      bills:[...v.bills].length,
+      gross: grossAfterCancel,
+      discount: disc,
+      cancel: cancelAmt,
+      preVat: preVatAfter,
+      vat:    vatAfter
+    };
   });
 
   const catOrder=['Sushi Bento','Donburi','Beverage','Dessert','Appetizer'];
@@ -5083,6 +5152,7 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[]){
   TOTAL_NET    = DAILY.reduce((s,d)=>s+d.net,0);
   TOTAL_PREVAT = DAILY.reduce((s,d)=>s+(d.preVat||0),0);
   TOTAL_VAT    = DAILY.reduce((s,d)=>s+(d.vat||0),0);
+  TOTAL_CANCEL = DAILY.reduce((s,d)=>s+(d.cancel||0),0);
   CATS.length=0;   newCATS.forEach(c=>CATS.push(c));
   HOURS.length=0;  newHOURS.forEach(h=>HOURS.push(h));
   PRODUCTS.length=0; newPRODS.forEach(p=>PRODUCTS.push(p));
@@ -5179,7 +5249,7 @@ function dropFileUp(e, n){
   if(file) handleF({target:{files:[file]}}, n);
 }
 
-const modalFiles={1:null,'1b':null,'1c':null,2:null,'2b':null,3:null};
+const modalFiles={1:null,'1b':null,'1c':null,2:null,'2b':null,3:null,4:null};
 function handleModalFile(input,n){
   const file=input.files[0];
   if(!file)return;
@@ -5233,6 +5303,7 @@ async function processModalFiles(){
     upF[2]=modalFiles[2]||null;
     upF['2b']=modalFiles['2b']||null;
     upF[3]=modalFiles[3]||null;
+    upF[4]=modalFiles[4]||null;
     await processFiles();
     const modal=document.getElementById('upload-modal');
     if(modal){modal.style.animation='modalOut .25s ease forwards';setTimeout(()=>modal.remove(),260);}
