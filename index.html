@@ -1065,7 +1065,7 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
       <th style="padding:8px 8px;cursor:pointer;user-select:none" onclick="toggleSP('cat')">หมวด <span id="sp-cat">↕</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('qty')">รวม <span id="sp-qty">↕</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--green);white-space:nowrap" onclick="toggleSP('normal')">☀️ ปกติ <span id="sp-normal">↕</span></th>
-      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--red);white-space:nowrap" onclick="toggleSP('flash')" title="จำนวนชิ้นที่ขายในช่วง Flash Sale 19:00–22:00&#10;ถ่วงน้ำหนักด้วย fraction ของบิลที่ได้รับส่วนลดจริง&#10;= qty_sold × (flash_promo_bills ÷ total_bills_in_window)&#10;ไม่นับลูกค้าที่ซื้อราคาเต็มในช่วงเวลาเดียวกัน">⚡ Flash <span id="sp-flash">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--red);white-space:nowrap" onclick="toggleSP('flash')" title="จำนวนชิ้นที่ขายผ่าน Flash Sale&#10;เงื่อนไข: ทุกหมวดยกเว้น Beverage (Sushi Bento, Donburi, Dessert, Appetizer ร่วมได้)&#10;ช่วงเวลา: 19:00–22:00&#10;ถ่วงน้ำหนัก: qty × (flash_promo_bills ÷ total_bills_in_window)">⚡ Flash <span id="sp-flash">↕</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--text3);white-space:nowrap" onclick="toggleSP('flashpct')" title="Flash% = Flash Sale qty ÷ Total qty × 100&#10;แสดงสัดส่วนยอดขายที่มาจาก Flash Sale promotion">Flash% <span id="sp-flashpct">↕</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('net')">ยอดสุทธิ <span id="sp-net">↓</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('rpu')">฿/ชิ้น <span id="sp-rpu">↕</span></th>
@@ -3869,20 +3869,30 @@ function renderProd(){
     }
   });
 
+  // Flash Sale eligible categories: ทุกหมวดยกเว้น Beverage
+  // (Sushi Bento, Donburi, Dessert, Appetizer ร่วม Flash Sale — Beverage ไม่ร่วม)
+  const FLASH_CATS = new Set(['Sushi Bento','Donburi','Dessert','Appetizer']);
+
   salesRows.forEach(r=>{
     if(!r.date) return;
     if(!inRange(r.date)) return;
     const h=parseInt((r.time||'00:00').split(':')[0])||0;
     const key=(r.prod||'').trim();
     if(!key) return;
+    const cat = r.cat||'';
     if(h>=5 && h<19){
       normalMap[key]=(normalMap[key]||0)+r.qty;
     } else if(h>=19 && h<22){
-      // Apply Flash Sale participation fraction for this date
-      const flashBills = flashPromoBillsByDate[r.date]||0;
-      const totalBills = windowBillsByDate[r.date]?.size||1;
-      const fraction   = Math.min(1, flashBills/totalBills);
-      flashMap[key]=(flashMap[key]||0)+r.qty*fraction;
+      if(FLASH_CATS.has(cat)){
+        // Apply Flash Sale participation fraction for this date
+        const flashBills = flashPromoBillsByDate[r.date]||0;
+        const totalBills = windowBillsByDate[r.date]?.size||1;
+        const fraction   = Math.min(1, flashBills/totalBills);
+        flashMap[key]=(flashMap[key]||0)+r.qty*fraction;
+      } else {
+        // Non-Flash-Sale category sold in flash hours = normal sale
+        normalMap[key]=(normalMap[key]||0)+r.qty;
+      }
     } else {
       normalMap[key]=(normalMap[key]||0)+r.qty;
     }
@@ -6272,11 +6282,14 @@ function computePPI(){
     const key  = r.prod.includes('/') ? r.prod.split('/').slice(1).join('/').trim() : r.prod;
     const h    = parseInt((r.time||'00:00').split(':')[0])||0;
     const isFlashWindow = h >= 19 && h < 22;
+    // Flash Sale eligible categories: ทุกหมวดยกเว้น Beverage
+    const FLASH_CATS2 = new Set(['Sushi Bento','Donburi','Dessert','Appetizer']);
+    const isCatEligible = FLASH_CATS2.has(r.cat||'');
     // Flash Sale fraction: ratio of promo bills to total bills in window for this date
-    const flashFrac2 = isFlashWindow
+    const flashFrac2 = (isFlashWindow && isCatEligible)
       ? Math.min(1, (flashPromoBillsByDate2[r.date]||0) / (windowBillsByDate2[r.date]?.size||1))
       : 0;
-    const isFlash    = isFlashWindow && (flashPromoBillsByDate2[r.date]||0) > 0;
+    const isFlash    = isFlashWindow && isCatEligible && (flashPromoBillsByDate2[r.date]||0) > 0;
     const billDisc   = docDiscMap[r.doc]||0;
     const rowDisc    = r.disc||0;
     const discPct    = r.gross > 0 ? rowDisc/r.gross : 0;
