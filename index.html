@@ -1065,8 +1065,8 @@ tbody td.num{text-align:right;font-family:var(--font-m);font-size:var(--ts-sm);}
       <th style="padding:8px 8px;cursor:pointer;user-select:none" onclick="toggleSP('cat')">หมวด <span id="sp-cat">↕</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('qty')">รวม <span id="sp-qty">↕</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--green);white-space:nowrap" onclick="toggleSP('normal')">☀️ ปกติ <span id="sp-normal">↕</span></th>
-      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--red);white-space:nowrap" onclick="toggleSP('flash')">⚡ Flash <span id="sp-flash">↕</span></th>
-      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--text3);white-space:nowrap" onclick="toggleSP('flashpct')">Flash% <span id="sp-flashpct">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--red);white-space:nowrap" onclick="toggleSP('flash')" title="จำนวนชิ้นที่ขายในช่วง Flash Sale 19:00–22:00&#10;ถ่วงน้ำหนักด้วย fraction ของบิลที่ได้รับส่วนลดจริง&#10;= qty_sold × (flash_promo_bills ÷ total_bills_in_window)&#10;ไม่นับลูกค้าที่ซื้อราคาเต็มในช่วงเวลาเดียวกัน">⚡ Flash <span id="sp-flash">↕</span></th>
+      <th class="num" style="padding:8px;cursor:pointer;user-select:none;color:var(--text3);white-space:nowrap" onclick="toggleSP('flashpct')" title="Flash% = Flash Sale qty ÷ Total qty × 100&#10;แสดงสัดส่วนยอดขายที่มาจาก Flash Sale promotion">Flash% <span id="sp-flashpct">↕</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('net')">ยอดสุทธิ <span id="sp-net">↓</span></th>
       <th class="num" style="padding:8px;cursor:pointer;user-select:none;white-space:nowrap" onclick="toggleSP('rpu')">฿/ชิ้น <span id="sp-rpu">↕</span></th>
       <th style="padding:8px">Revenue</th>
@@ -3843,18 +3843,48 @@ function renderProd(){
   const inRange = d => { const t=toTs(d); return t>=fromTs && t<=toTs2; };
 
   // ── คำนวณ normal / flash qty จาก salesRows ──
-  // normal: 05-19 (h>=5 && h<=19), flash: 20-22 (h>=20 && h<=22)
+  // Flash Sale eligible = items sold 19-22h, weighted by fraction of bills that actually
+  // used Flash Sale promo on that date (from PROMO_DATA).
+  // This excludes full-price customers who happened to buy during flash hours.
+  //   flashFraction[date] = flashPromoBills[date] / totalBills19-22h[date]
+  //   flashQty[product] += qty_in_19-22h × flashFraction[date]
   const normalMap={}, flashMap={};
+
+  // Build flash promo bill count per date from PROMO_DATA
+  const flashPromoBillsByDate={};
+  PROMO_DATA.forEach(p=>{
+    if((p.name||'').toLowerCase().includes('flash')){
+      flashPromoBillsByDate[p.date]=(flashPromoBillsByDate[p.date]||0)+p.count;
+    }
+  });
+
+  // Build total bills in 19-22h window per date
+  const windowBillsByDate={};
+  salesRows.forEach(r=>{
+    if(!r.date||!inRange(r.date)) return;
+    const h=parseInt((r.time||'00:00').split(':')[0])||0;
+    if(h>=19&&h<22){
+      if(!windowBillsByDate[r.date]) windowBillsByDate[r.date]=new Set();
+      windowBillsByDate[r.date].add(r.doc);
+    }
+  });
+
   salesRows.forEach(r=>{
     if(!r.date) return;
     if(!inRange(r.date)) return;
     const h=parseInt((r.time||'00:00').split(':')[0])||0;
     const key=(r.prod||'').trim();
     if(!key) return;
-    if(h>=5 && h<=19){
+    if(h>=5 && h<19){
       normalMap[key]=(normalMap[key]||0)+r.qty;
-    } else if(h>=20 && h<=22){
-      flashMap[key]=(flashMap[key]||0)+r.qty;
+    } else if(h>=19 && h<22){
+      // Apply Flash Sale participation fraction for this date
+      const flashBills = flashPromoBillsByDate[r.date]||0;
+      const totalBills = windowBillsByDate[r.date]?.size||1;
+      const fraction   = Math.min(1, flashBills/totalBills);
+      flashMap[key]=(flashMap[key]||0)+r.qty*fraction;
+    } else {
+      normalMap[key]=(normalMap[key]||0)+r.qty;
     }
   });
 
@@ -6209,6 +6239,24 @@ function computePPI(){
   const docDiscMap = {};
   salesRows.forEach(r => { if(r.doc) docDiscMap[r.doc] = (docDiscMap[r.doc]||0)+(r.disc||0); });
 
+  // Flash Sale participation fraction per date:
+  // fraction = flashPromoBills[date] / totalBillsInWindow[date]
+  // ensures full-price customers in 19-22h are excluded proportionally
+  const flashPromoBillsByDate2={};
+  PROMO_DATA.forEach(p=>{
+    if((p.name||'').toLowerCase().includes('flash'))
+      flashPromoBillsByDate2[p.date]=(flashPromoBillsByDate2[p.date]||0)+p.count;
+  });
+  const windowBillsByDate2={};
+  salesRows.forEach(r=>{
+    if(!r.date) return;
+    const h=parseInt((r.time||'00:00').split(':')[0])||0;
+    if(h>=19&&h<22){
+      if(!windowBillsByDate2[r.date]) windowBillsByDate2[r.date]=new Set();
+      windowBillsByDate2[r.date].add(r.doc);
+    }
+  });
+
   // ── 2. Per-product aggregation ──
   // prodMap: prodKey → {
   //   cat, totalQty, totalNet, totalGross, totalDisc,
@@ -6223,7 +6271,12 @@ function computePPI(){
     if(!r.prod || !r.date) return;
     const key  = r.prod.includes('/') ? r.prod.split('/').slice(1).join('/').trim() : r.prod;
     const h    = parseInt((r.time||'00:00').split(':')[0])||0;
-    const isFlash    = h >= 19 && h < 22;
+    const isFlashWindow = h >= 19 && h < 22;
+    // Flash Sale fraction: ratio of promo bills to total bills in window for this date
+    const flashFrac2 = isFlashWindow
+      ? Math.min(1, (flashPromoBillsByDate2[r.date]||0) / (windowBillsByDate2[r.date]?.size||1))
+      : 0;
+    const isFlash    = isFlashWindow && (flashPromoBillsByDate2[r.date]||0) > 0;
     const billDisc   = docDiscMap[r.doc]||0;
     const rowDisc    = r.disc||0;
     const discPct    = r.gross > 0 ? rowDisc/r.gross : 0;
@@ -6244,8 +6297,8 @@ function computePPI(){
     pm.totalGross += r.gross;
     pm.totalDisc  += rowDisc;
     pm.dates.add(r.date);
-    if(isFlash)    pm.flashQty    += r.qty;
-    else           pm.normalQty   += r.qty;
+    if(isFlashWindow) pm.flashQty += r.qty * flashFrac2;       // weighted by participation rate
+    if(!isFlashWindow) pm.normalQty += r.qty;
     if(isStaff10||isStaff15) pm.staffDiscQty += r.qty;
     if(hasAnyDisc) pm.discBillQty += r.qty;
     if(onPromoDay) pm.promoQtyOnDay += r.qty;
