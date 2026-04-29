@@ -1622,7 +1622,7 @@ function buildOverview(){
   if(qtyLbl) qtyLbl.textContent=_isByDateFile?'—':'จำนวนชิ้น';
   // Update KPI Items label
   const kpiItemsLbl=document.querySelector('#kpi-items')?.closest('.kpi')?.querySelector('.kpi-lbl');
-  if(kpiItemsLbl) kpiItemsLbl.textContent=_isByDateFile?'ไฟล์แยกตามวันที่':'Total Items Sold';
+  if(kpiItemsLbl) kpiItemsLbl.textContent='Total Items Sold';
   set('kpi-net')('฿'+TOTAL_NET.toLocaleString());
   set('kpi-net-sub')(('รายได้สุทธิรวม '+days+' วัน'));
   // VAT + Cancel breakdown
@@ -1638,8 +1638,9 @@ function buildOverview(){
   }
   set('kpi-bills')(TOTAL_BILLS.toLocaleString());
   set('kpi-bills-sub')('เฉลี่ย '+Math.round(TOTAL_BILLS/days)+' บิล/วัน');
-  set('kpi-items')(totalItems>0 ? totalItems.toLocaleString() : (_isByDateFile ? TOTAL_BILLS.toLocaleString() : '—'));
-  set('kpi-items-sub')(_isByDateFile ? 'ไม่มีข้อมูลชิ้น (ใช้ไฟล์แยกตามวันที่)' : 'เฉลี่ย '+Math.round(totalItems/days)+' ชิ้น/วัน');
+  const _hasP2=!!(window._productSalesRows&&window._productSalesRows.length>0);
+  set('kpi-items')(totalItems>0 ? totalItems.toLocaleString() : 'N/A');
+  set('kpi-items-sub')(totalItems>0 ? 'เฉลี่ย '+Math.round(totalItems/days)+' ชิ้น/วัน' : (_isByDateFile&&!_hasP2?'อัปโหลดไฟล์สินค้า (1p) เพื่อดูข้อมูล':'ไม่มีข้อมูลชิ้น'));
   // ABV = ยอดขาย (ไม่รวม Bev + ไม่รวมบิลที่มีส่วนลด) ÷ บิลที่ผ่านเกณฑ์
   const _qABV=computeQualifiedABV();
   const _hasP=!!(window._productSalesRows&&window._productSalesRows.length>0);
