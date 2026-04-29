@@ -1445,6 +1445,7 @@ const HOURS=[];
 const DAYPARTS=[];  // from สรุปยอดขายแยกตามช่วงเวลา (slot 6)
 const HM_SALES={};
 const CAT_HOUR={};
+const CAT_HOUR_QTY={};
 const PROMO_DATA=[];
 const PRODUCTS=[];
 const MONTHLY_OVERRIDE=[]; // rows from the optional monthly summary file (upF[3])
@@ -1724,7 +1725,7 @@ function buildOverview(){
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'var(--text2)',boxWidth:12,font:{size:11}}},
         tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
-      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
+      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>v+' ชิ้น'}}}
     }
   });
 
@@ -2450,7 +2451,7 @@ function buildDOW(){
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'var(--text2)',boxWidth:12,font:{size:11}}},
         tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?f(ctx.raw):fn(ctx.raw)+' บิล'}}},
-      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},
+      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>v+' ชิ้น'}},
         y1:{grid:{display:false},position:'right',ticks:{color:'#22d47a'}}}
     }
   });
@@ -2585,7 +2586,7 @@ function buildVisual(){
     data:{datasets:CATS.map(c=>({label:c.cat,data:[{x:c.qty,y:c.net,r:Math.sqrt(c.qty)/3+5}],backgroundColor:c.color+'99',borderColor:c.color,borderWidth:1}))},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:10,font:{size:11}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fn(ctx.raw.x)} ชิ้น · ${f(ctx.raw.y)}`}}},
-      scales:{x:{grid:grd,title:{display:true,text:'จำนวนชิ้น',color:'#e2e8f4'}},y:{grid:grd,title:{display:true,text:'ยอดรายได้ (฿)',color:'#e2e8f4'},ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
+      scales:{x:{grid:grd,title:{display:true,text:'จำนวนชิ้น',color:'#e2e8f4'}},y:{grid:grd,title:{display:true,text:'ยอดรายได้ (฿)',color:'#e2e8f4'},ticks:{callback:v=>v+' ชิ้น'}}}
     }
   });
 }
@@ -2627,7 +2628,7 @@ function buildBasket(){
   });
   mkChart('ch-bseg-rev',{type:'bar',
     data:{labels:segs.map(s=>s.l),datasets:[{data:segs.map(s=>s.tot),backgroundColor:segs.map(s=>s.c),borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)}}},scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)}}},scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>v+' ชิ้น'}}}}
   });
   // Bill Value Distribution จากข้อมูลจริง
   const _bdRanges=[
@@ -2867,7 +2868,7 @@ function buildHourlySalesHM(){
       <div class="hm-rlbl">${k}<br><span style="font-size:7px;color:var(--text3)">${DOW_MAP[k+'/2026']||''}</span></div>`;
     vals.forEach((v,ci)=>{
       const t=maxV>0?v/maxV:0;const bg=hmSalesColor(t);
-      const d=v>999?Math.round(v/1000)+'K':v>0?Math.round(v):'';
+      const d=v>0?v.toLocaleString():'';
       html+=`<div class="hm-cell" style="background:${bg}" title="${k} ${String(ci+5).padStart(2,'0')}:00 — ${f(v)}">${d}</div>`;
     });
     html+='</div>';
@@ -2884,24 +2885,26 @@ function buildHourlySalesHM(){
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'var(--text2)',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?f(ctx.raw):fn(ctx.raw)+' ชิ้น'}}},
-      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},y1:{grid:{display:false},position:'right',ticks:{color:'#3d9be0'}}}
+      scales:{x:{grid:grd},y:{grid:grd,ticks:{callback:v=>v+' ชิ้น'}},y1:{grid:{display:false},position:'right',ticks:{color:'#3d9be0'}}}
     }
   });
 }
 
 function buildCatHM(){
-  const cats=Object.keys(CAT_HOUR);
+  // Use CAT_HOUR_QTY (quantity/ชิ้น) when available, else CAT_HOUR (revenue)
+  const _catD=Object.keys(CAT_HOUR_QTY).length>0?CAT_HOUR_QTY:CAT_HOUR;
+  const cats=Object.keys(_catD);
   const hrs=Array.from({length:18},(_,i)=>i+5);
-  const allV=Object.values(CAT_HOUR).flat();const maxV=Math.max(...allV);
+  const allV=Object.values(_catD).flat();const maxV=Math.max(...allV,1);
   let html=`<div style="display:grid;grid-template-columns:100px repeat(18,1fr);gap:2px;margin-bottom:3px">
     <div></div>${hrs.map(h=>`<div class="hm-clbl">${String(h).padStart(2,'0')}</div>`).join('')}</div>`;
   cats.forEach(cat=>{
-    const vals=CAT_HOUR[cat];const catMax=Math.max(...vals);
+    const vals=_catD[cat]||hrs.map(()=>0);const catMax=Math.max(...vals);
     html+=`<div style="display:grid;grid-template-columns:100px repeat(18,1fr);gap:2px;margin-bottom:2px">
       <div class="hm-rlbl" style="font-size:10px;color:${catColors[cat]}">${cat}</div>`;
     vals.forEach((v,ci)=>{
       const t=catMax>0?v/catMax:0;const bg=hmCatColor(cat,t);
-      const d=v>999?Math.round(v/1000)+'K':v>0?Math.round(v):'';
+      const d=v>0?v.toLocaleString():'';
       html+=`<div class="hm-cell" style="background:${bg}" title="${cat} ${String(ci+5).padStart(2,'0')}:00 — ${f(v)}">${d}</div>`;
     });
     html+='</div>';
@@ -2916,14 +2919,14 @@ function buildCatHM(){
       datasets:cats.map(cat=>({label:cat,data:CAT_HOUR[cat],backgroundColor:catColors[cat]+'55',borderColor:catColors[cat],fill:true,tension:.4,borderWidth:1.5}))},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
-      scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
+      scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>v+' ชิ้น'}}}
     }
   });
 
   // Peak hour per category
   const peakEl=document.getElementById('cat-peak-info');
   peakEl.innerHTML=cats.map(cat=>{
-    const vals=CAT_HOUR[cat];const maxV=Math.max(...vals);const peakH=vals.indexOf(maxV)+5;
+    const vals=_catD[cat]||hrs.map(()=>0);const maxV=Math.max(...vals);const peakH=vals.indexOf(maxV)+5;
     const pct=(maxV/vals.reduce((s,v)=>s+v,0)*100).toFixed(1);
     return `<div class="combo-card">
       <div style="width:10px;height:36px;border-radius:3px;background:${catColors[cat]}"></div>
@@ -2976,7 +2979,7 @@ function buildDiscHM(){
       datasets:promoNames.map(n=>({label:n,data:stacked.map(d=>d[n]||0),backgroundColor:getPromoColor(n),borderRadius:3}))},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
-      scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
+      scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>v+' ชิ้น'}}}
     }
   });
 }
@@ -3490,7 +3493,7 @@ function buildQuality(){
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:true,labels:{color:'#e2e8f4',boxWidth:12}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+f(ctx.raw)}}},
-      scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}}}
+      scales:{x:{grid:grd,stacked:true},y:{grid:grd,stacked:true,ticks:{callback:v=>v+' ชิ้น'}}}
     }
   });
   const byName={};
@@ -3754,7 +3757,7 @@ function buildTopBot(){
     type:'bar',indexAxis:'y',
     data:{labels:bot10.map(p=>sn(p.p)),datasets:[{data:bot10.map(p=>p.net),backgroundColor:bot10.map(p=>catColors[p.c]||'#888'),borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>f(ctx.raw)}}},
-      scales:{x:{grid:grd,ticks:{callback:v=>'฿'+Math.round(v/1000)+'K'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+      scales:{x:{grid:grd,ticks:{callback:v=>v+' ชิ้น'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
   const maxT=top10[0]?.net||1,maxB=bot10[0]?.net||1; // BUG2 fixed: maxB = largest in bot10 for normalizing bar width
   document.getElementById('top10-tbody').innerHTML=top10.map((p,i)=>`<tr>
@@ -3923,7 +3926,9 @@ function renderProd(){
 
   // Build total bills in 19-22h window per date
   const windowBillsByDate={};
-  salesRows.forEach(r=>{
+  // Use _productSalesRows for hour/time data (has r.time even with by-date main file)
+  const _rpSrc=(window._productSalesRows&&window._productSalesRows.length>0)?window._productSalesRows:salesRows;
+  _rpSrc.forEach(r=>{
     if(!r.date||!inRange(r.date)) return;
     const h=parseInt((r.time||'00:00').split(':')[0])||0;
     if(h>=19&&h<22){
@@ -3936,7 +3941,7 @@ function renderProd(){
   // (Sushi Bento, Donburi, Dessert, Appetizer ร่วม Flash Sale — Beverage ไม่ร่วม)
   const FLASH_CATS = new Set(['Sushi Bento','Donburi','Dessert','Appetizer']);
 
-  salesRows.forEach(r=>{
+  _rpSrc.forEach(r=>{
     if(!r.date) return;
     if(!inRange(r.date)) return;
     const h=parseInt((r.time||'00:00').split(':')[0])||0;
@@ -5444,7 +5449,7 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[], i
   monthlyRows.forEach(r=>MONTHLY_OVERRIDE.push(r));
   
 
-  const dateMap={},catMap={},hourMap={},prodMap={},catHourMap={};
+  const dateMap={},catMap={},hourMap={},prodMap={},catHourMap={},catHourQtyMap={};
   const dates=new Set();
 
   salesRows.forEach(r=>{
@@ -5472,6 +5477,7 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[], i
   // ── productRows override: use 1p/1p-b for hourly + category analysis ──
   if(productRows&&productRows.length>0){
     Object.keys(catHourMap).forEach(k=>delete catHourMap[k]);
+    Object.keys(catHourQtyMap).forEach(k=>delete catHourQtyMap[k]);
     Object.keys(hourMap).forEach(k=>delete hourMap[k]);
     Object.keys(catMap).forEach(k=>delete catMap[k]);
     Object.keys(prodMap).forEach(k=>delete prodMap[k]);
@@ -5482,7 +5488,7 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[], i
       const _rc=r.cat&&r.cat.trim();if(_rc){if(!catMap[_rc])catMap[_rc]={net:0,qty:0};catMap[_rc].net+=r.net;catMap[_rc].qty+=r.qty;}
       if(!hourMap[h])hourMap[h]={net:0,qty:0};hourMap[h].net+=r.net;hourMap[h].qty+=r.qty;
       const _rp=r.prod&&r.prod.trim();if(_rp){if(!prodMap[_rp])prodMap[_rp]={net:0,qty:0,bills:new Set(),cat:r.cat};prodMap[_rp].net+=r.net;prodMap[_rp].qty+=r.qty;prodMap[_rp].bills.add(r.doc);}
-      if(_rc){if(!catHourMap[_rc])catHourMap[_rc]={};catHourMap[_rc][h]=(catHourMap[_rc][h]||0)+r.net;}
+      if(_rc){if(!catHourMap[_rc])catHourMap[_rc]={};catHourMap[_rc][h]=(catHourMap[_rc][h]||0)+r.net;if(!catHourQtyMap[_rc])catHourQtyMap[_rc]={};catHourQtyMap[_rc][h]=(catHourQtyMap[_rc][h]||0)+(r.qty||0);}
     });
   }
 
@@ -5578,14 +5584,20 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[], i
   // Use whichever cat list was built above
   const activeCats=newCATS.map(c=>c.cat);
   const newCAT_HOUR={};
-  activeCats.forEach(cat=>{newCAT_HOUR[cat]=hrs.map(h=>catHourMap[cat]?.[h]||0);});
+  const newCAT_HOUR_QTY={};
+  activeCats.forEach(cat=>{
+    newCAT_HOUR[cat]=hrs.map(h=>catHourMap[cat]?.[h]||0);
+    newCAT_HOUR_QTY[cat]=hrs.map(h=>catHourQtyMap[cat]?.[h]||0);
+  });
 
   const newHM={};
+  // Use productRows (1p/1p-b) for hourly heatmap — they have r.time; by-date rows don't
+  const _hmRows=(productRows&&productRows.length>0)?productRows:salesRows;
   sortedDates.forEach(d=>{
     const key=d.substring(0,5);
     newHM[key]=hrs.map(h=>{
       let v=0;
-      salesRows.filter(r=>r.date===d&&(parseInt((r.time||'00').split(':')[0])||0)===h).forEach(r=>v+=r.net);
+      _hmRows.filter(r=>normDate(r.date)===d&&(parseInt((r.time||'00').split(':')[0])||0)===h).forEach(r=>v+=r.net);
       return v;
     });
   });
@@ -5598,7 +5610,7 @@ function rebuildDashboard(salesRows, promoRows, monthlyRows=[], cancelRows=[], i
   CATS.length=0;   newCATS.forEach(c=>CATS.push(c));
   HOURS.length=0;  newHOURS.forEach(h=>HOURS.push(h));
   PRODUCTS.length=0; newPRODS.forEach(p=>PRODUCTS.push(p));
-  Object.keys(CAT_HOUR).forEach(k=>delete CAT_HOUR[k]); Object.assign(CAT_HOUR,newCAT_HOUR);
+  Object.keys(CAT_HOUR).forEach(k=>delete CAT_HOUR[k]); Object.assign(CAT_HOUR,newCAT_HOUR); Object.keys(CAT_HOUR_QTY).forEach(k=>delete CAT_HOUR_QTY[k]); Object.assign(CAT_HOUR_QTY,newCAT_HOUR_QTY);
   Object.keys(HM_SALES).forEach(k=>delete HM_SALES[k]); Object.assign(HM_SALES,newHM);
   PROMO_DATA.length=0; promoRows.forEach(p=>PROMO_DATA.push(p));
 
@@ -5804,7 +5816,9 @@ function buildTrial(){
   }
 
   // Filter salesRows for trial products
-  const trialRows=salesRows.filter(r=>matchTrial(r.prod).length>0);
+  // Use _productSalesRows when available — has r.prod for by-date main files
+  const _trialSrc=(window._productSalesRows&&window._productSalesRows.length>0)?window._productSalesRows:salesRows;
+  const trialRows=_trialSrc.filter(r=>r.prod&&matchTrial(r.prod).length>0);
 
   if(trialRows.length===0){
     document.getElementById("trial-kpis").innerHTML=
@@ -6600,7 +6614,10 @@ function computePPI(){
   // }
   const prodMap = {};
 
-  salesRows.forEach(r => {
+  // Use _productSalesRows (1p/1p-b) when available — has r.prod for by-date main file
+  const _ppiSalesRows=(window._productSalesRows&&window._productSalesRows.length>0)
+    ?window._productSalesRows:salesRows;
+  _ppiSalesRows.forEach(r => {
     if(!r.prod || !r.date) return;
     const key  = r.prod.includes('/') ? r.prod.split('/').slice(1).join('/').trim() : r.prod;
     const h    = parseInt((r.time||'00:00').split(':')[0])||0;
